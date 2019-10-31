@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>5235e7fa-8c10-40e2-a6e4-3b9e43d0ad9e</ProjectGuid>
+    <ProjectGuid>{5235E7FA-8C10-40E2-A6E4-3B9E43D0AD9E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>mediatekaLib</RootNamespace>
@@ -31,24 +31,36 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="BaseClasses\MetaInfoBase.cs" />
+    <Compile Include="DataTypes\EnumFileCategory.cs" />
+    <Compile Include="Interfaces\IDurationable.cs" />
+    <Compile Include="Interfaces\IElement.cs" />
+    <Compile Include="Interfaces\IMediaList.cs" />
+    <Compile Include="Interfaces\IMediaStreamable.cs" />
+    <Compile Include="Interfaces\IPlayable.cs" />
+    <Compile Include="Models\MediaFileModel.cs" />
+    <Compile Include="Models\MediaRegistryModel.cs" />
+    <Compile Include="Models\FileInfoModel.cs" />
+    <Compile Include="Models\MetaInfoAudioModel.cs" />
+    <Compile Include="Models\MetaInfoGraphicModel.cs" />
+    <Compile Include="Models\MetaInfoModel.cs" />
+    <Compile Include="Models\MetaInfoVideoModel.cs" />
+    <Compile Include="Models\PlayList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="mediatecaDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>
