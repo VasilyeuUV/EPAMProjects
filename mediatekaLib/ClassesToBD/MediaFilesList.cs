@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace mediatekaLib.Models
+namespace mediatekaLib.ClassesToBD
 {
 
     /// <summary>
     /// All media files (1)
     /// </summary>
-    internal class MediaRegistryModel
+    public static class MediaFilesList
     {
 
 
@@ -16,7 +16,7 @@ namespace mediatekaLib.Models
         /// <summary>
         /// Registry mediafiles 
         /// </summary>
-        public SortedSet<MediaFileModel> Items
+        public static Dictionary<string, MediaFile> Items
         {
             get
             {
@@ -26,13 +26,23 @@ namespace mediatekaLib.Models
             {
                 if (Items == null)
                 {
-                    Items = new SortedSet<MediaFileModel>(/*new ByFileId()*/);          // создаем с сортировкой по Id медиафайла
+                    Items = new Dictionary<string, MediaFile>();          // string - Id
                 }
             }
         }
 
 
         #endregion // PROPERTIES      
+
+
+        #region METHODS
+        //##########################################################################################################################################
+
+
+        // добавление, удаление, ...
+
+
+        #endregion // METHODS   
 
     }
 }

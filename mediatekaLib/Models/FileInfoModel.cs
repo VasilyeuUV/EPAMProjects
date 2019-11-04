@@ -1,4 +1,5 @@
 ﻿using mediatekaLib.DataTypes;
+using System;
 using System.IO;
 
 namespace mediatekaLib.Models
@@ -23,7 +24,7 @@ namespace mediatekaLib.Models
         /// <summary>
         /// Meta information
         /// </summary>
-        public MetaInfoModel MetaInfo { get; private set; } 
+        public dynamic MetaInfo { get; private set; } 
 
 
 
@@ -37,9 +38,13 @@ namespace mediatekaLib.Models
         public FileInfoModel(string fileName)
         {
             this.FileInfo = new FileInfo(fileName);            
-            this.MetaInfo = new MetaInfoModel(fileName);
-            this.FileCategory = this.MetaInfo.FileCategory;
+            this.MetaInfo = GetMetaInfo(this.FileInfo);
+            this.FileCategory = this.MetaInfo.FileExtention == null
+                                ? DictSupportedTypes.GetFileCategory(this.FileInfo.Extension)
+                                : this.MetaInfo.FileExtention;
+
         }
+
 
 
 
@@ -51,6 +56,27 @@ namespace mediatekaLib.Models
 
         #region METHODS
         //##########################################################################################################################################
+
+
+        /// <summary>
+        /// Get MetaInfo from File
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        private dynamic GetMetaInfo(FileInfo fileInfo)
+        {
+            switch (DictSupportedTypes.GetFileCategory(fileInfo.Extension.ToLower()))
+            {
+                case EnumFileCategory.Audio:
+                    return new MetaInfoAudioModel(fileInfo);
+                case EnumFileCategory.Video:
+                    return new MetaInfoVideoModel(fileInfo);
+                case EnumFileCategory.Graphic:
+                    return new MetaInfoGraphicModel(fileInfo);
+                default:
+                    return null;
+            }
+        }
 
 
 

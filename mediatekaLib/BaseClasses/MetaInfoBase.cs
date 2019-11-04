@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using mediatekaLib.DataTypes;
 
 namespace mediatekaLib.BaseClasses
 {
@@ -23,10 +19,12 @@ namespace mediatekaLib.BaseClasses
         public string License { get; protected set; }
 
         /// <summary>
-        /// 
+        /// The mediafile Genre (жанр)
         /// </summary>
         public string Genre { get; protected set; }
 
+
+        public EnumFileCategory FileExtention { get; protected set; }
 
         #endregion // PROPERTIES
 
@@ -35,7 +33,6 @@ namespace mediatekaLib.BaseClasses
 
         #region CTOR
         //##########################################################################################################################################
-
 
 
         #endregion // CTOR
@@ -47,6 +44,7 @@ namespace mediatekaLib.BaseClasses
 
         #region METHODS
         //##########################################################################################################################################
+
 
 
 

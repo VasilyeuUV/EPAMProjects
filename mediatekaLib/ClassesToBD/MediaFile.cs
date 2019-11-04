@@ -1,65 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
 using mediatekaLib.Interfaces;
 
-namespace mediatekaLib.Models
+namespace mediatekaLib.ClassesToBD
 {
-    public class PlayList : IMediaList
+    /// <summary>
+    /// Get file information from JSON
+    /// </summary>
+    public sealed class MediaFile : IElement
     {
+
         #region PROPERTIES
         //##########################################################################################################################################
 
         /// <summary>
-        /// PlayList Id
+        /// File Id
         /// </summary>
         public Guid Id { get; private set; }
 
 
         /// <summary>
-        /// PlayList Name
+        /// File name
         /// </summary>
-        public string Name { get; set; } = "Default PlayList";
+        public string Name { get; set; }
 
 
         /// <summary>
-        /// Collection MediaFileModel Id
+        /// File path
         /// </summary>
-        public ICollection<IElement> Items { get; private set; }
-
+        public string FullName { get; private set; }
 
         #endregion // PROPERTIES
+
+
 
 
         #region CTOR
         //##########################################################################################################################################
 
-        public PlayList() : this("Default PlayList") { }
-        public PlayList(string name)
+        public MediaFile(Guid id, string name, string fullName)
         {
+            this.Id = id;
             this.Name = name;
-            this.Id = Guid.NewGuid();
-            this.Items = new List<IElement>();
+            this.FullName = fullName;
         }
 
         #endregion // CTOR
+
+
+
 
 
         #region METHODS
         //##########################################################################################################################################
 
 
+
         #endregion // METHODS
-
-
-
-
-
-
-
-
-
-
-
 
 
     }

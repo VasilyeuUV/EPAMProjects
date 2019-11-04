@@ -42,25 +42,38 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseClasses\MetaInfoBase.cs" />
+    <Compile Include="DataTypes\DictSupportedTypes.cs" />
     <Compile Include="DataTypes\EnumFileCategory.cs" />
-    <Compile Include="Interfaces\IDurationable.cs" />
     <Compile Include="Interfaces\IElement.cs" />
     <Compile Include="Interfaces\IMediaList.cs" />
     <Compile Include="Interfaces\IMediaStreamable.cs" />
+    <Compile Include="Interfaces\IMetaInfoAudio.cs" />
+    <Compile Include="Interfaces\IMetaInfoGeneral.cs" />
+    <Compile Include="Interfaces\IMetaInfoGraphic.cs" />
+    <Compile Include="Interfaces\IMetaInfoVideo.cs" />
     <Compile Include="Interfaces\IPlayable.cs" />
+    <Compile Include="ClassesToBD\MediaFile.cs" />
+    <Compile Include="ClassesToBD\MediaPlayLists.cs" />
+    <Compile Include="Interfaces\IViewable.cs" />
     <Compile Include="Models\MediaFileModel.cs" />
-    <Compile Include="Models\MediaRegistryModel.cs" />
+    <Compile Include="ClassesToBD\MediaFilesList.cs" />
+    <Compile Include="Models\AviMetaInfoModel.cs" />
     <Compile Include="Models\FileInfoModel.cs" />
+    <Compile Include="Models\JPGMetaInfoModel.cs" />
     <Compile Include="Models\MetaInfoAudioModel.cs" />
     <Compile Include="Models\MetaInfoGraphicModel.cs" />
     <Compile Include="Models\MetaInfoModel.cs" />
     <Compile Include="Models\MetaInfoVideoModel.cs" />
-    <Compile Include="Models\PlayList.cs" />
+    <Compile Include="ClassesToBD\PlayList.cs" />
+    <Compile Include="Models\MP3MetaInfoModel.cs" />
+    <Compile Include="Models\PlayListModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mediatecaDiagram.cd" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,5 +1,7 @@
 ﻿using mediatekaLib.Interfaces;
+using mediatekaLib.Models;
 using System;
+using System.IO;
 
 namespace mediatekaLib.Models
 {
@@ -62,19 +64,6 @@ namespace mediatekaLib.Models
         }
 
 
-        /// <summary>
-        /// for parse JSON file
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        /// <param name="fullName"></param>
-        public MediaFileModel(string id, string name, string fullName)
-        {
-            this.Id = new Guid(id);
-            this.Name = name;
-            this.FullName = fullName;
-            this.File = new FileInfoModel(fullName);
-        }
 
 
 
@@ -87,7 +76,6 @@ namespace mediatekaLib.Models
 
         #region METHODS
         //##########################################################################################################################################
-
 
 
         #endregion // METHODS

@@ -1,29 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="mediatekaLib.Models.PlayList">
-    <Position X="9.25" Y="0.5" Width="1.5" />
+  <Class Name="mediatekaLib.ClassesToBD.PlayList">
+    <Position X="6.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\PlayList.cs</FileName>
+      <FileName>ClassesToBD\PlayList.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="mediatekaLib.Models.MediaRegistryModel">
-    <Position X="7.25" Y="0.5" Width="1.75" />
+  <Class Name="mediatekaLib.ClassesToBD.MediaFilesList">
+    <Position X="4.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\MediaRegistryModel.cs</FileName>
+      <FileName>ClassesToBD\MediaFilesList.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="mediatekaLib.Models.FileInfoModel">
-    <Position X="5.5" Y="2.75" Width="1.5" />
+    <Position X="9.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAEAAAAAgAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAEAAAAAiAAA=</HashCode>
       <FileName>Models\FileInfoModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="mediatekaLib.Models.MediaFileModel">
-    <Position X="5.5" Y="0.5" Width="1.5" />
+    <Position X="9.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAIAAAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\MediaFileModel.cs</FileName>
@@ -31,49 +31,113 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="mediatekaLib.BaseClasses.MetaInfoBase">
-    <Position X="5.5" Y="5" Width="1.5" />
+    <Position X="9.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAACAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <HashCode>AAAAAAKAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
       <FileName>BaseClasses\MetaInfoBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="mediatekaLib.Models.MetaInfoAudioModel">
-    <Position X="5.5" Y="7" Width="1.5" />
+    <Position X="7.5" Y="7.25" Width="1.5" />
+    <InheritanceLine Type="mediatekaLib.BaseClasses.MetaInfoBase" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="10" Y="6.68" />
+        <Point X="10" Y="6.95" />
+        <Point X="8.188" Y="6.95" />
+        <Point X="8.188" Y="7.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Models\MetaInfoAudioModel.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="mediatekaLib.Models.MetaInfoGraphicModel">
-    <Position X="7.25" Y="7" Width="1.5" />
+    <Position X="9.25" Y="7.25" Width="1.5" />
+    <InheritanceLine Type="mediatekaLib.BaseClasses.MetaInfoBase" FixedToPoint="true">
+      <Path>
+        <Point X="10" Y="6.68" />
+        <Point X="10" Y="7.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\MetaInfoGraphicModel.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="mediatekaLib.Models.MetaInfoVideoModel">
-    <Position X="3.75" Y="7" Width="1.5" />
+    <Position X="11" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Models\MetaInfoVideoModel.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="mediatekaLib.Interfaces.IDurationable">
-    <Position X="0.5" Y="6" Width="1.5" />
+  <Class Name="mediatekaLib.DataTypes.DictSupportedTypes">
+    <Position X="2.25" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces\IDurationable.cs</FileName>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>DataTypes\DictSupportedTypes.cs</FileName>
     </TypeIdentifier>
-  </Interface>
+  </Class>
+  <Class Name="mediatekaLib.ClassesToBD.MediaPlayLists">
+    <Position X="6.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ClassesToBD\MediaPlayLists.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="mediatekaLib.ClassesToBD.MediaFile">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAIAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ClassesToBD\MediaFile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="mediatekaLib.Models.AviMetaInfoModel">
+    <Position X="11" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAIAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\AviMetaInfoModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="mediatekaLib.Models.JPGMetaInfoModel">
+    <Position X="9.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAIAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\JPGMetaInfoModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="mediatekaLib.Models.MP3MetaInfoModel">
+    <Position X="7.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAIAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\MP3MetaInfoModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="mediatekaLib.Models.PlayListModel">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAEAAAAAgAAAAAAAAAQAAAAAAAEAIAAAAAAAAAA=</HashCode>
+      <FileName>Models\PlayListModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
   <Interface Name="mediatekaLib.Interfaces.IMediaStreamable">
-    <Position X="2.5" Y="4.75" Width="1.5" />
+    <Position X="0.5" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Interfaces\IMediaStreamable.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="mediatekaLib.Interfaces.IPlayable">
-    <Position X="0.5" Y="4.75" Width="1.5" />
+    <Position X="0.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Interfaces\IPlayable.cs</FileName>
@@ -99,8 +163,43 @@
       <FileName>Interfaces\IMediaList.cs</FileName>
     </TypeIdentifier>
   </Interface>
+  <Interface Name="mediatekaLib.Interfaces.IMetaInfoAudio" Collapsed="true">
+    <Position X="0.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IMetaInfoAudio.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="mediatekaLib.Interfaces.IMetaInfoGeneral">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAIAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IMetaInfoGeneral.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="mediatekaLib.Interfaces.IMetaInfoGraphic" Collapsed="true">
+    <Position X="2.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IMetaInfoGraphic.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="mediatekaLib.Interfaces.IMetaInfoVideo" Collapsed="true">
+    <Position X="4" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IMetaInfoVideo.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="mediatekaLib.Interfaces.IViewable">
+    <Position X="0.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IViewable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
   <Enum Name="mediatekaLib.DataTypes.EnumFileCategory">
-    <Position X="3.75" Y="0.5" Width="1.5" />
+    <Position X="2.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>BAAQAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
       <FileName>DataTypes\EnumFileCategory.cs</FileName>
