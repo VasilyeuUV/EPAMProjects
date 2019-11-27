@@ -33,35 +33,15 @@ namespace Task2.Menu
 
             //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
 
-            Console.WriteLine("АБЗАЦЫ:");
-            foreach (var item in _textModel.Paragraphs)
+            if (_textModel == null || _textModel.Paragraphs == null 
+                                   || _textModel.Paragraphs.Count() < 1)
             {
-                Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+                MenuManager.WaitForContinue("При обработке текста возникли ошибки. Текст не обработан.");
+                return;
             }
-            Console.WriteLine();
-                       
-            Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
-            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
-            {
-                item.ToList()
-                    .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
-            }
-            Console.WriteLine();
 
-            Console.WriteLine("СЛОВА:");
-            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
-            {
-                item.Select(s => s).ToList()
-                    .ForEach(s => s.Words.Select(w => w).ToList()
-                                    .ForEach(w => Console.WriteLine(string.Format("{0}:{1}:{2} - {3}", w.ParagraphNumber
-                                                                                                     , w.SentenseNumber
-                                                                                                     , w.Number
-                                                                                                     , w.Content))));
-            }
-            Console.WriteLine();
-
-            MenuManager.WaitForContinue();
-
+            MenuManager.WaitForContinue("Текст обработан успешно");
+            DisplayOperationMenu();
         }
 
 
@@ -86,8 +66,8 @@ namespace Task2.Menu
         /// </summary>
         internal static void DisplayCreateMenu()
         {
-            string operation = "СФОРМИРОВАТЬ КОНКОРДАНС";
-            string[] items = { "Из файла", "Назад" };
+            string operation = "ИСХОДНЫЕ ДАННЫЕ:";
+            string[] items = { "Выбрать файл для обработки", "Назад" };
             MenuManager.method[] methods = new MenuManager.method[] { FileDialog, Back };
             MenuManager.SelectMenuItem(operation, items, methods);
         }
@@ -116,7 +96,7 @@ namespace Task2.Menu
             }
             catch (Exception e)
             {
-                MenuManager.WaitForContinue("Ошибка открытия файла.");
+                MenuManager.WaitForContinue(string.Format("Ошибка открытия файла:\n" + e.Message));
                 return;
             }
 
@@ -144,11 +124,47 @@ namespace Task2.Menu
         /// </summary>
         private static void DisplayOperationMenu()
         {
-            string operation = "РАБОТА С КОНКОРДАНСОМ";
-            string[] items = { "Показать Конкорданс", "Назад" };
-            MenuManager.method[] methods = new MenuManager.method[] { ViewConcordance, Back };
+            string operation = "ОПЕРАЦИИ:";
+            string[] items = { "Структура текста","Показать Конкорданс", "Назад" };
+            MenuManager.method[] methods = new MenuManager.method[] { ViewTextModel, ViewConcordance, Back };
             MenuManager.SelectMenuItem(operation, items, methods);
         }
+
+        /// <summary>
+        /// View Text structure
+        /// </summary>
+        private static void ViewTextModel()
+        {
+            Console.WriteLine("АБЗАЦЫ:");
+            foreach (var item in _textModel.Paragraphs)
+            {
+                Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
+            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            {
+                item.ToList()
+                    .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("СЛОВА:");
+            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            {
+                item.Select(s => s).ToList()
+                    .ForEach(s => s.Words.Select(w => w).ToList()
+                                    .ForEach(w => Console.WriteLine(string.Format("{0}:{1}:{2} - {3}", w.ParagraphNumber
+                                                                                                     , w.SentenseNumber
+                                                                                                     , w.Number
+                                                                                                     , w.Content))));
+            }
+            Console.WriteLine();
+            MenuManager.WaitForContinue();
+        }
+
+
 
         private static void ViewConcordance()
         {
