@@ -10,5 +10,12 @@ namespace Task2.Models
     class ParagraphModel : IContentable
     {
         public string Content => throw new NotImplementedException();
+
+        internal static ParagraphModel NewInstance(string x, int v)
+        {
+
+
+            return null;
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Task2.Models;
 using Task2.Tools;
 
 namespace Task2.Menu
@@ -28,14 +29,13 @@ namespace Task2.Menu
             }
 
             fileContent = TextHandler.OptimizeText(fileContent);
+            _textModel = TextModel.NewInstance(fileContent);
 
 
 
 
-
-
-
-
+            //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
+            
 
             /*
 

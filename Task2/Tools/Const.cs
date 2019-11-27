@@ -37,6 +37,17 @@ namespace Task2.Tools
                 [PageParameter.CharsLineCount] = 65,
             };
 
+        /// <summary>
+        /// A4 default page standart
+        /// </summary>
+        internal static IReadOnlyDictionary<PageParameter, int> Page_A5 { get; }
+            = new Dictionary<PageParameter, int>()
+            {
+                [PageParameter.LinesPageCount] = 14,
+                [PageParameter.CharsLineCount] = 32,
+            };
+
+
         #endregion
 
 
