@@ -34,25 +34,23 @@ namespace Task2.Menu
             //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
 
             Console.WriteLine("АБЗАЦЫ:");
-            foreach (var item in _textModel.Paragraphs)
+            _textModel.Paragraphs.Select(p => p)
+                                 .ToList()
+                                 .ForEach(p => Console.WriteLine(string.Format("{0} - {1}", p.Number, p.Content)));
+            //foreach (var item in _textModel.Paragraphs)
+            //{
+            //    Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+            //}
+            Console.WriteLine();
+                       
+            Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
+            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
             {
-                Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+                item.Select(p => p)
+                    .ToList()
+                    .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
             }
             Console.WriteLine();
-
-            //Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
-            
-            //_textModel.Paragraphs.
-
-
-            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
-            //{
-            //    item.Fo
-
-            //    var sentence = item.Select(s => s);
-            //    Console.WriteLine(string.Format("{0} - {1}", sentence.Select(s => s.Number), sentence.Select(s => s.Content)));
-            //}
-            //Console.WriteLine();
 
 
             //list.ForEach(x => Console.WriteLine(x));

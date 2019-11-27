@@ -57,11 +57,31 @@ namespace Task2.Models
         private IEnumerable<SentenceModel> GetSentences(string paragraph)
         {
             if (string.IsNullOrWhiteSpace(paragraph)) { return null; }
-            
-            return Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
-                        .Where(s => s.Trim().Length > 1)
-                        .Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
+
+            string[] arrTmp = Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
+                                   .Where(s => s.Trim().Length > 0)
+                                   .ToArray();
+            if (arrTmp == null || arrTmp.Length < 1) { return null; }
+
+
+            List<string> result = new List<string>();
+            if (arrTmp.Length < 2) { result = arrTmp.ToList(); }
+            else
+            {
+                for (int i = 1; i < arrTmp.Length; i += 2)
+                {
+                    result.Add(arrTmp[i - 1] + arrTmp[i]);
+                }
+            }
+            if (arrTmp.Length % 2 > 0) { result.Add(arrTmp[arrTmp.Length - 1]); }
+
+            return result.Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
                         .ToList();
+
+            //return Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
+            //            .Where(s => s.Trim().Length > 1)
+            //            .Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
+            //            .ToList();
         }
 
     }
