@@ -31,61 +31,43 @@ namespace Task2.Menu
             fileContent = TextHandler.OptimizeText(fileContent);
             _textModel = TextModel.NewInstance(fileContent);
 
-
-
-
             //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
+
+            Console.WriteLine("АБЗАЦЫ:");
+            foreach (var item in _textModel.Paragraphs)
+            {
+                Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+            }
+            Console.WriteLine();
+
+            //Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
             
-
-            /*
-
-            IEnumerable<string> uniqueWords = await TextHandler.GetUnique    Task.Run(() => TextHandler.OptimizeWords(wordsContent)).Result.OrderByDescending(x => x.Length);
+            //_textModel.Paragraphs.
 
 
+            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            //{
+            //    item.Fo
+
+            //    var sentence = item.Select(s => s);
+            //    Console.WriteLine(string.Format("{0} - {1}", sentence.Select(s => s.Number), sentence.Select(s => s.Content)));
+            //}
+            //Console.WriteLine();
 
 
+            //list.ForEach(x => Console.WriteLine(x));
 
 
+            //Console.WriteLine("СЛОВА:");
+            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences.Select(s => s.Words)))
+            //{
+            //    var word = item.Select(p => p.Select(w => w));
+            //    Console.WriteLine(string.Format("{0} - {1}", word.  Select(w => w.  Number)), 
+            //                                                 item.Select(p => p.Content)));
+            //}
+            //Console.WriteLine();
 
-
-
-            IEnumerable<string> wordsContent = await TextHandler.SplitToWords(fileContent)
-
-            IEnumerable<string> uniqueWords = Task.Run(() => TextHandler.OptimizeWords(wordsContent)).Result.OrderByDescending(x => x.Length);
-
-
-            foreach (var item in uniqueWords)
-            {
-                fileContent = Regex.Replace(fileContent, item, "1", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            }
-            var result = fileContent.ToCharArray().Select(c => c.ToString()).ToList();
-
-
-            var tmp = wordsContent.ToArray();
-            int nWord = -1;
-            for (int i = 0; i < result.Count - 1; i++)
-            {
-                if (result[i] == "1")
-                {
-                    result[i] = tmp[++nWord];
-                }
-            }
-
-            */
-
-
-            //wordsContent.AsParallel()
-            //            .ForAll(w =>
-            //            {
-
-            //            });
-
-
-
-
-
-
-            MenuManager.WaitForContinue(fileContent);
+            MenuManager.WaitForContinue();
 
         }
 

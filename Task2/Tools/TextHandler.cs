@@ -111,7 +111,7 @@ namespace Task2.Tools
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private static string GetWordContent(string item)
+        internal static string GetWordContent(string item)
         {
             if (string.IsNullOrWhiteSpace(item)) { return string.Empty; }
 
