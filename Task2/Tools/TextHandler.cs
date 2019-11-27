@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Task2.Tools
 {
@@ -33,6 +35,45 @@ namespace Task2.Tools
 
 
 
+        #region TEXT_PARSER
+        //##############################################################################################################################
+
+
+        /// <summary>
+        /// Get Words from text
+        /// </summary>
+        /// <param name="text">text content</param>
+        /// <returns>string list words</returns>
+        internal static async Task<IEnumerable<string>> ParseTextToWordsAsync(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) { return null; }
+
+            List<string> words = await Task.Run(() => 
+                                 Regex.Split(text, Const.WORD_DELIMITER)
+                                      .Where(s => (s = s.Trim()) != string.Empty)
+                                      .ToList());
+
+            var result = new List<string>();
+            words.AsParallel()
+                .ForAll(w =>
+                {
+                    w = GetWordContent(w);
+                    if (!string.IsNullOrWhiteSpace(w.Trim()))
+                    {
+                        // capital letter
+                        w = IsUpperCase(w) ? w
+                                           : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
+                        result.Add(w);
+                    }
+                });
+
+            return result.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x);
+        }
+
+
+        #endregion // TEXT_PARSER
+
+
 
 
         #region PUNCTUATION
@@ -45,7 +86,7 @@ namespace Task2.Tools
         /// <returns>optimize text</returns>
         internal static string OptimizePunctuation(string value)
         {
-            if (String.IsNullOrWhiteSpace(value)) { return String.Empty; }
+            if (string.IsNullOrWhiteSpace(value)) { return string.Empty; }
 
             var regPattern = string.Empty;
             string strTmp = value.Trim();
@@ -60,8 +101,57 @@ namespace Task2.Tools
         }
 
 
+        /// <summary>
+        /// Delete non-alphanumeric characters at the beginning and end of a line (TEMPORARY VARIANT)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private static string GetWordContent(string item)
+        {
+            if (string.IsNullOrWhiteSpace(item)) { return string.Empty; }
+
+            Regex reg = new Regex("[^a-zA-Zа-яА-ЯёЁ0-9]+$");    
+            var result = reg.Replace(item, "");
+            reg = new Regex("^[^a-zA-Zа-яА-ЯёЁ0-9]+");
+            result = reg.Replace(result, "");
+            return result;
+        }
+
+
+
         #endregion
 
+
+
+        #region CHECK
+        //##############################################################################################################################
+
+        /// <summary>
+        /// Check list to empty
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="lst"></param>
+        /// <returns></returns>
+        internal static bool IsEmpty<T>(IEnumerable<T> lst)
+        {
+            return (lst == null || lst.Count() < 1) ? true : false;
+        }
+
+
+        /// <summary>
+        /// Check word to UpperCase
+        /// </summary>
+        /// <param name="str">string content</param>
+        /// <returns>formatted string</returns>
+        internal static bool IsUpperCase(string str)
+        {
+            if (string.IsNullOrWhiteSpace(str)) { return false; }
+            if (str.Length < 2) { return false; }
+            if (str.ToUpper() == str) { return true; }
+            return false;
+        }
+
+        #endregion
 
 
     }

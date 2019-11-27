@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Task2.Tools;
@@ -24,6 +25,7 @@ namespace Task2.Menu
             }
 
             fileContent = TextHandler.OptimizeText(fileContent);
+            IEnumerable<string> words = TextHandler.ParseTextToWordsAsync(fileContent).Result;
 
             MenuManager.WaitForContinue(fileContent);
 
