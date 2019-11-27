@@ -155,10 +155,15 @@ namespace Task2.Menu
             {
                 item.Select(s => s).ToList()
                     .ForEach(s => s.Words.Select(w => w).ToList()
-                                    .ForEach(w => Console.WriteLine(string.Format("{0}:{1}:{2} - {3}", w.ParagraphNumber
-                                                                                                     , w.SentenseNumber
-                                                                                                     , w.Number
-                                                                                                     , w.Content))));
+                                    .ForEach(w => {
+                                        Console.Write(string.Format("{0}:{1}:{2} - {3, -22}\t:", w.ParagraphNumber
+                                                                                               , w.SentenseNumber
+                                                                                               , w.Number
+                                                                                               , w.Content));
+                                        w.WordParts.Select(wp => wp).ToList()
+                                                   .ForEach(x => Console.Write(string.Format("\t{0, -20}", x)));
+                                        Console.WriteLine();
+                                    }));
             }
             Console.WriteLine();
             MenuManager.WaitForContinue();
