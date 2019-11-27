@@ -8,8 +8,12 @@ namespace Task2
 {
     class Program
     {
+        delegate void method();
+
+        [STAThread]
         static void Main(string[] args)
         {
+            MenuManager.DisplayMainMenu();
         }
     }
 }
