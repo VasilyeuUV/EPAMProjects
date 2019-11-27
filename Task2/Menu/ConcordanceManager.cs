@@ -12,7 +12,7 @@ namespace Task2.Menu
     public static class ConcordanceManager
     {
         private static string _originalFilePath = string.Empty;
-
+        private static TextModel _textModel = null;
 
 
         /// <summary>

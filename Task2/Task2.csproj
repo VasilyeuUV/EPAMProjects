@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IContentable.cs" />
     <Compile Include="Menu\ConcordanceManager.cs" />
     <Compile Include="Menu\ConsoleMenu.cs" />
     <Compile Include="Menu\MenuManager.cs" />
