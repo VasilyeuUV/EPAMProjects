@@ -9,6 +9,7 @@ namespace Task2.Tools
     {
 
         #region TEXT_CONVERTERS
+        //##############################################################################################################################
 
         /// <summary>
         /// Converts text to standard form
@@ -51,6 +52,8 @@ namespace Task2.Tools
             foreach (var item in Const.PUNCTUATION_MARKS)
             {
                 regPattern = @"\s+" + Regex.Escape(item.ToString()) + @"\s+";
+                strTmp = Regex.Replace(strTmp, regPattern.ToString(), item.ToString() + " ").Trim();
+                regPattern = @"\s+" + Regex.Escape(item.ToString()) + @"\s*$";
                 strTmp = Regex.Replace(strTmp, regPattern.ToString(), item.ToString() + " ").Trim();
             }
             return strTmp;

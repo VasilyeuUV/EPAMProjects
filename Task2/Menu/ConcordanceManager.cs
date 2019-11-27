@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Linq;
+using Task2.Tools;
 
 namespace Task2.Menu
 {
@@ -23,8 +23,9 @@ namespace Task2.Menu
                 return;
             }
 
-            fileContent = 
+            fileContent = TextHandler.OptimizeText(fileContent);
 
+            MenuManager.WaitForContinue(fileContent);
 
         }
 
@@ -116,7 +117,7 @@ namespace Task2.Menu
 
         private static void ViewConcordance()
         {
-            Console.WriteLine("Показ конкорданса:");
+            MenuManager.WaitForContinue("Показ конкорданса.");
         }
 
 
