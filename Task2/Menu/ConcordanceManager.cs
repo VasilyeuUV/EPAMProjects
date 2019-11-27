@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Task2.Tools;
 
 namespace Task2.Menu
@@ -16,7 +19,7 @@ namespace Task2.Menu
         /// Work Process
         /// </summary>
         /// <param name="fileContent"></param>
-        private static void DoWork(string fileContent)
+        private static async void DoWorkAsync(string fileContent)
         {
             if (string.IsNullOrWhiteSpace(fileContent))
             {
@@ -25,7 +28,62 @@ namespace Task2.Menu
             }
 
             fileContent = TextHandler.OptimizeText(fileContent);
-            IEnumerable<string> words = TextHandler.ParseTextToWordsAsync(fileContent).Result;
+
+
+
+
+
+
+
+
+
+            /*
+
+            IEnumerable<string> uniqueWords = await TextHandler.GetUnique    Task.Run(() => TextHandler.OptimizeWords(wordsContent)).Result.OrderByDescending(x => x.Length);
+
+
+
+
+
+
+
+
+
+            IEnumerable<string> wordsContent = await TextHandler.SplitToWords(fileContent)
+
+            IEnumerable<string> uniqueWords = Task.Run(() => TextHandler.OptimizeWords(wordsContent)).Result.OrderByDescending(x => x.Length);
+
+
+            foreach (var item in uniqueWords)
+            {
+                fileContent = Regex.Replace(fileContent, item, "1", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            }
+            var result = fileContent.ToCharArray().Select(c => c.ToString()).ToList();
+
+
+            var tmp = wordsContent.ToArray();
+            int nWord = -1;
+            for (int i = 0; i < result.Count - 1; i++)
+            {
+                if (result[i] == "1")
+                {
+                    result[i] = tmp[++nWord];
+                }
+            }
+
+            */
+
+
+            //wordsContent.AsParallel()
+            //            .ForAll(w =>
+            //            {
+
+            //            });
+
+
+
+
+
 
             MenuManager.WaitForContinue(fileContent);
 
@@ -92,7 +150,7 @@ namespace Task2.Menu
                 FileStream fs = fileStream as FileStream;
                 _originalFilePath = fs == null ? string.Empty : fs.Name;  //Get the path of opened file
                 string fileContent = ReadFile(fileStream);
-                DoWork(fileContent);
+                DoWorkAsync(fileContent);
             }            
         }
 

@@ -30,29 +30,14 @@ namespace Task2.Tools
             return str.ToString();
         }
 
-        #endregion // TEXT_CONVERTERS
-
-
-
-
-        #region TEXT_PARSER
-        //##############################################################################################################################
-
 
         /// <summary>
-        /// Get Words from text
+        /// Get Words from text (example: World
         /// </summary>
         /// <param name="text">text content</param>
         /// <returns>string list words</returns>
-        internal static async Task<IEnumerable<string>> ParseTextToWordsAsync(string text)
+        internal static IEnumerable<string> OptimizeWords(IEnumerable<string> words)
         {
-            if (string.IsNullOrWhiteSpace(text)) { return null; }
-
-            List<string> words = await Task.Run(() => 
-                                 Regex.Split(text, Const.WORD_DELIMITER)
-                                      .Where(s => (s = s.Trim()) != string.Empty)
-                                      .ToList());
-
             var result = new List<string>();
             words.AsParallel()
                 .ForAll(w =>
@@ -68,6 +53,26 @@ namespace Task2.Tools
                 });
 
             return result.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x);
+        }
+
+
+        #endregion // TEXT_CONVERTERS
+
+
+
+
+        #region TEXT_PARSER
+        //##############################################################################################################################
+
+        /// <summary>
+        /// Split text to word content
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static async Task<List<string>> SplitToWords(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) { return null; }
+            return await Task.Run(() => Regex.Split(text, Const.WORD_DELIMITER).ToList());
         }
 
 
