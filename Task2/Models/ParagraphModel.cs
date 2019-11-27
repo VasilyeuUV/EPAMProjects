@@ -50,7 +50,7 @@ namespace Task2.Models
         }
 
         /// <summary>
-        /// Get paragraph content converted sentences
+        /// Get paragraph content converted to sentences
         /// </summary>
         /// <param name="paragraph">string paragraph content</param>
         /// <returns>list converted sentences</returns>
@@ -60,7 +60,8 @@ namespace Task2.Models
             
             return Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
                         .Where(s => s.Trim().Length > 1)
-                        .Select((x, n) => SentenceModel.NewInstance(this.Number, x, ++n));
+                        .Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
+                        .ToList();
         }
 
     }

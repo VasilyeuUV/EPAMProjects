@@ -52,7 +52,8 @@ namespace Task2.Models
 
             return Regex.Split(fileContent, Const.PARAGRAPH_DELIMITER)
                         .Where(p => p.Trim().Length > 1)
-                        .Select((x, n) => ParagraphModel.NewInstance(x, ++n));
+                        .Select((x, n) => ParagraphModel.NewInstance(x, ++n))
+                        .ToList();
         }
     }
 }
