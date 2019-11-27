@@ -58,28 +58,31 @@ namespace Task2.Models
         {
             if (string.IsNullOrWhiteSpace(paragraph)) { return null; }
 
-            string[] arrTmp = Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
+            var arrTmp = Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
                                    .Where(s => s.Trim().Length > 0)
-                                   .ToArray();
-            if (arrTmp == null || arrTmp.Length < 1) { return null; }
+                                   .ToList();
+            if (arrTmp == null || arrTmp.Count() < 1) { return null; }
 
 
             List<string> result = new List<string>();
-            if (arrTmp.Length < 2) { result = arrTmp.ToList(); }
-            else
+            foreach (var item in arrTmp)
             {
-                for (int i = 1; i < arrTmp.Length; i += 2)
+                if (item.Length == 1 && char.IsPunctuation(item[0]))
                 {
-                    result.Add(arrTmp[i - 1] + arrTmp[i]);
+                    string s = result.Last();
+                    s += item;
+                    result.Remove(result.Last());
+                    result.Add(s);
+                    continue;
                 }
+                result.Add(item);
             }
-            if (arrTmp.Length % 2 > 0) { result.Add(arrTmp[arrTmp.Length - 1]); }
 
             return result.Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
-                        .ToList();
+                         .ToList();
 
             //return Regex.Split(paragraph, Const.SENTENCE_DELIMITER)
-            //            .Where(s => s.Trim().Length > 1)
+            //            .Where(s => s.Trim().Length > 0)
             //            .Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
             //            .ToList();
         }

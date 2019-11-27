@@ -34,36 +34,31 @@ namespace Task2.Menu
             //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
 
             Console.WriteLine("АБЗАЦЫ:");
-            _textModel.Paragraphs.Select(p => p)
-                                 .ToList()
-                                 .ForEach(p => Console.WriteLine(string.Format("{0} - {1}", p.Number, p.Content)));
-            //foreach (var item in _textModel.Paragraphs)
-            //{
-            //    Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
-            //}
+            foreach (var item in _textModel.Paragraphs)
+            {
+                Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+            }
             Console.WriteLine();
                        
             Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
             foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
             {
-                item.Select(p => p)
-                    .ToList()
+                item.ToList()
                     .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
             }
             Console.WriteLine();
 
-
-            //list.ForEach(x => Console.WriteLine(x));
-
-
-            //Console.WriteLine("СЛОВА:");
-            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences.Select(s => s.Words)))
-            //{
-            //    var word = item.Select(p => p.Select(w => w));
-            //    Console.WriteLine(string.Format("{0} - {1}", word.  Select(w => w.  Number)), 
-            //                                                 item.Select(p => p.Content)));
-            //}
-            //Console.WriteLine();
+            Console.WriteLine("СЛОВА:");
+            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            {
+                item.Select(s => s).ToList()
+                    .ForEach(s => s.Words.Select(w => w).ToList()
+                                    .ForEach(w => Console.WriteLine(string.Format("{0}:{1}:{2} - {3}", w.ParagraphNumber
+                                                                                                     , w.SentenseNumber
+                                                                                                     , w.Number
+                                                                                                     , w.Content))));
+            }
+            Console.WriteLine();
 
             MenuManager.WaitForContinue();
 
