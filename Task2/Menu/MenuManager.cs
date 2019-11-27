@@ -10,7 +10,7 @@ namespace Task2.Menu
         {
             string operation = "ВЫБОР ОПЕРАЦИИ";
             string[] items = { "Создать предметный указатель текста", "Выход" };
-            method[] methods = new method[] { ConcordanceManager.ConcordanceDoWork, Back };
+            method[] methods = new method[] { ConcordanceManager.DisplayCreateMenu, Back };
             SelectMenuItem(operation, items, methods);
         }
 
