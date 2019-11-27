@@ -9,13 +9,36 @@ namespace Task2.Menu
     {
         private static string _originalFilePath = string.Empty;
 
+
+
+        /// <summary>
+        /// Work Process
+        /// </summary>
+        /// <param name="fileContent"></param>
+        private static void DoWork(string fileContent)
+        {
+            if (string.IsNullOrWhiteSpace(fileContent))
+            {
+                MenuManager.WaitForContinue("Текст не получен.");
+                return;
+            }
+
+            fileContent = 
+
+
+        }
+
+
+
+
+
+
         /// <summary>
         /// Return to the menu one level higher
         /// </summary>
         private static void Back()
         {
         }
-
 
 
 
@@ -58,9 +81,8 @@ namespace Task2.Menu
             catch (Exception e)
             {
                 MenuManager.WaitForContinue("Ошибка открытия файла.");
+                return;
             }
-
-
 
             if (fileStream != null)
             {
@@ -71,14 +93,7 @@ namespace Task2.Menu
             }            
         }
 
-        /// <summary>
-        /// Work Process
-        /// </summary>
-        /// <param name="fileContent"></param>
-        private static void DoWork(string fileContent)
-        {
-            
-        }
+
 
 
         #endregion // CONCORDANCE_FIRST_MENU
@@ -188,7 +203,7 @@ namespace Task2.Menu
         }
 
 
-        #endregion // READ_FILE
+        #endregion // READ_STREAM
 
 
 
