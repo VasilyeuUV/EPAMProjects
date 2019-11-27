@@ -49,6 +49,7 @@
     <Compile Include="Menu\ConsoleMenu.cs" />
     <Compile Include="Menu\MenuManager.cs" />
     <Compile Include="Models\ParagraphModel.cs" />
+    <Compile Include="Models\SentenceModel.cs" />
     <Compile Include="Models\TextLayoutModel.cs" />
     <Compile Include="Models\TextModel.cs" />
     <Compile Include="Program.cs" />

@@ -27,7 +27,7 @@ namespace Task2.Models
         /// <param name="fileContent">string file content</param>
         private TextModel(string fileContent)
         {
-            this.Content = fileContent;
+            this.Content = fileContent.Trim();
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Task2.Models
             if (string.IsNullOrEmpty(fileContent.Trim())) { return null; }
 
             return Regex.Split(fileContent, Const.PARAGRAPH_DELIMITER)
-                        .Where(p => p.Trim() != string.Empty)
+                        .Where(p => p.Trim().Length > 1)
                         .Select((x, n) => ParagraphModel.NewInstance(x, ++n));
         }
     }
