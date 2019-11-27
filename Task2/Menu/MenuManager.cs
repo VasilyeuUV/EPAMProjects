@@ -14,11 +14,22 @@ namespace Task2.Menu
             SelectMenuItem(operation, items, methods);
         }
 
+
+        /// <summary>
+        /// Back to the up menu
+        /// </summary>
         private static void Back()
         {
             Console.WriteLine("Работа завершена.");
         }
 
+
+        /// <summary>
+        /// Select menu item
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="items"></param>
+        /// <param name="methods"></param>
         internal static void SelectMenuItem(string operation, string[] items, method[] methods)
         {
             ConsoleMenu menu = new ConsoleMenu(items);
@@ -30,5 +41,25 @@ namespace Task2.Menu
                 methods[menuResult]();
             } while (menuResult != items.Length - 1);
         }
+
+
+        /// <summary>
+        /// Display 
+        /// </summary>
+        /// <param name="str"></param>
+        internal static void WaitForContinue(string str = "")
+        {
+            if (!String.IsNullOrEmpty(str.Trim()))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(str);
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            Console.WriteLine();
+            Console.WriteLine("Для продолжения нажмите любую клавишу");
+            Console.ReadKey();
+        }
+
+
     }
 }
