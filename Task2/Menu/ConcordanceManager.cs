@@ -9,6 +9,7 @@ namespace Task2.Menu
 {
     public static class ConcordanceManager
     {
+        internal delegate void method();
 
         private static TextModel _textModel = null;
         private static IEnumerable<string> _tmWords = null;
@@ -42,10 +43,7 @@ namespace Task2.Menu
             return result;
         }
 
-
-
-
-
+        
 
 
         #region CONCORDANCE_SECOND_MENU
@@ -56,7 +54,13 @@ namespace Task2.Menu
         /// </summary>
         internal async static void DisplayOperationMenuAsync(TextModel textModel)
         {
-            _tmWords = await GetTMWords(textModel);
+            if (TextHandler.IsEmptyTextModel(textModel))
+            {
+                MenuManager.WaitForContinue("Нет данных для обработки.");
+                return; ;
+            }
+
+            _textModel = textModel;            
 
             string operation = "ОПЕРАЦИИ:";
             string[] items = { "Структура текста",
@@ -68,7 +72,7 @@ namespace Task2.Menu
                                "Заменить слова заданной длины в предложении",
                                "Удалить слова заданной длины в тексте",
                                "Назад" };
-            MenuManager.method[] methods = new MenuManager.method[] {
+            method[] methods = new method[] {
                                ViewTextModel,               // "Структура текста"
                                ViewConcordance,             // "Показать Конкорданс",
                                ViewConcordanceA4,           // "Предметный указатель слов для А4"
@@ -78,8 +82,13 @@ namespace Task2.Menu
                                ReplaceWords,                // "Заменить слова заданной длины в предложении"
                                DeleteWords,                 // "Удалить слова заданной длины в тексте"
                                Back };                      // "Назад"
-            MenuManager.SelectMenuItem(operation, items, methods);
+            SelectMenuItem(operation, items, methods);
+
+            _tmWords = await GetTMWords(textModel);
         }
+
+
+
 
         /// <summary>
         /// View Text structure
@@ -191,6 +200,23 @@ namespace Task2.Menu
         {
         }
 
+        /// <summary>
+        /// Select menu item
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="items"></param>
+        /// <param name="methods"></param>
+        internal static void SelectMenuItem(string operation, string[] items, method[] methods)
+        {
+            ConsoleMenu menu = new ConsoleMenu(items);
+            int menuResult;
+            do
+            {
+                menuResult = menu.PrintMenu(operation);
+                Console.WriteLine();
+                methods[menuResult]();
+            } while (menuResult != items.Length - 1);
+        }
 
         #endregion
 
