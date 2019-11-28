@@ -51,7 +51,9 @@ namespace Task2.Tools
         internal enum Task
         {
             GetTextModel = 1,
-            SortTextBySentence
+            SortTextBySentence,
+            ViewConcordance,
+
         }
 
         /// <summary>

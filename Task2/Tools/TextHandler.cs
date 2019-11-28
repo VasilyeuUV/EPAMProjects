@@ -48,13 +48,39 @@ namespace Task2.Tools
         #region TEXTMODEL_OPERATIONS
 
 
+        /// <summary>
+        /// Create list concordance words from TextModelobject
+        /// </summary>
+        /// <param name="paragraphs"></param>
+        /// <returns></returns>
+        internal static IEnumerable<ConcordanceItemModel> GetTMWordParts(IEnumerable<ParagraphModel> paragraphs)
+        {
+            List<WordModel> lst = new List<WordModel>();
+
+
+            // ТУТ ИНОГДА ВЫДАЕТ ОШИБКУ О НЕДОСТАТОЧНОСТИ РАЗМЕРА МАССИВА (РАЗОБРАТЬСЯ)
+            paragraphs.AsParallel()
+                      .ForAll(p => lst.AddRange(p.Sentences.SelectMany(w => w.Words).ToList()));
+
+
+            return lst.Where(w => w != null)
+                      .GroupBy(w => w.Content)
+                      .Select(x => ConcordanceItemModel.NewInstance(x))
+                      .Where(x => x != null)
+                      .OrderBy(x => x.Word)
+                      .ThenBy(x => x.Positions.OrderBy(p => p.ParagraphNumber)
+                                              .ThenBy(p => p.SentenceNumber)
+                                              .ThenBy(p => p.WordNumber))
+                      .ToList();
+        }
+
 
         /// <summary>
-        /// 
+        /// Get all words, symbols, etc.
         /// </summary>
         /// <param name="textModel"></param>
         /// <returns></returns>
-        internal static Task<IEnumerable<string>> GetTMWords(TextModel textModel)
+        internal static Task<IEnumerable<string>> GetTMWordParts(TextModel textModel)
         {
             if (TextHandler.IsEmptyTextModel(textModel)) { return null; }
 

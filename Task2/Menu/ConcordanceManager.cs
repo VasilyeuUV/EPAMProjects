@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Task2.Interfaces;
 using Task2.Models;
 using Task2.Tools;
@@ -18,11 +17,21 @@ namespace Task2.Menu
         /// </summary>
         private const int PARAGRAPH_VIEW_LIMIT = 10;
         private const int SENTENCE_VIEW_LIMIT = 25;
-        private const int WORD_VIEW_LIMIT = 50;
+        private const int WORD_VIEW_LIMIT = 100;
 
         private static TextModel _textModel = null;
-        private static IEnumerable<string> _tmWords = null;
+        private static IEnumerable<string> _tmWordParts = null;
         private static IEnumerable<string> _uniqueWord = null;
+
+        public static IEnumerable<string> UniqueWord => _uniqueWord == null 
+            ? TextHandler.ParseTextToWordsAsync(_textModel.Content).Result 
+            : _uniqueWord;
+
+        public static IEnumerable<string> TmWordParts => _tmWordParts == null
+            ? TextHandler.GetTMWordParts(_textModel).Result
+            : _tmWordParts;
+        
+        
 
 
         #region CONCORDANCE_SECOND_MENU
@@ -62,11 +71,6 @@ namespace Task2.Menu
                                DeleteWords,                 // "Удалить слова заданной длины в тексте"
                                Back };                      // "Назад"
             SelectMenuItem(operation, items, methods);
-
-            
-            _tmWords = TextHandler.GetTMWords(textModel).Result;
-
-
         }
                
 
@@ -97,17 +101,7 @@ namespace Task2.Menu
         {            
             //"Показ конкорданса."
             ToDisplay.ViewTitle("КОНКОРДАНС", true);
-
-            _uniqueWord = TextHandler.ParseTextToWordsAsync(_textModel.Content).Result;
-
-            Console.Clear();
-            foreach (var item in _uniqueWord)
-            {
-                Console.WriteLine(item);
-            }
-
-            
-            //ToDisplay.ViewBody(MakeConcordanceString(Const.Task.GetTextModel));
+            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordance));
             ToDisplay.WaitForContinue();
         }
 
@@ -130,15 +124,66 @@ namespace Task2.Menu
         }
 
 
-
-
-
-
-
-        private static string MakeConcordanceString(Const.Task getTextModel)
+        /// <summary>
+        /// Concordance options to display
+        /// </summary>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        private static string MakeConcordanceString(Const.Task task)
         {
-            throw new NotImplementedException();
+            if (UniqueWord.Count() > WORD_VIEW_LIMIT)
+            {
+                ToDisplay.ViewInfo(UniqueWord.Count(), WORD_VIEW_LIMIT);
+            }
+            else { ToDisplay.ViewInfo(UniqueWord.Count()); }
+            
+            switch (task)
+            {
+                case Const.Task.ViewConcordance: return GetConcordanceString();
+            }
+            return string.Empty;
         }
+
+        /// <summary>
+        /// Get Concordance
+        /// </summary>
+        /// <param name="page_A4Standart"></param>
+        /// <returns></returns>
+        private static string GetConcordanceString(IReadOnlyDictionary<Const.PageParameter, int> page = null)
+        {
+            //List<WordModel> lst = new List<WordModel>();
+            //// ТУТ ИНОГДА ВЫДАЕТ ОШИБКУ О НЕДОСТАТОЧНОСТИ РАЗМЕРА МАССИВА (РАЗОБРАТЬСЯ)
+            //_textModel.Paragraphs.AsParallel()
+            //          .ForAll(p => lst.AddRange(p.Sentences.SelectMany(w => w.Words).ToList()));
+
+
+
+
+            StringBuilder str = new StringBuilder();
+
+            //str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
+
+            if (page == null)
+            {
+                
+                int count = 1;
+                foreach (var item in _textModel.Paragraphs)
+                {
+                    str.Append(string.Format("{0} - {1}\n", item.Number, item.Content));
+                    if (++count >= WORD_VIEW_LIMIT)
+                    {
+                        str.Append(string.Format("\n"));
+                        break;
+                    }
+                }
+                string result = str.ToString().Trim();
+                
+            }
+
+            return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
+        }
+
+
 
         /// <summary>
         /// View full concordance
@@ -161,8 +206,26 @@ namespace Task2.Menu
         //    WaitForContinue(str.ToString());
         //}
 
+        ///// <summary>
+        ///// View full concordance
+        ///// </summary>
+        //private static void ViewConcordance()
+        //{
+        //    StringBuilder str = new StringBuilder();
 
+        //    str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
 
+        //    int count = 0;
+
+        //    foreach (var item in _concordance.Words)
+        //    {
+        //        str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, item.Word, item.Positions.Count));
+        //        str.Append(ViewConcordance(item));
+        //        str.Append(string.Format("\n"));
+        //    }
+
+        //    WaitForContinue(str.ToString());
+        //}
 
 
 
