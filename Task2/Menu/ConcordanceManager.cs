@@ -86,54 +86,30 @@ namespace Task2.Menu
 
             _tmWords = await GetTMWords(textModel);
         }
-
-
-
+               
 
         /// <summary>
         /// View Text structure
         /// </summary>
         private static void ViewTextModel()
         {
-            //if (IsTMEmpty())
-            //{
-            //    MenuManager.WaitForContinue("Нет данных для отображения.");
-            //    return;
-            //}
+            if (TextHandler.IsEmptyTextModel(_textModel))
+            {
+                MenuManager.WaitForContinue("Нет данных для отображения.");
+                return;
+            }
 
-            //Console.WriteLine("АБЗАЦЫ:");
-            //foreach (var item in _textModel.Paragraphs)
-            //{
-            //    Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
-            //}
-            //Console.WriteLine();
+            Console.Clear();
+            Console.WriteLine("СТРУКТУРА ТЕКСТА:");
+            Console.WriteLine();
 
-            //Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
-            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
-            //{
-            //    item.ToList()
-            //        .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
-            //}
-            //Console.WriteLine();
+            DisplayTMParagraphs();
+            DisplayTMSentences();
+            DisplayTMWords();
 
-            //Console.WriteLine("СЛОВА:");
-            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
-            //{
-            //    item.Select(s => s).ToList()
-            //        .ForEach(s => s.Words.Select(w => w).ToList()
-            //                        .ForEach(w => {
-            //                            Console.Write(string.Format("{0}:{1}:{2} - {3, -22}\t:", w.ParagraphNumber
-            //                                                                                   , w.SentenseNumber
-            //                                                                                   , w.Number
-            //                                                                                   , w.Content));
-            //                            w.WordParts.Select(wp => wp).ToList()
-            //                                       .ForEach(x => Console.Write(string.Format("\t{0, -20}", x)));
-            //                            Console.WriteLine();
-            //                        }));
-            //}
-            //Console.WriteLine();
-            //MenuManager.WaitForContinue();
+            MenuManager.WaitForContinue();
         }
+
 
         /// <summary>
         /// View Concordance by text
@@ -219,6 +195,67 @@ namespace Task2.Menu
         }
 
         #endregion
+
+
+
+
+
+        #region DISPLAY_TEXT
+        //###############################################################################################################################
+
+        /// <summary>
+        /// Display TextModel words
+        /// </summary>
+        private static void DisplayTMWords()
+        {
+            Console.WriteLine("СЛОВА:");
+            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            {
+                item.Select(s => s).ToList()
+                    .ForEach(s => s.Words.Select(w => w).ToList()
+                                    .ForEach(w =>
+                                    {
+                                        Console.Write(string.Format("{0}:{1}:{2} - {3, -22}\t:", w.ParagraphNumber
+                                                                                               , w.SentenseNumber
+                                                                                               , w.Number
+                                                                                               , w.Content));
+                                        w.WordParts.Select(wp => wp).ToList()
+                                                   .ForEach(x => Console.Write(string.Format("\t{0, -20}", x)));
+                                        Console.WriteLine();
+                                    }));
+            }
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Display TextModel Sentences
+        /// </summary>
+        private static void DisplayTMSentences()
+        {
+            Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
+            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            {
+                item.ToList()
+                    .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
+            }
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Display TextModel Paragraphs
+        /// </summary>
+        private static void DisplayTMParagraphs()
+        {
+            Console.WriteLine("АБЗАЦЫ:");
+            foreach (var item in _textModel.Paragraphs)
+            {
+                Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+            }
+            Console.WriteLine();
+        }
+
+        #endregion // DISPLAY_TEXT
+
 
 
     }

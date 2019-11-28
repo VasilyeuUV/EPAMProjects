@@ -18,7 +18,7 @@ namespace Task2.Menu
         internal static void DisplayMainMenu()
         {
             string operation = "ИСХОДНЫЕ ДАННЫЕ:";
-            string[] items = { "Выбрать файл для обработки", "Назад" };
+            string[] items = { "Выбрать файл для обработки", "Выход" };
             method[] methods = new MenuManager.method[] { FileDialog, Exit };
             SelectMenuItem(operation, items, methods);
         }
@@ -87,27 +87,6 @@ namespace Task2.Menu
         {
             Console.WriteLine("Работа завершена.");
         }
-
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="fileContent"></param>
-        //private static async void DoWorkAsync(string fileContent)
-        //{
-        //    if (string.IsNullOrWhiteSpace(fileContent))
-        //    {
-        //        MenuManager.WaitForContinue("Текст не получен.");
-        //        return;
-        //    }
-
-        //    fileContent = TextHandler.OptimizeText(fileContent);
-        //    _textModel = TextModel.NewInstance(fileContent);
-
-        //    //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
-        //}
-
-
 
 
         /// <summary>
