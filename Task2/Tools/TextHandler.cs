@@ -59,6 +59,30 @@ namespace Task2.Tools
         //##############################################################################################################################
 
         /// <summary>
+        /// Convert IContentable list to needed class 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        internal static List<T> ConvertIContentabletToList<T>(IEnumerable<IContentable> collection)
+            where T : class, IContentable
+        {
+            if (TextHandler.IsEmpty(collection)) { return null; }
+
+            List<T> lst = new List<T>();
+            foreach (var item in collection)
+            {
+                T result = item as T;
+                if (result == null) { continue; }
+                lst.Add(result);
+
+            }
+            return lst;
+        }
+
+
+
+        /// <summary>
         /// Converts text to standard form
         /// </summary>
         /// <param name="fileContent">text content</param>

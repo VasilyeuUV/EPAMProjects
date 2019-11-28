@@ -36,15 +36,16 @@ namespace Task2.Tools
         /// <param name="title"></param>
         internal static void ViewBody(string body)
         {
-            Console.WriteLine(body + ":");
+            Console.WriteLine(body);
             Console.WriteLine();
         }
 
         /// <summary>
         /// Show information if there are many objects
         /// </summary>
-        internal static void ViewInfo(int objCount, int viewCount)
+        internal static void ViewInfo(int objCount, int viewCount = 0)
         {
+            if (viewCount == 0) { viewCount = objCount; } 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"(показано {viewCount} из {objCount})");
             Console.ForegroundColor = ConsoleColor.White;

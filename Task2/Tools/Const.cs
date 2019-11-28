@@ -51,6 +51,7 @@ namespace Task2.Tools
         internal enum Task
         {
             GetTextModel = 1,
+            SortTextBySentence
         }
 
         /// <summary>
@@ -61,13 +62,6 @@ namespace Task2.Tools
             LinesPageCount = 1,
             CharsLineCount,
         }
-
-
-        internal enum Sort
-        {
-            Sentences = 1,
-        }
-
 
 
 
