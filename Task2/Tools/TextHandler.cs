@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Task2.Interfaces;
 using Task2.Models;
 
 namespace Task2.Tools
@@ -23,6 +24,30 @@ namespace Task2.Tools
                               || tm.Paragraphs.Count() < 1;
         }
 
+
+        /// <summary>
+        /// Get list string of TM list elements
+        /// </summary>
+        /// <param name="textModel"></param>
+        /// <returns></returns>
+        internal static IEnumerable<IContentable> GetTMElements(IEnumerable<IContentable> elements)
+        {
+            if (IsEmpty(elements)) { return null; }
+            return elements.Select(x => x).ToList();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        internal static IContentable GetTMElements(IEnumerable<IContentable> elements, int n = 1)
+        {
+            if (IsEmpty(elements) || n < 1 || n > elements.Count()) { return null; }
+            return elements.Skip(n - 1).Take(1).FirstOrDefault();
+        }
 
         #endregion
 
@@ -175,6 +200,7 @@ namespace Task2.Tools
             if (str.ToUpper() == str) { return true; }
             return false;
         }
+
 
         #endregion
 

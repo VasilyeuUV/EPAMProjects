@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Task2.Interfaces;
 using Task2.Models;
 using Task2.Tools;
 
@@ -10,6 +11,8 @@ namespace Task2.Menu
     public static class ConcordanceManager
     {
         internal delegate void method();
+
+        private const int VIEW_COEF = 5;
 
         private static TextModel _textModel = null;
         private static IEnumerable<string> _tmWords = null;
@@ -209,21 +212,48 @@ namespace Task2.Menu
         private static void DisplayTMWords()
         {
             Console.WriteLine("СЛОВА:");
-            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+
+            int ViewCount = VIEW_COEF * 10;
+            IEnumerable<IContentable> words = TextHandler.GetTMElements(_textModel.Paragraphs.SelectMany(p => p.Sentences)
+                                                                                              .SelectMany(s => s.Words));
+            if (words.Count() > ViewCount)
             {
-                item.Select(s => s).ToList()
-                    .ForEach(s => s.Words.Select(w => w).ToList()
-                                    .ForEach(w =>
-                                    {
-                                        Console.Write(string.Format("{0}:{1}:{2} - {3, -22}\t:", w.ParagraphNumber
-                                                                                               , w.SentenseNumber
-                                                                                               , w.Number
-                                                                                               , w.Content));
-                                        w.WordParts.Select(wp => wp).ToList()
-                                                   .ForEach(x => Console.Write(string.Format("\t{0, -20}", x)));
-                                        Console.WriteLine();
-                                    }));
+                ViewIfMoreToDisplayLimit(words.Count(), ViewCount);
             }
+
+            int count = 1;
+            foreach (var item in words)
+            {
+                var w = item as WordModel;
+                if (w == null) { continue; }
+
+                Console.Write(string.Format("{0}:{1}:{2} - {3, -22}\t:", w.ParagraphNumber
+                                                       , w.SentenseNumber
+                                                       , w.Number
+                                                       , w.Content));
+                w.WordParts.Select(wp => wp).ToList()
+                           .ForEach(x => Console.Write(string.Format("\t{0, -20}", x)));
+                Console.WriteLine();
+
+                if (++count >= ViewCount) { break; }
+            }
+            Console.WriteLine();
+                                 
+            //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+            //{
+            //    item.Select(s => s).ToList()
+            //        .ForEach(s => s.Words.Select(w => w).ToList()
+            //                        .ForEach(w =>
+            //                        {
+            //                            Console.Write(string.Format("{0}:{1}:{2} - {3, -22}\t:", w.ParagraphNumber
+            //                                                                                   , w.SentenseNumber
+            //                                                                                   , w.Number
+            //                                                                                   , w.Content));
+            //                            w.WordParts.Select(wp => wp).ToList()
+            //                                       .ForEach(x => Console.Write(string.Format("\t{0, -20}", x)));
+            //                            Console.WriteLine();
+            //                        }));
+            //}
             Console.WriteLine();
         }
 
@@ -233,10 +263,23 @@ namespace Task2.Menu
         private static void DisplayTMSentences()
         {
             Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
-            foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
+
+            int ViewCount = VIEW_COEF * 2;
+            IEnumerable<IContentable> sentences = TextHandler.GetTMElements(_textModel.Paragraphs.SelectMany(p => p.Sentences));           
+
+            if (sentences.Count() > ViewCount)
             {
-                item.ToList()
-                    .ForEach(s => Console.WriteLine(string.Format("{0}:{1} - {2}", s.ParagraphNumber, s.Number, s.Content)));
+                ViewIfMoreToDisplayLimit(sentences.Count(), ViewCount);
+            }
+                        
+            int count = 1;
+            foreach (var item in sentences)
+            {
+                var sentence = item as SentenceModel;
+                if (sentence == null) { continue; }
+  
+                Console.WriteLine(string.Format("{0}:{1} - {2}", sentence.ParagraphNumber, sentence.Number, sentence.Content));
+                if (++count >= ViewCount) { break; }
             }
             Console.WriteLine();
         }
@@ -247,11 +290,31 @@ namespace Task2.Menu
         private static void DisplayTMParagraphs()
         {
             Console.WriteLine("АБЗАЦЫ:");
+
+            int ViewCount = VIEW_COEF;
+
+            if (_textModel.Paragraphs.Count() > ViewCount)
+            {
+                ViewIfMoreToDisplayLimit(_textModel.Paragraphs.Count(), ViewCount);
+            }        
+
+            int count = 1;
             foreach (var item in _textModel.Paragraphs)
             {
                 Console.WriteLine(string.Format("{0} - {1}", item.Number, item.Content));
+                if (++count >= ViewCount) { break; }
             }
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Show information if there are many objects
+        /// </summary>
+        private static void ViewIfMoreToDisplayLimit(int objCount, int viewCount)
+        {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"(показано {viewCount} из {objCount})");
+                Console.ForegroundColor = ConsoleColor.White;
         }
 
         #endregion // DISPLAY_TEXT
