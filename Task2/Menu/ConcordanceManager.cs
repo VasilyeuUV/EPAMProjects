@@ -96,15 +96,7 @@ namespace Task2.Menu
         /// </summary>
         private static void ViewTextModel()
         {
-            if (TextHandler.IsEmptyTextModel(_textModel))
-            {
-                MenuManager.WaitForContinue("Нет данных для отображения.");
-                return;
-            }
-
-            Console.Clear();
-            Console.WriteLine("СТРУКТУРА ТЕКСТА:");
-            Console.WriteLine();
+            OperationTitle("СТРУКТУРА ТЕКСТА");
 
             DisplayTMParagraphs();
             DisplayTMSentences();
@@ -114,6 +106,7 @@ namespace Task2.Menu
         }
 
 
+        
         /// <summary>
         /// View Concordance by text
         /// </summary>
@@ -143,8 +136,12 @@ namespace Task2.Menu
         /// </summary>
         private static void SortTextBySentenceLength()
         {
-            MenuManager.WaitForContinue("Показать текст сортированный по количеству слов в предложении.");
+            // Показать текст сортированный по количеству слов в предложении
+            OperationTitle("СОРТИРОВКА ТЕКСТА ПО ДЛИНЕ ПРЕДЛОЖЕНИЙ");
+            DisplaySortTMbyElement(Const.Sort.Sentences);
+            MenuManager.WaitForContinue();
         }
+
 
         /// <summary>
         /// View selected words in interrogative sentences
@@ -203,8 +200,57 @@ namespace Task2.Menu
 
 
 
+        #region GET_TEXTMODEL_ELEMENTS
+        //###############################################################################################################################
+
+        /// <summary>
+        /// Get this TextModel Senteces
+        /// </summary>
+        /// <returns></returns>
+        private static IEnumerable<IContentable> GetSentences()
+        {
+            return TextHandler.GetTMElements(_textModel.Paragraphs.SelectMany(p => p.Sentences));
+        }
+
+
+        /// <summary>
+        /// Get this TextModel Words list
+        /// </summary>
+        /// <returns></returns>
+        private static IEnumerable<IContentable> GetWords()
+        {
+            return TextHandler.GetTMElements(_textModel.Paragraphs.SelectMany(p => p.Sentences).SelectMany(s => s.Words));
+        }
+
+
+        #endregion // GET_TEXTMODEL_ELEMENTS
+
+
+
+
+
         #region DISPLAY_TEXT
         //###############################################################################################################################
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elt"></param>
+        /// <param name="asc"></param>
+        private static void DisplaySortTMbyElement(Const.Sort elt, bool asc = false)
+        {            
+            switch (elt)
+            {
+                case Const.Sort.Sentences:
+                    var sent = GetSentences();
+                    sent = asc ? sent.OrderBy(x => x.Content.Length) : sent.OrderByDescending(x => x.Content.Length);
+                    DisplayTMSentences(sent);
+                    break;
+                default:
+                    break;
+            }            
+        }
+
 
         /// <summary>
         /// Display TextModel words
@@ -214,8 +260,7 @@ namespace Task2.Menu
             Console.WriteLine("СЛОВА:");
 
             int ViewCount = VIEW_COEF * 10;
-            IEnumerable<IContentable> words = TextHandler.GetTMElements(_textModel.Paragraphs.SelectMany(p => p.Sentences)
-                                                                                              .SelectMany(s => s.Words));
+            IEnumerable<IContentable> words = GetWords();
             if (words.Count() > ViewCount)
             {
                 ViewIfMoreToDisplayLimit(words.Count(), ViewCount);
@@ -238,7 +283,7 @@ namespace Task2.Menu
                 if (++count >= ViewCount) { break; }
             }
             Console.WriteLine();
-                                 
+
             //foreach (var item in _textModel.Paragraphs.Select(p => p.Sentences))
             //{
             //    item.Select(s => s).ToList()
@@ -260,29 +305,30 @@ namespace Task2.Menu
         /// <summary>
         /// Display TextModel Sentences
         /// </summary>
-        private static void DisplayTMSentences()
+        private static void DisplayTMSentences(IEnumerable<IContentable> sent = null)
         {
             Console.WriteLine("ПРЕДЛОЖЕНИЯ:");
 
             int ViewCount = VIEW_COEF * 2;
-            IEnumerable<IContentable> sentences = TextHandler.GetTMElements(_textModel.Paragraphs.SelectMany(p => p.Sentences));           
 
+            IEnumerable<IContentable> sentences = sent == null ? GetSentences() : sent;
             if (sentences.Count() > ViewCount)
             {
                 ViewIfMoreToDisplayLimit(sentences.Count(), ViewCount);
             }
-                        
+
             int count = 1;
             foreach (var item in sentences)
             {
                 var sentence = item as SentenceModel;
                 if (sentence == null) { continue; }
-  
+
                 Console.WriteLine(string.Format("{0}:{1} - {2}", sentence.ParagraphNumber, sentence.Number, sentence.Content));
                 if (++count >= ViewCount) { break; }
             }
             Console.WriteLine();
         }
+
 
         /// <summary>
         /// Display TextModel Paragraphs
@@ -317,6 +363,17 @@ namespace Task2.Menu
                 Console.ForegroundColor = ConsoleColor.White;
         }
 
+
+        /// <summary>
+        /// View operation Title
+        /// </summary>
+        /// <param name="title"></param>
+        private static void OperationTitle(string title)
+        {
+            Console.Clear();
+            Console.WriteLine(title + ":");
+            Console.WriteLine();
+        }
         #endregion // DISPLAY_TEXT
 
 
