@@ -56,6 +56,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\Const.cs" />
+    <Compile Include="Tools\FileReadWriter.cs" />
     <Compile Include="Tools\TextHandler.cs" />
   </ItemGroup>
   <ItemGroup>

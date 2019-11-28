@@ -4,11 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Task2.Models;
 
 namespace Task2.Tools
 {
     internal static class TextHandler
     {
+
+        #region TEXTMODEL_OPERATIONS
+
+        /// <summary>
+        /// Check TextModel object for null or empty
+        /// </summary>
+        /// <returns></returns>
+        internal static bool IsEmptyTextModel(TextModel tm)
+        {
+            return tm == null || tm.Paragraphs == null
+                              || tm.Paragraphs.Count() < 1;
+        }
+
+
+        #endregion
+
+
+
+
 
         #region TEXT_CONVERTERS
         //##############################################################################################################################
