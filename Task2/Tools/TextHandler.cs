@@ -12,7 +12,74 @@ namespace Task2.Tools
     internal static class TextHandler
     {
 
+        /// <summary>
+        /// Get Words from text
+        /// </summary>
+        /// <param name="text">text content</param>
+        /// <returns>string list words</returns>
+        internal static async Task<IEnumerable<string>> ParseTextToWordsAsync(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) { return null; }
+
+            List<string> words = await Task.Run(() =>
+                                 Regex.Split(text, Const.WORD_DELIMITER)
+                                      .Where(s => (s = s.Trim()) != string.Empty)
+                                      .ToList());
+
+            var result = new List<string>();
+            words.AsParallel()
+                .ForAll(w =>
+                {
+                    w = GetWordContent(w);
+                    if (!string.IsNullOrWhiteSpace(w.Trim()))
+                    {
+                        // capital letter
+                        w = IsUpperCase(w) ? w
+                                           : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
+                        result.Add(w);
+                    }
+                });
+
+            return result.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x);
+        }
+
+
+
         #region TEXTMODEL_OPERATIONS
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="textModel"></param>
+        /// <returns></returns>
+        internal static Task<IEnumerable<string>> GetTMWords(TextModel textModel)
+        {
+            if (TextHandler.IsEmptyTextModel(textModel)) { return null; }
+
+            var result = Task.Run(() =>
+                  textModel.Paragraphs.SelectMany(p =>
+                            p.Sentences.SelectMany(s =>
+                                s.Words.SelectMany(w =>
+                                    w.WordParts.Select(wp =>
+                                    {
+                                        ref string rwp = ref wp;
+                                        return rwp;
+                                    }).ToList())))
+            );
+            //var result = Task.Run(() =>
+            //    _textModel.Paragraphs.SelectMany(p =>
+            //                p.Sentences.SelectMany(s =>
+            //                    s.Words.SelectMany(w =>
+            //                        w.WordParts.ToList())))
+            //);
+            return result;
+        }
+
+
+
+
 
         /// <summary>
         /// Check TextModel object for null or empty

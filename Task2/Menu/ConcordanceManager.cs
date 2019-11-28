@@ -22,37 +22,7 @@ namespace Task2.Menu
 
         private static TextModel _textModel = null;
         private static IEnumerable<string> _tmWords = null;
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="textModel"></param>
-        /// <returns></returns>
-        private static Task<IEnumerable<string>> GetTMWords(TextModel textModel)
-        {
-            if (TextHandler.IsEmptyTextModel(textModel)) { return null; }
-
-            var result = Task.Run(() =>
-                  textModel.Paragraphs.SelectMany(p =>
-                            p.Sentences.SelectMany(s =>
-                                s.Words.SelectMany(w =>
-                                    w.WordParts.Select(wp =>
-                                    {
-                                        ref string rwp = ref wp;
-                                        return rwp;
-                                    }).ToList())))
-            );
-            //var result = Task.Run(() =>
-            //    _textModel.Paragraphs.SelectMany(p =>
-            //                p.Sentences.SelectMany(s =>
-            //                    s.Words.SelectMany(w =>
-            //                        w.WordParts.ToList())))
-            //);
-            return result;
-        }
-
-        
+        private static IEnumerable<string> _uniqueWord = null;
 
 
         #region CONCORDANCE_SECOND_MENU
@@ -69,7 +39,9 @@ namespace Task2.Menu
                 return; ;
             }
 
-            _textModel = textModel;            
+            _textModel = textModel;
+            _uniqueWord = TextHandler.ParseTextToWordsAsync(_textModel.Content).Result;
+            _tmWords = TextHandler.GetTMWords(textModel).Result;
 
             string operation = "ОПЕРАЦИИ:";
             string[] items = { "Структура текста",
@@ -93,7 +65,9 @@ namespace Task2.Menu
                                Back };                      // "Назад"
             SelectMenuItem(operation, items, methods);
 
-            _tmWords = await GetTMWords(textModel);
+           
+            
+
         }
                
 
@@ -121,10 +95,19 @@ namespace Task2.Menu
         /// View Concordance by text
         /// </summary>
         private static void ViewConcordance()
-        {
+        {            
             //"Показ конкорданса."
             ToDisplay.ViewTitle("КОНКОРДАНС", true);
-            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.GetTextModel));
+
+            
+            Console.Clear();
+            foreach (var item in _uniqueWord)
+            {
+                Console.WriteLine(item);
+            }
+
+            
+            //ToDisplay.ViewBody(MakeConcordanceString(Const.Task.GetTextModel));
             ToDisplay.WaitForContinue();
         }
 
@@ -160,23 +143,23 @@ namespace Task2.Menu
         /// <summary>
         /// View full concordance
         /// </summary>
-        private static void ViewConcordance()
-        {
-            StringBuilder str = new StringBuilder();
+        //private static void ViewConcordance()
+        //{
+        //    StringBuilder str = new StringBuilder();
 
-            str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
+        //    str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
 
-            int count = 0;
+        //    int count = 0;
 
-            foreach (var item in _concordance.Words)
-            {
-                str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, item.Word, item.Positions.Count));
-                str.Append(ViewConcordance(item));
-                str.Append(string.Format("\n"));
-            }
+        //    foreach (var item in _concordance.Words)
+        //    {
+        //        str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, item.Word, item.Positions.Count));
+        //        str.Append(ViewConcordance(item));
+        //        str.Append(string.Format("\n"));
+        //    }
 
-            WaitForContinue(str.ToString());
-        }
+        //    WaitForContinue(str.ToString());
+        //}
 
 
 
