@@ -164,8 +164,25 @@ namespace Task2.Menu
         private static void DisplayOperationMenu()
         {
             string operation = "ОПЕРАЦИИ:";
-            string[] items = { "Структура текста","Показать Конкорданс", "Назад" };
-            MenuManager.method[] methods = new MenuManager.method[] { ViewTextModel, ViewConcordance, Back };
+            string[] items = { "Структура текста",
+                               "Показать Конкорданс",
+                               "Предметный указатель слов для А4",
+                               "Предметный указатель слов для А5",
+                               "Показать текст сортированный по количеству слов в предложении",
+                               "Показать слова вопросительных предложений",
+                               "Заменить слова заданной длины в предложении",
+                               "Удалить слова заданной длины в тексте",
+                               "Назад" };
+            MenuManager.method[] methods = new MenuManager.method[] {
+                               ViewTextModel,               // "Структура текста"
+                               ViewConcordance,             // "Показать Конкорданс",
+                               ViewConcordanceA4,           // "Предметный указатель слов для А4"
+                               ViewConcordanceA5,           // "Предметный указатель слов для А5"
+                               SortTextBySentenceLength,    // "Показать текст сортированный по количеству слов в предложении
+                               DisplayWordsQuestion,        // "Показать слова вопросительных предложений"
+                               ReplaceWords,                // "Заменить слова заданной длины в предложении"
+                               DeleteWords,                 // "Удалить слова заданной длины в тексте"
+                               Back };                      // "Назад"
             MenuManager.SelectMenuItem(operation, items, methods);
         }
 
@@ -214,13 +231,61 @@ namespace Task2.Menu
             MenuManager.WaitForContinue();
         }
 
-
-
+        /// <summary>
+        /// View Concordance by text
+        /// </summary>
         private static void ViewConcordance()
         {
             MenuManager.WaitForContinue("Показ конкорданса.");
         }
 
+        /// <summary>
+        /// View Concordsnce by text to A4 page format
+        /// </summary>
+        private static void ViewConcordanceA4()
+        {
+            MenuManager.WaitForContinue("Предметный указатель слов для А4.");
+        }
+
+        /// <summary>
+        /// View Concordsnce by text to A5 page format
+        /// </summary>
+        private static void ViewConcordanceA5()
+        {
+            MenuManager.WaitForContinue("Предметный указатель слов для А5.");
+        }
+
+        /// <summary>
+        /// View sorted text by sentences lengt
+        /// </summary>
+        private static void SortTextBySentenceLength()
+        {
+            MenuManager.WaitForContinue("Показать текст сортированный по количеству слов в предложении.");
+        }
+
+        /// <summary>
+        /// View selected words in interrogative sentences
+        /// </summary>
+        private static void DisplayWordsQuestion()
+        {
+            MenuManager.WaitForContinue("Показать слова вопросительных предложений.");
+        }
+
+        /// <summary>
+        /// Replace words in selected sentences
+        /// </summary>
+        private static void ReplaceWords()
+        {
+            MenuManager.WaitForContinue("Заменить слова заданной длины в предложении.");
+        }
+
+        /// <summary>
+        /// Delete words in text
+        /// </summary>
+        private static void DeleteWords()
+        {
+            MenuManager.WaitForContinue("Удалить слова заданной длины в тексте.");
+        }
 
         #endregion
 
