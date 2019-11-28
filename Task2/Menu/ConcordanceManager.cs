@@ -40,8 +40,6 @@ namespace Task2.Menu
             }
 
             _textModel = textModel;
-            _uniqueWord = TextHandler.ParseTextToWordsAsync(_textModel.Content).Result;
-            _tmWords = TextHandler.GetTMWords(textModel).Result;
 
             string operation = "ОПЕРАЦИИ:";
             string[] items = { "Структура текста",
@@ -65,8 +63,9 @@ namespace Task2.Menu
                                Back };                      // "Назад"
             SelectMenuItem(operation, items, methods);
 
-           
             
+            _tmWords = TextHandler.GetTMWords(textModel).Result;
+
 
         }
                
@@ -99,7 +98,8 @@ namespace Task2.Menu
             //"Показ конкорданса."
             ToDisplay.ViewTitle("КОНКОРДАНС", true);
 
-            
+            _uniqueWord = TextHandler.ParseTextToWordsAsync(_textModel.Content).Result;
+
             Console.Clear();
             foreach (var item in _uniqueWord)
             {

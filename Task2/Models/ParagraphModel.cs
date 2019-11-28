@@ -69,6 +69,7 @@ namespace Task2.Models
             {
                 if (item.Length == 1 && char.IsPunctuation(item[0]))
                 {
+                    if (result.Count() < 1) { result.Add(string.Empty); }
                     string s = result.Last();
                     s += item;
                     result.Remove(result.Last());
