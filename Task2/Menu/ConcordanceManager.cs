@@ -14,6 +14,7 @@ namespace Task2.Menu
     {
         private static string _originalFilePath = string.Empty;
         private static TextModel _textModel = null;
+        private static IEnumerable<string> _tmWords = null;
 
 
         /// <summary>
@@ -31,10 +32,10 @@ namespace Task2.Menu
             fileContent = TextHandler.OptimizeText(fileContent);
             _textModel = TextModel.NewInstance(fileContent);
 
+            _tmWords = await GetTMWords(_textModel);
             //var pages = TextLayoutModel.NewInstance(_textModel.Content);  // работает
 
-            if (_textModel == null || _textModel.Paragraphs == null 
-                                   || _textModel.Paragraphs.Count() < 1)
+            if (IsTMEmpty())
             {
                 MenuManager.WaitForContinue("При обработке текста возникли ошибки. Текст не обработан.");
                 return;
@@ -42,6 +43,44 @@ namespace Task2.Menu
 
             MenuManager.WaitForContinue("Текст обработан успешно");
             DisplayOperationMenu();
+        }
+
+        /// <summary>
+        /// Check TextModel object for null or empty
+        /// </summary>
+        /// <returns></returns>
+        private static bool IsTMEmpty()
+        {
+            return _textModel == null || _textModel.Paragraphs == null
+                                               || _textModel.Paragraphs.Count() < 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="textModel"></param>
+        /// <returns></returns>
+        private static Task<IEnumerable<string>> GetTMWords(TextModel textModel)
+        {
+            if (IsTMEmpty()) { return null; }
+
+            var result = Task.Run(() =>
+                _textModel.Paragraphs.SelectMany(p =>
+                            p.Sentences.SelectMany(s =>
+                                s.Words.SelectMany(w =>
+                                    w.WordParts.Select(wp =>
+                                    {
+                                        ref string rwp = ref wp;
+                                        return rwp;
+                                    }).ToList())))
+            );
+            //var result = Task.Run(() =>
+            //    _textModel.Paragraphs.SelectMany(p =>
+            //                p.Sentences.SelectMany(s =>
+            //                    s.Words.SelectMany(w =>
+            //                        w.WordParts.ToList())))
+            //);
+            return result;
         }
 
 
@@ -135,6 +174,12 @@ namespace Task2.Menu
         /// </summary>
         private static void ViewTextModel()
         {
+            if (IsTMEmpty())
+            {
+                MenuManager.WaitForContinue("Нет данных для отображения.");
+                return;
+            }
+
             Console.WriteLine("АБЗАЦЫ:");
             foreach (var item in _textModel.Paragraphs)
             {
