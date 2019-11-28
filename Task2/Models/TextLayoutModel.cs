@@ -19,6 +19,11 @@ namespace Task2.Models
             this.Pages = ConvertToPages(content);
         }
 
+        /// <summary>
+        /// Create new TextLayoutModel object
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public static TextLayoutModel NewInstance(string content)
         {
             return string.IsNullOrWhiteSpace(content) ? null : new TextLayoutModel(content);

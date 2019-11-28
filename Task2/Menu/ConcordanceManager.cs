@@ -118,6 +118,18 @@ namespace Task2.Menu
 
 
         /// <summary>
+        /// View Concordance by text
+        /// </summary>
+        private static void ViewConcordance()
+        {
+            //"Показ конкорданса."
+            ToDisplay.ViewTitle("КОНКОРДАНС", true);
+            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.GetTextModel));
+            ToDisplay.WaitForContinue();
+        }
+
+
+        /// <summary>
         /// View sorted text by sentences lenght
         /// </summary>
         private static void SortSentencesByNumberOfWord()
@@ -139,13 +151,37 @@ namespace Task2.Menu
 
 
 
+
+        private static string MakeConcordanceString(Const.Task getTextModel)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
-        /// View Concordance by text
+        /// View full concordance
         /// </summary>
         private static void ViewConcordance()
         {
-            ToDisplay.WaitForContinue("Показ конкорданса.");
+            StringBuilder str = new StringBuilder();
+
+            str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
+
+            int count = 0;
+
+            foreach (var item in _concordance.Words)
+            {
+                str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, item.Word, item.Positions.Count));
+                str.Append(ViewConcordance(item));
+                str.Append(string.Format("\n"));
+            }
+
+            WaitForContinue(str.ToString());
         }
+
+
+
+
+
 
         /// <summary>
         /// View Concordsnce by text to A4 page format
