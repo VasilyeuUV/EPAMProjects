@@ -46,7 +46,7 @@ namespace Task2.Menu
             }
             catch (Exception e)
             {
-                MenuManager.WaitForContinue(string.Format("Ошибка открытия файла:\n" + e.Message));
+                ToDisplay.WaitForContinue(string.Format("Ошибка открытия файла:\n" + e.Message));
                 return;
             }
 
@@ -54,10 +54,10 @@ namespace Task2.Menu
 
             if (TextHandler.IsEmptyTextModel(textModel))
             {
-                WaitForContinue("При обработке текста возникли ошибки. Текст не обработан.");
+                ToDisplay.WaitForContinue("При обработке текста возникли ошибки. Текст не обработан.");
                 return;
             }
-            WaitForContinue("Текс обработан успешно.");
+            ToDisplay.WaitForContinue("Текс обработан успешно.");
 
             ConcordanceManager.DisplayOperationMenuAsync(textModel);
         }
@@ -106,25 +106,5 @@ namespace Task2.Menu
                 methods[menuResult]();
             } while (menuResult != items.Length - 1);
         }
-
-
-        /// <summary>
-        /// Display 
-        /// </summary>
-        /// <param name="str"></param>
-        internal static void WaitForContinue(string str = "")
-        {
-            if (!String.IsNullOrEmpty(str.Trim()))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(str);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            Console.WriteLine();
-            Console.WriteLine("Для продолжения нажмите любую клавишу");
-            Console.ReadKey();
-        }
-
-
     }
 }

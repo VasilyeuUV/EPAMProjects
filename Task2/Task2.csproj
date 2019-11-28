@@ -58,6 +58,7 @@
     <Compile Include="Tools\Const.cs" />
     <Compile Include="Tools\FileReadWriter.cs" />
     <Compile Include="Tools\TextHandler.cs" />
+    <Compile Include="Tools\ToDisplay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

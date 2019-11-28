@@ -46,7 +46,13 @@ namespace Task2.Tools
 
         #region ENUMS
         //###############################################################################################################################
-        
+
+
+        internal enum Task
+        {
+            GetTextModel = 1,
+        }
+
         /// <summary>
         /// Page Parameters
         /// </summary>
@@ -61,6 +67,7 @@ namespace Task2.Tools
         {
             Sentences = 1,
         }
+
 
 
 
