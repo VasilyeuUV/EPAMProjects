@@ -53,6 +53,7 @@ namespace Task2.Tools
             GetTextModel = 1,
             SortTextBySentence,
             ViewConcordance,
+            ViewConcordanceA4,
 
         }
 

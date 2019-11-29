@@ -105,6 +105,17 @@ namespace Task2.Menu
             ToDisplay.WaitForContinue();
         }
 
+        /// <summary>
+        /// View Concordsnce by text to A4 page format
+        /// </summary>
+        private static void ViewConcordanceA4()
+        {
+            //Предметный указатель слов для А4.
+            ToDisplay.ViewTitle("ПРЕДМЕТНЫЙ УКАЗАТЕЛЬ ДЛЯ ТЕКСТА ФОРМАТА А4", true);
+            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordanceA4));
+            ToDisplay.WaitForContinue();
+        }
+
 
         /// <summary>
         /// View sorted text by sentences lenght
@@ -140,6 +151,7 @@ namespace Task2.Menu
             switch (task)
             {
                 case Const.Task.ViewConcordance: return GetConcordanceString();
+                case Const.Task.ViewConcordanceA4: return GetConcordanceString(TextLayoutModel.NewInstance(_textModel.Content));
             }
             return string.Empty;
         }
@@ -149,21 +161,24 @@ namespace Task2.Menu
         /// </summary>
         /// <param name="page_A4Standart"></param>
         /// <returns></returns>
-        private static string GetConcordanceString(IReadOnlyDictionary<Const.PageParameter, int> page = null)
+        private static string GetConcordanceString(TextLayoutModel book = null)
         {
+            TextModel tm = null;
+            if (book == null) { tm = _textModel; }
+            else
+            {
+                StringBuilder s = new StringBuilder();
+                book.Pages.ToList().ForEach(x => x.Value.ToList().ForEach(p => s.Append(p.Value)));
+                string bookLines = s.ToString();
+                tm = TextModel.NewInstance(bookLines);
+            }
 
-            var lines = _textModel.Paragraphs.Select(x => x.Content).ToList();
-
-
-            // Слово(№ строки, количество слов в строке)
-            IDictionary<string, Dictionary<int, int>> words = GetConcordance(lines);
-
+            var lines = tm.Paragraphs.Select(x => x.Content).ToList();
             
-
-
+            // Слово(№ строки, количество слов в строке)
+            IDictionary<string, Dictionary<int, int>> words = GetConcordance(lines);           
 
             StringBuilder str = new StringBuilder();
-
             string firstLetter = "";
             foreach (var item in words)
             {                
@@ -182,57 +197,6 @@ namespace Task2.Menu
                 str.Append(string.Format("\r\n", firstLetter));
             }
             str.Append(string.Format("\r\n"));
-
-
-
-
-
-
-
-
-
-
-
-
-            //StringBuilder str = new StringBuilder();
-
-            ////str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
-
-            //if (page == null)
-            //{                
-            //    int count = 0;
-            //    foreach (var item in lst)
-            //    {
-            //        str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, 
-            //                                                                        item.Key,
-            //                                                                        item.Count()));
-            //        //str.Append(GetGroupedItems(item));       
-            //        int round = 0;
-            //        foreach (var group in item)
-            //        {
-            //            str.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
-            //        }
-
-            //        if (++round >= VIEW_COLUMNS)
-            //        {
-            //            round = 0;
-            //            str.Append(string.Format("\n       "));
-            //        }
-
-            //        str.Append(string.Format("\n\n"));
-
-            //        if (count >= WORD_VIEW_LIMIT)
-            //        {
-            //            str.Append(string.Format("\n"));
-            //            break;
-            //        }
-            //    }
-            //    str.Append(string.Format("\n"));
-            //}
-
-
-
-
 
             string result = str.ToString().Trim();
             return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
@@ -263,102 +227,6 @@ namespace Task2.Menu
         }
 
 
-        //private static string GetGroupedItems(IGrouping<string, WordPartModel> gr)
-        //{
-        //    if ( gr == null) { return "Нет данных."; }
-
-        //    StringBuilder result = new StringBuilder();
-
-        //    int round = 0;
-        //    foreach (var group in gr)
-        //    {
-        //        result.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
-        //    }
-
-        //    if (++round >= VIEW_COLUMNS)
-        //    {
-        //        round = 0;
-        //        result.Append(string.Format("\n       "));
-        //    }
-        //    return result.ToString();
-
-        //}
-
-
-
-        ///// <summary>
-        ///// Format string for view concordance word positions
-        ///// </summary>
-        ///// <param name="cItem">concordance item</param>
-        ///// <param name="v"></param>
-        ///// <returns></returns>
-        //private static string GetGroupedItems(WordPartModel wp)
-        //{
-        //    if (wp == null) { return "Нет данных."; }
-
-        //    StringBuilder result = new StringBuilder();
-        //    int round = 0;
-        //    result.Append(string.Format("{0},{1},{2};       ", wp.ParagraphNumber, wp.SentenseNumber, wp.Number));
-        //    if (++round >= VIEW_COLUMNS)
-        //    {
-        //        round = 0;
-        //        result.Append(string.Format("\n       "));
-        //    }
-        //    return result.ToString();
-        //}
-
-
-        /// <summary>
-        /// View full concordance
-        /// </summary>
-        //private static void ViewConcordance()
-        //{
-        //    StringBuilder str = new StringBuilder();
-
-        //    str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
-
-        //    int count = 0;
-
-        //    foreach (var item in _concordance.Words)
-        //    {
-        //        str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, item.Word, item.Positions.Count));
-        //        str.Append(ViewConcordance(item));
-        //        str.Append(string.Format("\n"));
-        //    }
-
-        //    WaitForContinue(str.ToString());
-        //}
-
-        ///// <summary>
-        ///// View full concordance
-        ///// </summary>
-        //private static void ViewConcordance()
-        //{
-        //    StringBuilder str = new StringBuilder();
-
-        //    str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
-
-        //    int count = 0;
-
-        //    foreach (var item in _concordance.Words)
-        //    {
-        //        str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, item.Word, item.Positions.Count));
-        //        str.Append(ViewConcordance(item));
-        //        str.Append(string.Format("\n"));
-        //    }
-
-        //    WaitForContinue(str.ToString());
-        //}
-
-
-
-        /// <summary>
-        /// View Concordsnce by text to A4 page format
-        /// </summary>
-        private static void ViewConcordanceA4()
-        {
-            ToDisplay.WaitForContinue("Предметный указатель слов для А4.");
-        }
 
         /// <summary>
         /// View Concordsnce by text to A5 page format
