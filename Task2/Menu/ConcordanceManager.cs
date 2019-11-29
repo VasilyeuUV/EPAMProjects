@@ -98,10 +98,16 @@ namespace Task2.Menu
         /// View Concordance by text
         /// </summary>
         private static void ViewConcordance()
-        {            
+        {
             //"Показ конкорданса."
-            ToDisplay.ViewTitle("КОНКОРДАНС", true);
-            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordance));
+            //ToDisplay.ViewTitle("КОНКОРДАНС", true);
+            //ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordance));
+            //
+
+            foreach (var item in TmWordParts)
+            {
+                Console.WriteLine(item);
+            }
             ToDisplay.WaitForContinue();
         }
 
@@ -180,7 +186,8 @@ namespace Task2.Menu
                 
             }
 
-            return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
+            return "";
+            //return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
         }
 
 

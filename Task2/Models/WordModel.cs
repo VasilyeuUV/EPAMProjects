@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Task2.Interfaces;
@@ -9,6 +10,7 @@ namespace Task2.Models
     internal sealed class WordModel : IContentable
     {
         private ICollection<string> _wordParts = null;
+        private ICollection<WordPartModel> _wordPartsModel = null;
 
         /// <summary>
         /// Paragraph number
@@ -33,9 +35,17 @@ namespace Task2.Models
 
         /// <summary>
         /// Word Parts in word content
-        /// </summary>
-        internal ICollection<string> WordParts => _wordParts == null ? _wordParts = GetWordParts(Content) : _wordParts;
+        /// </summary>  
+        internal ICollection<string> WordParts => _wordParts == null 
+            ? _wordParts = GetWordParts(Content) 
+            : _wordParts;
 
+        /// <summary>
+        /// Word Parts Model
+        /// </summary>
+        internal ICollection<WordPartModel> WordPartsModel => _wordPartsModel == null 
+            ? _wordPartsModel = GetWordPartsModel(WordParts) 
+            : _wordPartsModel;
 
         /// <summary>
         /// CTOR
@@ -94,6 +104,22 @@ namespace Task2.Models
 
             return result;
         }
+
+
+        /// <summary>
+        /// Parse Word to word component (example: "World"! => ["], [World], ["], [!])
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private ICollection<WordPartModel> GetWordPartsModel(ICollection<string> words)
+        {
+            if (TextHandler.IsEmpty(words)) { return null; }
+
+            return words.Where(w => w.Trim().Length > 0)
+                 .Select((w, n) => WordPartModel.NewInstance(w, ++n, this.ParagraphNumber, this.Number))
+                 .ToList();
+        }
+
 
 
     }

@@ -88,18 +88,36 @@ namespace Task2.Tools
                   textModel.Paragraphs.SelectMany(p =>
                             p.Sentences.SelectMany(s =>
                                 s.Words.SelectMany(w =>
-                                    w.WordParts.Select(wp =>
+                                    w.WordParts.ToList()
+                                        .Where(wp => wp != null)
+                                        .GroupBy(wp => wp)
+                                        .Select(x => ConcordanceItemModel.NewInstance(x))
+                                    
+                                    
+                                    
+                                    Select(wp => ConcordanceItemModel.NewInstance()
                                     {
-                                        ref string rwp = ref wp;
-                                        return rwp;
+                                        ref string rwp = ref wp,
+
+                                        //return rwp;
                                     }).ToList())))
             );
             //var result = Task.Run(() =>
-            //    _textModel.Paragraphs.SelectMany(p =>
+            //      textModel.Paragraphs.SelectMany(p =>
             //                p.Sentences.SelectMany(s =>
             //                    s.Words.SelectMany(w =>
-            //                        w.WordParts.ToList())))
+            //                        w.WordParts.Select(wp =>
+            //                        {
+            //                            ref string rwp = ref wp;
+            //                            return rwp;
+            //                        }).ToList())))
             //);
+            ////var result = Task.Run(() =>
+            ////    _textModel.Paragraphs.SelectMany(p =>
+            ////                p.Sentences.SelectMany(s =>
+            ////                    s.Words.SelectMany(w =>
+            ////                        w.WordParts.ToList())))
+            ////);
             return result;
         }
 
