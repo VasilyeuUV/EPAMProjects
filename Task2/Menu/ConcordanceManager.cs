@@ -18,6 +18,7 @@ namespace Task2.Menu
         private const int PARAGRAPH_VIEW_LIMIT = 10;
         private const int SENTENCE_VIEW_LIMIT = 25;
         private const int WORD_VIEW_LIMIT = 100;
+        private const int VIEW_COLUMNS = 6;
 
         private static TextModel _textModel = null;
         private static IEnumerable<WordPartModel> _tmWordParts = null;
@@ -99,17 +100,8 @@ namespace Task2.Menu
         private static void ViewConcordance()
         {
             //"Показ конкорданса."
-            //ToDisplay.ViewTitle("КОНКОРДАНС", true);
-            //ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordance));
-            //
-
-            foreach (var item in TmWordParts)
-            {
-                Console.WriteLine(string.Format("{0}: [{1}:{2}:{3}]", item.ParagraphNumber
-                                                                    , item.SentenseNumber
-                                                                    , item.Number
-                                                                    , item.Content));
-            }
+            ToDisplay.ViewTitle("КОНКОРДАНС", true);
+            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordance));
             ToDisplay.WaitForContinue();
         }
 
@@ -159,39 +151,107 @@ namespace Task2.Menu
         /// <returns></returns>
         private static string GetConcordanceString(IReadOnlyDictionary<Const.PageParameter, int> page = null)
         {
-            //List<WordModel> lst = new List<WordModel>();
-            //// ТУТ ИНОГДА ВЫДАЕТ ОШИБКУ О НЕДОСТАТОЧНОСТИ РАЗМЕРА МАССИВА (РАЗОБРАТЬСЯ)
-            //_textModel.Paragraphs.AsParallel()
-            //          .ForAll(p => lst.AddRange(p.Sentences.SelectMany(w => w.Words).ToList()));
 
+            var conc = TextHandler.GetGroupedWordParts(TmWordParts);
+            //var words = UniqueWord.Select(x => x.ToLower());
 
-
+            List<IGrouping<string, WordPartModel>> lst = new List<IGrouping<string, WordPartModel>>();
+            foreach (var item in conc)
+            {
+                if (UniqueWord.Select(w => w.ToLower()).Contains(item.Key.ToLower()))
+                {
+                    lst.Add(item);
+                }
+            }
 
             StringBuilder str = new StringBuilder();
 
             //str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
 
             if (page == null)
-            {
-                
-                int count = 1;
-                foreach (var item in _textModel.Paragraphs)
+            {                
+                int count = 0;
+                foreach (var item in lst)
                 {
-                    str.Append(string.Format("{0} - {1}\n", item.Number, item.Content));
-                    if (++count >= WORD_VIEW_LIMIT)
+                    str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, 
+                                                                                    item.Key,
+                                                                                    item.Count()));
+                    //str.Append(GetGroupedItems(item));       
+                    int round = 0;
+                    foreach (var group in item)
+                    {
+                        str.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
+                    }
+
+                    if (++round >= VIEW_COLUMNS)
+                    {
+                        round = 0;
+                        str.Append(string.Format("\n       "));
+                    }
+
+                    str.Append(string.Format("\n\n"));
+
+                    if (count >= WORD_VIEW_LIMIT)
                     {
                         str.Append(string.Format("\n"));
                         break;
                     }
                 }
-                string result = str.ToString().Trim();
-                
+                str.Append(string.Format("\n"));
             }
 
-            return "";
-            //return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
+
+
+
+
+            string result = str.ToString().Trim();
+            return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
         }
 
+
+        //private static string GetGroupedItems(IGrouping<string, WordPartModel> gr)
+        //{
+        //    if ( gr == null) { return "Нет данных."; }
+
+        //    StringBuilder result = new StringBuilder();
+
+        //    int round = 0;
+        //    foreach (var group in gr)
+        //    {
+        //        result.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
+        //    }
+            
+        //    if (++round >= VIEW_COLUMNS)
+        //    {
+        //        round = 0;
+        //        result.Append(string.Format("\n       "));
+        //    }
+        //    return result.ToString();
+
+        //}
+
+
+
+        ///// <summary>
+        ///// Format string for view concordance word positions
+        ///// </summary>
+        ///// <param name="cItem">concordance item</param>
+        ///// <param name="v"></param>
+        ///// <returns></returns>
+        //private static string GetGroupedItems(WordPartModel wp)
+        //{
+        //    if (wp == null) { return "Нет данных."; }
+
+        //    StringBuilder result = new StringBuilder();
+        //    int round = 0;
+        //    result.Append(string.Format("{0},{1},{2};       ", wp.ParagraphNumber, wp.SentenseNumber, wp.Number));
+        //    if (++round >= VIEW_COLUMNS)
+        //    {
+        //        round = 0;
+        //        result.Append(string.Format("\n       "));
+        //    }
+        //    return result.ToString();
+        //}
 
 
         /// <summary>

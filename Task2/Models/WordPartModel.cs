@@ -64,6 +64,6 @@ namespace Task2.Models
             return new WordPartModel(word, number, paragraphNumber, sentenceNumber);
         }
 
-
     }
 }
+

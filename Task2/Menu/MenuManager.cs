@@ -57,7 +57,7 @@ namespace Task2.Menu
                 ToDisplay.WaitForContinue("При обработке текста возникли ошибки. Текст не обработан.");
                 return;
             }
-            ToDisplay.WaitForContinue("Текс обработан успешно.");
+            ToDisplay.WaitForContinue("Текст обработан успешно.");
 
             ConcordanceManager.DisplayOperationMenuAsync(textModel);
         }

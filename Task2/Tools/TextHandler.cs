@@ -26,26 +26,26 @@ namespace Task2.Tools
                                       .Where(s => (s = s.Trim()) != string.Empty)
                                       .ToList());
 
-            var result = new List<string>();
+            List<string> result = new List<string>();
             words.AsParallel()
-                .ForAll(w =>
-                {
-                    w = GetWordContent(w);
-                    if (!string.IsNullOrWhiteSpace(w.Trim()))
-                    {
-                        // capital letter
-                        w = IsUpperCase(w) ? w
-                                           : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
-                        result.Add(w);
-                    }
-                });
+                 .ForAll(w =>
+                 {
+                     if (w != null) {}
+                     w = GetWordContent(w);
+                     if (!string.IsNullOrWhiteSpace(w))
+                     {
+                         // capital letter
+                         w = IsUpperCase(w) ? w
+                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
 
-            return result.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x);
+                         // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
+                         result.Add(w);
+                     }
+                 });
+
+            return result.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
         }
 
-
-
-        #region TEXTMODEL_OPERATIONS
 
 
         /// <summary>
@@ -53,27 +53,19 @@ namespace Task2.Tools
         /// </summary>
         /// <param name="paragraphs"></param>
         /// <returns></returns>
-        //internal static IEnumerable<ConcordanceItemModel> GetTMWordParts(IEnumerable<ParagraphModel> paragraphs)
-        //{
-        //    List<WordPartModel> lst = new List<WordPartModel>();
+        internal static IOrderedEnumerable<IGrouping<string, WordPartModel>> GetGroupedWordParts(IEnumerable<WordPartModel> wp, 
+                                                                  IEnumerable<string> unique = null,
+                                                                  TextLayoutModel page = null)
+        {
+            var result = wp.Where(w => w.Content.Length > 0)
+                           .GroupBy(w => w.Content)
+                           .OrderBy(gr => gr.Key);
+                           //.ToList();
+            return result;
+        }
 
 
-        //    // ТУТ ИНОГДА ВЫДАЕТ ОШИБКУ О НЕДОСТАТОЧНОСТИ РАЗМЕРА МАССИВА (РАЗОБРАТЬСЯ)
-        //    paragraphs.AsParallel()
-        //              .ForAll(p => lst.AddRange(p.Sentences.SelectMany(w => 
-        //                                            w.Words.SelectMany(wp => wp.WordPartsModel).ToList())));
-
-
-        //    return lst.Where(w => w != null)
-        //              .GroupBy(w => w.Content)
-        //              .Select(x => ConcordanceItemModel.NewInstance(x))
-        //              .Where(x => x != null)
-        //              .OrderBy(x => x.Word)
-        //              .ThenBy(x => x.Positions.OrderBy(p => p.ParagraphNumber)
-        //                                      .ThenBy(p => p.SentenceNumber)
-        //                                      .ThenBy(p => p.WordNumber))
-        //              .ToList();
-        //}
+        #region TEXTMODEL_OPERATIONS
 
 
         /// <summary>
@@ -85,27 +77,6 @@ namespace Task2.Tools
         {
             if (TextHandler.IsEmptyTextModel(textModel)) { return null; }
 
-            //var result = Task.Run(() =>
-            //      textModel.Paragraphs.SelectMany(p =>
-            //                p.Sentences.SelectMany(s =>
-            //                    s.Words.SelectMany(w =>
-            //                        w.WordParts.ToList()
-            //                            .Where(wp => wp != null)
-
-
-            //                            .GroupBy(wp => wp)
-            //                            .Select(x => 
-
-
-
-
-            //                        Select(wp => ConcordanceItemModel.NewInstance()
-            //                        {
-            //    ref string rwp = ref wp,
-
-            //                            //return rwp;
-            //}).ToList())))
-            //);
             var result = Task.Run(() =>
                   textModel.Paragraphs.SelectMany(p =>
                             p.Sentences.SelectMany(s =>
@@ -116,29 +87,10 @@ namespace Task2.Tools
                                         return rwp;
                                     }).ToList())))
             );
-            //var result = Task.Run(() =>
-            //      textModel.Paragraphs.SelectMany(p =>
-            //                p.Sentences.SelectMany(s =>
-            //                    s.Words.SelectMany(w =>
-            //                        w.WordParts.Select(wp =>
-            //                        {
-            //                            ref string rwp = ref wp;
-            //                            return rwp;
-            //                        }).ToList())))
-            //);
-            ////var result = Task.Run(() =>
-            ////    _textModel.Paragraphs.SelectMany(p =>
-            ////                p.Sentences.SelectMany(s =>
-            ////                    s.Words.SelectMany(w =>
-            ////                        w.WordParts.ToList())))
-            ////);
             return result;
         }
 
-
-
-
-
+                     
         /// <summary>
         /// Check TextModel object for null or empty
         /// </summary>
