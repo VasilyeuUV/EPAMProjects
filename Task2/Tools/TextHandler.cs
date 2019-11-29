@@ -53,26 +53,27 @@ namespace Task2.Tools
         /// </summary>
         /// <param name="paragraphs"></param>
         /// <returns></returns>
-        internal static IEnumerable<ConcordanceItemModel> GetTMWordParts(IEnumerable<ParagraphModel> paragraphs)
-        {
-            List<WordModel> lst = new List<WordModel>();
+        //internal static IEnumerable<ConcordanceItemModel> GetTMWordParts(IEnumerable<ParagraphModel> paragraphs)
+        //{
+        //    List<WordPartModel> lst = new List<WordPartModel>();
 
 
-            // ТУТ ИНОГДА ВЫДАЕТ ОШИБКУ О НЕДОСТАТОЧНОСТИ РАЗМЕРА МАССИВА (РАЗОБРАТЬСЯ)
-            paragraphs.AsParallel()
-                      .ForAll(p => lst.AddRange(p.Sentences.SelectMany(w => w.Words).ToList()));
+        //    // ТУТ ИНОГДА ВЫДАЕТ ОШИБКУ О НЕДОСТАТОЧНОСТИ РАЗМЕРА МАССИВА (РАЗОБРАТЬСЯ)
+        //    paragraphs.AsParallel()
+        //              .ForAll(p => lst.AddRange(p.Sentences.SelectMany(w => 
+        //                                            w.Words.SelectMany(wp => wp.WordPartsModel).ToList())));
 
 
-            return lst.Where(w => w != null)
-                      .GroupBy(w => w.Content)
-                      .Select(x => ConcordanceItemModel.NewInstance(x))
-                      .Where(x => x != null)
-                      .OrderBy(x => x.Word)
-                      .ThenBy(x => x.Positions.OrderBy(p => p.ParagraphNumber)
-                                              .ThenBy(p => p.SentenceNumber)
-                                              .ThenBy(p => p.WordNumber))
-                      .ToList();
-        }
+        //    return lst.Where(w => w != null)
+        //              .GroupBy(w => w.Content)
+        //              .Select(x => ConcordanceItemModel.NewInstance(x))
+        //              .Where(x => x != null)
+        //              .OrderBy(x => x.Word)
+        //              .ThenBy(x => x.Positions.OrderBy(p => p.ParagraphNumber)
+        //                                      .ThenBy(p => p.SentenceNumber)
+        //                                      .ThenBy(p => p.WordNumber))
+        //              .ToList();
+        //}
 
 
         /// <summary>
@@ -80,26 +81,39 @@ namespace Task2.Tools
         /// </summary>
         /// <param name="textModel"></param>
         /// <returns></returns>
-        internal static Task<IEnumerable<string>> GetTMWordParts(TextModel textModel)
+        internal static Task<IEnumerable<WordPartModel>> GetTMWordParts(TextModel textModel)
         {
             if (TextHandler.IsEmptyTextModel(textModel)) { return null; }
 
+            //var result = Task.Run(() =>
+            //      textModel.Paragraphs.SelectMany(p =>
+            //                p.Sentences.SelectMany(s =>
+            //                    s.Words.SelectMany(w =>
+            //                        w.WordParts.ToList()
+            //                            .Where(wp => wp != null)
+
+
+            //                            .GroupBy(wp => wp)
+            //                            .Select(x => 
+
+
+
+
+            //                        Select(wp => ConcordanceItemModel.NewInstance()
+            //                        {
+            //    ref string rwp = ref wp,
+
+            //                            //return rwp;
+            //}).ToList())))
+            //);
             var result = Task.Run(() =>
                   textModel.Paragraphs.SelectMany(p =>
                             p.Sentences.SelectMany(s =>
                                 s.Words.SelectMany(w =>
-                                    w.WordParts.ToList()
-                                        .Where(wp => wp != null)
-                                        .GroupBy(wp => wp)
-                                        .Select(x => ConcordanceItemModel.NewInstance(x))
-                                    
-                                    
-                                    
-                                    Select(wp => ConcordanceItemModel.NewInstance()
+                                    w.WordPartsModel.Select(wp =>
                                     {
-                                        ref string rwp = ref wp,
-
-                                        //return rwp;
+                                        ref WordPartModel rwp = ref wp;
+                                        return rwp;
                                     }).ToList())))
             );
             //var result = Task.Run(() =>

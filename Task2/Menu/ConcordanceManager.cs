@@ -20,18 +20,17 @@ namespace Task2.Menu
         private const int WORD_VIEW_LIMIT = 100;
 
         private static TextModel _textModel = null;
-        private static IEnumerable<string> _tmWordParts = null;
+        private static IEnumerable<WordPartModel> _tmWordParts = null;
         private static IEnumerable<string> _uniqueWord = null;
 
         public static IEnumerable<string> UniqueWord => _uniqueWord == null 
             ? TextHandler.ParseTextToWordsAsync(_textModel.Content).Result 
             : _uniqueWord;
 
-        public static IEnumerable<string> TmWordParts => _tmWordParts == null
+        internal static IEnumerable<WordPartModel> TmWordParts => _tmWordParts == null
             ? TextHandler.GetTMWordParts(_textModel).Result
             : _tmWordParts;
-        
-        
+
 
 
         #region CONCORDANCE_SECOND_MENU
@@ -106,7 +105,10 @@ namespace Task2.Menu
 
             foreach (var item in TmWordParts)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(string.Format("{0}: [{1}:{2}:{3}]", item.ParagraphNumber
+                                                                    , item.SentenseNumber
+                                                                    , item.Number
+                                                                    , item.Content));
             }
             ToDisplay.WaitForContinue();
         }
