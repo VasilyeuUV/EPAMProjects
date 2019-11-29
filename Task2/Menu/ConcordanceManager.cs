@@ -152,53 +152,83 @@ namespace Task2.Menu
         private static string GetConcordanceString(IReadOnlyDictionary<Const.PageParameter, int> page = null)
         {
 
-            var conc = TextHandler.GetGroupedWordParts(TmWordParts);
-            //var words = UniqueWord.Select(x => x.ToLower());
+            var lines = _textModel.Paragraphs.Select(x => x.Content).ToList();
 
-            List<IGrouping<string, WordPartModel>> lst = new List<IGrouping<string, WordPartModel>>();
-            foreach (var item in conc)
-            {
-                if (UniqueWord.Select(w => w.ToLower()).Contains(item.Key.ToLower()))
-                {
-                    lst.Add(item);
-                }
-            }
+
+            // Слово(№ строки, количество слов в строке)
+            IDictionary<string, Dictionary<int, int>> words = GetConcordance(lines);
+
+            
+
+
 
             StringBuilder str = new StringBuilder();
 
-            //str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
-
-            if (page == null)
+            string firstLetter = "";
+            foreach (var item in words)
             {                
-                int count = 0;
-                foreach (var item in lst)
+                string word = item.Key;
+                if (firstLetter != word[0].ToString().ToUpper())
                 {
-                    str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, 
-                                                                                    item.Key,
-                                                                                    item.Count()));
-                    //str.Append(GetGroupedItems(item));       
-                    int round = 0;
-                    foreach (var group in item)
-                    {
-                        str.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
-                    }
-
-                    if (++round >= VIEW_COLUMNS)
-                    {
-                        round = 0;
-                        str.Append(string.Format("\n       "));
-                    }
-
-                    str.Append(string.Format("\n\n"));
-
-                    if (count >= WORD_VIEW_LIMIT)
-                    {
-                        str.Append(string.Format("\n"));
-                        break;
-                    }
+                    str.Append(string.Format("\r\n"));
+                    firstLetter = word[0].ToString().ToUpper();
+                    str.Append(string.Format("{0}:\r\n", firstLetter));
                 }
-                str.Append(string.Format("\n"));
+                str.Append(string.Format("- {0, -25} {1}: ", word/*.ToLower()*/, item.Value.Count()));
+                foreach (var d in item.Value)
+                {
+                    str.Append(string.Format("{0}; ", d.Key));
+                }
+                str.Append(string.Format("\r\n", firstLetter));
             }
+            str.Append(string.Format("\r\n"));
+
+
+
+
+
+
+
+
+
+
+
+
+            //StringBuilder str = new StringBuilder();
+
+            ////str.Append(string.Format("КОНКОРДАНС ({0} слов)\n\n", _concordance.WordUniqueCount));
+
+            //if (page == null)
+            //{                
+            //    int count = 0;
+            //    foreach (var item in lst)
+            //    {
+            //        str.Append(string.Format("{0}. {1, -25} : {2, 3} шт.\n       ", ++count, 
+            //                                                                        item.Key,
+            //                                                                        item.Count()));
+            //        //str.Append(GetGroupedItems(item));       
+            //        int round = 0;
+            //        foreach (var group in item)
+            //        {
+            //            str.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
+            //        }
+
+            //        if (++round >= VIEW_COLUMNS)
+            //        {
+            //            round = 0;
+            //            str.Append(string.Format("\n       "));
+            //        }
+
+            //        str.Append(string.Format("\n\n"));
+
+            //        if (count >= WORD_VIEW_LIMIT)
+            //        {
+            //            str.Append(string.Format("\n"));
+            //            break;
+            //        }
+            //    }
+            //    str.Append(string.Format("\n"));
+            //}
 
 
 
@@ -206,6 +236,30 @@ namespace Task2.Menu
 
             string result = str.ToString().Trim();
             return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
+        }
+
+        private static IDictionary<string, Dictionary<int, int>> GetConcordance(List<string> lines)
+        {
+            Dictionary<string, Dictionary<int, int>> result = new Dictionary<string, Dictionary<int, int>>();
+            int nLine = 0;
+            foreach (var line in lines)
+            {
+                ++nLine;
+                var words = TextHandler.ParseTextToWords(line).OrderByDescending(x => x.Length);   // массив слов строки
+                var uWords = words.Distinct();
+
+                foreach (var word in uWords)
+                {
+                    int wordCount = words.Where(x => x == word).Count();
+                    if (!result.ContainsKey(word))
+                    {
+                        Dictionary<int, int> d = new Dictionary<int, int>() { [nLine] = wordCount };
+                        result.Add(word, d);
+                    }
+                    else { result[word].Add(nLine, wordCount); }
+                }
+            }
+            return new SortedDictionary<string, Dictionary<int, int>>(result); 
         }
 
 
@@ -220,7 +274,7 @@ namespace Task2.Menu
         //    {
         //        result.Append(string.Format("{0},{1},{2};       ", group.ParagraphNumber, group.SentenseNumber, group.Number));
         //    }
-            
+
         //    if (++round >= VIEW_COLUMNS)
         //    {
         //        round = 0;

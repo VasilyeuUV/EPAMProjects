@@ -91,7 +91,7 @@ namespace Task2.Models
             if (string.IsNullOrWhiteSpace(content)) { return null; }
 
             string word = TextHandler.GetWordContent(content);
-            string w = Regex.Replace(content, word, "1", RegexOptions.IgnoreCase);
+            string w = Regex.Replace(Regex.Escape(content), Regex.Escape(word), "1", RegexOptions.IgnoreCase);
             var result = w.ToCharArray().Select(c => c.ToString()).ToList();
 
             for (int i = 0; i < result.Count; i++)

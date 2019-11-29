@@ -21,15 +21,16 @@ namespace Task2.Tools
         {
             if (string.IsNullOrWhiteSpace(text)) { return null; }
 
-            List<string> words = await Task.Run(() =>
+            List<string> words = Task.Run(() =>
                                  Regex.Split(text, Const.WORD_DELIMITER)
                                       .Where(s => (s = s.Trim()) != string.Empty)
-                                      .ToList());
+                                      .ToList()).Result;
 
             List<string> result = new List<string>();
             words.AsParallel()
                  .ForAll(w =>
                  {
+                     //Console.WriteLine(w);
                      if (w != null) {}
                      w = GetWordContent(w);
                      if (!string.IsNullOrWhiteSpace(w))
@@ -40,11 +41,45 @@ namespace Task2.Tools
 
                          // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
                          result.Add(w);
+
                      }
                  });
 
             return result.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
         }
+
+
+        internal static IEnumerable<string> ParseTextToWords(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) { return null; }
+
+            List<string> words = Task.Run(() =>
+                                 Regex.Split(text, Const.WORD_DELIMITER)
+                                      .Where(s => (s = s.Trim()) != string.Empty)
+                                      .ToList()).Result;
+
+            List<string> result = new List<string>();
+            words.AsParallel()
+                 .ForAll(w =>
+                 {
+                     //Console.WriteLine(w);
+                     if (w != null) { }
+                     w = GetWordContent(w);
+                     if (!string.IsNullOrWhiteSpace(w))
+                     {
+                         // capital letter
+                         w = IsUpperCase(w) ? w
+                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
+
+                         // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
+                         result.Add(w);
+
+                     }
+                 });
+
+            return result.Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
+        }
+
 
 
 
