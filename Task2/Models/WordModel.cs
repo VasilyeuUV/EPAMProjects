@@ -115,7 +115,7 @@ namespace Task2.Models
         {
             if (TextHandler.IsEmpty(words)) { return null; }
 
-            return words.Where(w => w.Trim().Length > 0)
+            return words.Where(w => w/*.Trim()*/.Length > 0)
                  .Select((w, n) => WordPartModel.NewInstance(w, ++n, this.ParagraphNumber, this.Number))
                  .ToList();
         }

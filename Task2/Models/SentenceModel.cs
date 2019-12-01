@@ -28,7 +28,7 @@ namespace Task2.Models
         /// <summary>
         /// Word content of sentence
         /// </summary>
-        internal IEnumerable<WordModel> Words => _words == null ? _words = GetWords(Content) : _words;
+        internal IEnumerable<WordModel> Words => _words == null ? _words = SetWords(Content) : _words;
 
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Task2.Models
         /// </summary>
         /// <param name="sentence">this sentence content</param>
         /// <returns>words list</returns>
-        private IEnumerable<WordModel> GetWords(string sentence)
+        private IEnumerable<WordModel> SetWords(string sentence)
         {
             if (string.IsNullOrWhiteSpace(sentence)) { return null; }
 
@@ -72,6 +72,24 @@ namespace Task2.Models
                         .Select((word, n) => WordModel.NewInstance(word, ++n, this.ParagraphNumber, this.Number))
                         .ToList();
         }
+
+
+        #region CONVERTERS
+        //##############################################################################################################################
+
+
+        /// <summary>
+        /// Get all words, punctuations mark and other symbols from this sentence
+        /// </summary>
+        /// <returns>WordPartModel list</returns>
+        internal IEnumerable<WordPartModel> GetWords()
+        {
+            return this.Words.SelectMany(wp => wp.WordPartsModel);
+        }
+
+        #endregion CONVERTERS
+
+
     }
 }
 

@@ -18,7 +18,7 @@ namespace Task2.Models
         /// <summary>
         /// Text paragraphs
         /// </summary>
-        internal IEnumerable<ParagraphModel> Paragraphs => _paragraphs == null ? _paragraphs = GetParagraphs(Content) : _paragraphs;
+        internal IEnumerable<ParagraphModel> Paragraphs => _paragraphs == null ? _paragraphs = SetParagraphs(Content) : _paragraphs;
 
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Task2.Models
         /// </summary>
         /// <param name="fileContent"> string file content</param>
         /// <returns>text paragraps</returns>
-        private static IEnumerable<ParagraphModel> GetParagraphs(string fileContent)
+        private static IEnumerable<ParagraphModel> SetParagraphs(string fileContent)
         {
             if (string.IsNullOrEmpty(fileContent.Trim())) { return null; }
 
@@ -55,6 +55,65 @@ namespace Task2.Models
                         .Select((x, n) => ParagraphModel.NewInstance(x, ++n))
                         .ToList();
         }
+
+
+
+        #region CONVERTERS
+        //##############################################################################################################################
+
+
+        /// <summary>
+        /// Get sentences from this text
+        /// </summary>
+        /// <returns>SentenceModel objects list</returns>
+        internal IEnumerable<SentenceModel> GetSentences(int nParagraph = 0, int nSentence = 0)
+        {
+            IEnumerable<SentenceModel> result = null;
+            result = this.Paragraphs.SelectMany(p => p.Sentences).Where(s => s != null).Select(s => s);
+
+            if (nParagraph > 0) { result = result.Where(s => s.ParagraphNumber == nParagraph); }
+            if (nSentence > 0) { result = result.Where(s => s.Number == nSentence); }
+
+            return (this.Paragraphs == null || this.Paragraphs.Count() < 1) ? null
+                : result;
+        }
+
+
+        /// <summary>
+        /// Get all words, punctuations mark and other symbols from this text
+        /// </summary>
+        /// <returns>WordPartModel list</returns>
+        internal IEnumerable<WordPartModel> GetWords(int nParagraph = 0, int nSentence = 0)
+        {
+            IEnumerable<SentenceModel> sentences = GetSentences();            
+            var result = sentences.SelectMany(s => s.Words.SelectMany(wp => wp.WordPartsModel));
+
+            if (nParagraph > 0) { result = result.Where(s => s.ParagraphNumber == nParagraph); }
+            if (nSentence > 0) { result = result.Where(s => s.SentenseNumber == nSentence); }
+            return result;
+        }
+
+
+        /// <summary>
+        /// Get words starting with a letter or number from this text
+        /// </summary>
+        /// <returns>String list</returns>
+        internal IEnumerable<string> GetUniqueWords()
+        {
+           return (GetWords().Select(w => w.Content)).Distinct().Where(w => char.IsLetter(w[0]) || char.IsDigit(w[0]));
+        }
+
+
+
+
+
+        #endregion CONVERTERS
+
+
+
+
+
+
     }
 }
 

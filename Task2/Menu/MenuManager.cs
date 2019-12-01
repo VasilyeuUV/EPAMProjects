@@ -17,8 +17,8 @@ namespace Task2.Menu
 
         internal static void DisplayMainMenu()
         {
-            string operation = "ИСХОДНЫЕ ДАННЫЕ:";
-            string[] items = { "Выбрать файл для обработки", "Выход" };
+            string operation = "INITIAL DATA:";
+            string[] items = { "Select a file to process", "Exit" };
             method[] methods = new MenuManager.method[] { FileDialog, Exit };
             SelectMenuItem(operation, items, methods);
         }
@@ -46,7 +46,7 @@ namespace Task2.Menu
             }
             catch (Exception e)
             {
-                ToDisplay.WaitForContinue(string.Format("Ошибка открытия файла:\n" + e.Message));
+                ToDisplay.WaitForContinue(string.Format("Error opening file:\n" + e.Message));
                 return;
             }
 
@@ -54,10 +54,10 @@ namespace Task2.Menu
 
             if (TextHandler.IsEmptyTextModel(textModel))
             {
-                ToDisplay.WaitForContinue("При обработке текста возникли ошибки. Текст не обработан.");
+                ToDisplay.WaitForContinue("There were errors while processing the text. Text not processed.");
                 return;
             }
-            ToDisplay.WaitForContinue("Текст обработан успешно.");
+            ToDisplay.WaitForContinue("Text processed successfully.");
 
             ConcordanceManager.DisplayOperationMenuAsync(textModel);
         }
@@ -85,7 +85,7 @@ namespace Task2.Menu
         /// </summary>
         private static void Exit()
         {
-            Console.WriteLine("Работа завершена.");
+            ToDisplay.WaitForContinue("Work completed.");
         }
 
 

@@ -15,23 +15,26 @@ namespace Task2.Menu
         /// <summary>
         /// Coefficient of displayed TextModel elements
         /// </summary>
-        private const int PARAGRAPH_VIEW_LIMIT = 10;
-        private const int SENTENCE_VIEW_LIMIT = 25;
-        private const int WORD_VIEW_LIMIT = 100;
-        private const int VIEW_COLUMNS = 6;
 
         private static TextModel _textModel = null;
         private static IEnumerable<WordPartModel> _tmWordParts = null;
         private static IEnumerable<string> _uniqueWord = null;
 
-        public static IEnumerable<string> UniqueWord => _uniqueWord == null 
-            ? TextHandler.ParseTextToWordsAsync(_textModel.Content).Result 
-            : _uniqueWord;
+        public static IEnumerable<string> UniqueWord => _uniqueWord ?? TextHandler.ParseTextToWordsAsync(_textModel.Content).Result;
 
-        internal static IEnumerable<WordPartModel> TmWordParts => _tmWordParts == null
-            ? TextHandler.GetTMWordParts(_textModel).Result
-            : _tmWordParts;
+        internal static IEnumerable<WordPartModel> TmWordParts => _tmWordParts ?? TextHandler.GetTMWordParts(_textModel).Result;
 
+        private static string[] items = {
+            "Text structure",
+            "Show Concordance",
+            "A4 word index",
+            "A5 word index",
+            "Show text sorted by word count in sentences",
+            "Show words of interrogative sentences",
+            "Replace words of a given length in a sentence",
+            "Delete words of a given length in the text",
+            "Back"
+        };
 
 
         #region CONCORDANCE_SECOND_MENU
@@ -40,7 +43,7 @@ namespace Task2.Menu
         /// <summary>
         /// Concordance view menu
         /// </summary>
-        internal async static void DisplayOperationMenuAsync(TextModel textModel)
+        internal static void DisplayOperationMenuAsync(TextModel textModel)
         {
             if (TextHandler.IsEmptyTextModel(textModel))
             {
@@ -49,17 +52,7 @@ namespace Task2.Menu
             }
 
             _textModel = textModel;
-
             string operation = "ОПЕРАЦИИ:";
-            string[] items = { "Структура текста",
-                               "Показать Конкорданс",
-                               "Предметный указатель слов для А4",
-                               "Предметный указатель слов для А5",
-                               "Показать текст сортированный по количеству слов в предложении",
-                               "Показать слова вопросительных предложений",
-                               "Заменить слова заданной длины в предложении",
-                               "Удалить слова заданной длины в тексте",
-                               "Назад" };
             method[] methods = new method[] {
                                ViewTextModel,               // "Структура текста"
                                ViewConcordance,             // "Показать Конкорданс",
@@ -79,42 +72,102 @@ namespace Task2.Menu
         /// </summary>
         private static void ViewTextModel()
         {
-            ToDisplay.ViewTitle("СТРУКТУРА ТЕКСТА", true);
+            ToDisplay.ViewTitle(items[0].ToUpper(), true);
 
-            ToDisplay.ViewTitle("АБЗАЦЫ");
+            ToDisplay.ViewTitle("PARAGRAPHS (АБЗАЦЫ)");
             ToDisplay.ViewBody(MakeParagraphString(Const.Task.GetTextModel));
 
-            ToDisplay.ViewTitle("ПРЕДЛОЖЕНИЯ");
+            ToDisplay.ViewTitle("SENTENCES (ПРЕДЛОЖЕНИЯ)");
             ToDisplay.ViewBody(MakeSentencesString(Const.Task.GetTextModel));
 
-            ToDisplay.ViewTitle("СЛОВА");
+            ToDisplay.ViewTitle("WORDS (СЛОВА)");
             ToDisplay.ViewBody(MakeWordsString(Const.Task.GetTextModel));
 
             ToDisplay.WaitForContinue();
         }
-
+        
 
         /// <summary>
         /// View Concordance by text
         /// </summary>
         private static void ViewConcordance()
         {
-            //"Показ конкорданса."
-            ToDisplay.ViewTitle("КОНКОРДАНС", true);
-            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordance));
+            var concordance = ConcordanceModel.CreateConcordance(_textModel.Paragraphs.Select(p => p.Content));
+
+            ToDisplay.ViewTitle(items[1].ToUpper(), true);
+
+            ToDisplay.ViewTitle("INITIAL TEXT");
+            ViewParagraphInfo(_textModel.Paragraphs.Count());
+            ToDisplay.ViewBody(_textModel.Content);
+
+            ToDisplay.ViewTitle("CONCORDANCE");
+            ViewWordInfo();
+            ToDisplay.ViewConcordanceTableHeader();
+            ToDisplay.ViewBody(concordance.ToString());
             ToDisplay.WaitForContinue();
         }
+               
 
         /// <summary>
         /// View Concordsnce by text to A4 page format
         /// </summary>
         private static void ViewConcordanceA4()
         {
-            //Предметный указатель слов для А4.
-            ToDisplay.ViewTitle("ПРЕДМЕТНЫЙ УКАЗАТЕЛЬ ДЛЯ ТЕКСТА ФОРМАТА А4", true);
-            ToDisplay.ViewBody(MakeConcordanceString(Const.Task.ViewConcordanceA4));
+            TextLayoutModel textA4 = TextLayoutModel.NewInstance(_textModel.Content);
+            var textA4Lines = textA4.ConvertToLines();
+            var concordance = ConcordanceModel.CreateConcordance(textA4Lines);
+
+            ToDisplay.ViewTitle(items[2].ToUpper(), true);
+            ToDisplay.ViewTitle("INITIAL TEXT");
+            ViewSentenceInfo(textA4Lines.Count());
+            ToDisplay.ViewBody(textA4.ConvertToText());
+
+            ToDisplay.ViewTitle(items[2].ToUpper());
+            ViewWordInfo();
+            ToDisplay.ViewConcordanceTableHeader();
+            ToDisplay.ViewBody(concordance.ToString());
             ToDisplay.WaitForContinue();
         }
+
+        
+        /// <summary>
+        /// View Concordsnce by text to A5 page format
+        /// </summary>
+        private static void ViewConcordanceA5()
+        {
+            TextLayoutModel textA5 = TextLayoutModel.NewInstance(_textModel.Content, Const.Page_A5);
+            var textA4Lines = textA5.ConvertToLines();
+            var concordance = ConcordanceModel.CreateConcordance(textA4Lines);
+
+            ToDisplay.ViewTitle(items[2].ToUpper(), true);
+            ToDisplay.ViewTitle("INITIAL TEXT");
+            ViewSentenceInfo(textA4Lines.Count());
+            ToDisplay.ViewBody(textA5.ConvertToText());
+
+            ToDisplay.ViewTitle(items[2].ToUpper());
+            ViewWordInfo();
+            ToDisplay.ViewConcordanceTableHeader();
+            ToDisplay.ViewBody(concordance.ToString());
+            ToDisplay.WaitForContinue();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         /// <summary>
@@ -134,107 +187,6 @@ namespace Task2.Menu
             ToDisplay.WaitForContinue();
         }
 
-
-        /// <summary>
-        /// Concordance options to display
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        private static string MakeConcordanceString(Const.Task task)
-        {
-            if (UniqueWord.Count() > WORD_VIEW_LIMIT)
-            {
-                ToDisplay.ViewInfo(UniqueWord.Count(), WORD_VIEW_LIMIT);
-            }
-            else { ToDisplay.ViewInfo(UniqueWord.Count()); }
-            
-            switch (task)
-            {
-                case Const.Task.ViewConcordance: return GetConcordanceString();
-                case Const.Task.ViewConcordanceA4: return GetConcordanceString(TextLayoutModel.NewInstance(_textModel.Content));
-            }
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Get Concordance
-        /// </summary>
-        /// <param name="page_A4Standart"></param>
-        /// <returns></returns>
-        private static string GetConcordanceString(TextLayoutModel book = null)
-        {
-            TextModel tm = null;
-            if (book == null) { tm = _textModel; }
-            else
-            {
-                StringBuilder s = new StringBuilder();
-                book.Pages.ToList().ForEach(x => x.Value.ToList().ForEach(p => s.Append(p.Value)));
-                string bookLines = s.ToString();
-                tm = TextModel.NewInstance(bookLines);
-            }
-
-            var lines = tm.Paragraphs.Select(x => x.Content).ToList();
-            
-            // Слово(№ строки, количество слов в строке)
-            IDictionary<string, Dictionary<int, int>> words = GetConcordance(lines);           
-
-            StringBuilder str = new StringBuilder();
-            string firstLetter = "";
-            foreach (var item in words)
-            {                
-                string word = item.Key;
-                if (firstLetter != word[0].ToString().ToUpper())
-                {
-                    str.Append(string.Format("\r\n"));
-                    firstLetter = word[0].ToString().ToUpper();
-                    str.Append(string.Format("{0}:\r\n", firstLetter));
-                }
-                str.Append(string.Format("- {0, -25} {1}: ", word/*.ToLower()*/, item.Value.Count()));
-                foreach (var d in item.Value)
-                {
-                    str.Append(string.Format("{0}; ", d.Key));
-                }
-                str.Append(string.Format("\r\n", firstLetter));
-            }
-            str.Append(string.Format("\r\n"));
-
-            string result = str.ToString().Trim();
-            return string.IsNullOrWhiteSpace(result) ? "Нет данных для отображения." : result;
-        }
-
-        private static IDictionary<string, Dictionary<int, int>> GetConcordance(List<string> lines)
-        {
-            Dictionary<string, Dictionary<int, int>> result = new Dictionary<string, Dictionary<int, int>>();
-            int nLine = 0;
-            foreach (var line in lines)
-            {
-                ++nLine;
-                var words = TextHandler.ParseTextToWords(line).OrderByDescending(x => x.Length);   // массив слов строки
-                var uWords = words.Distinct();
-
-                foreach (var word in uWords)
-                {
-                    int wordCount = words.Where(x => x == word).Count();
-                    if (!result.ContainsKey(word))
-                    {
-                        Dictionary<int, int> d = new Dictionary<int, int>() { [nLine] = wordCount };
-                        result.Add(word, d);
-                    }
-                    else { result[word].Add(nLine, wordCount); }
-                }
-            }
-            return new SortedDictionary<string, Dictionary<int, int>>(result); 
-        }
-
-
-
-        /// <summary>
-        /// View Concordsnce by text to A5 page format
-        /// </summary>
-        private static void ViewConcordanceA5()
-        {
-            ToDisplay.WaitForContinue("Предметный указатель слов для А5.");
-        }
 
 
 
@@ -295,6 +247,26 @@ namespace Task2.Menu
 
 
 
+
+
+        #region CONCORDANCE
+        //###############################################################################################################################
+
+
+
+
+
+
+
+
+
+        #endregion // CONCORDANCE
+
+
+
+
+
+
         #region PARAGRAPH_STRING_MAKER
         //###############################################################################################################################
 
@@ -304,11 +276,11 @@ namespace Task2.Menu
         /// <returns></returns>
         private static string MakeParagraphString(Const.Task task)
         {
-            if (_textModel.Paragraphs.Count() > PARAGRAPH_VIEW_LIMIT)
+            if (_textModel.Paragraphs.Count() > Const.PARAGRAPH_VIEW_LIMIT)
             {
-                ToDisplay.ViewInfo(_textModel.Paragraphs.Count(), PARAGRAPH_VIEW_LIMIT);
+                ToDisplay.ViewInfo("paragraphs", _textModel.Paragraphs.Count(), Const.PARAGRAPH_VIEW_LIMIT);
             }
-            else { ToDisplay.ViewInfo(_textModel.Paragraphs.Count()); }
+            else { ToDisplay.ViewInfo("paragraphs", _textModel.Paragraphs.Count()); }
 
 
             switch (task)
@@ -332,7 +304,7 @@ namespace Task2.Menu
             foreach (var item in _textModel.Paragraphs)
             {
                 str.Append(string.Format("{0} - {1}\n", item.Number, item.Content));
-                if (++count >= PARAGRAPH_VIEW_LIMIT)
+                if (++count >= Const.PARAGRAPH_VIEW_LIMIT)
                 {
                     str.Append(string.Format("\n"));
                     break;
@@ -359,13 +331,13 @@ namespace Task2.Menu
         private static string MakeSentencesString(Const.Task task, IEnumerable<IContentable> sent = null)
         {
             IEnumerable<IContentable> sentences = sent == null ? GetSentences() : sent;
-            List<SentenceModel> lst = TextHandler.ConvertIContentabletToList<SentenceModel>(sentences);
+            List<SentenceModel> lst = null; // TextHandler.ConvertIContentableToList<SentenceModel>(sentences);
 
-            if (sentences.Count() > SENTENCE_VIEW_LIMIT)
+            if (sentences.Count() > Const.SENTENCE_VIEW_LIMIT)
             {
-                ToDisplay.ViewInfo(sentences.Count(), SENTENCE_VIEW_LIMIT);
+                ToDisplay.ViewInfo("sentences", sentences.Count(), Const.SENTENCE_VIEW_LIMIT);
             }
-            else { ToDisplay.ViewInfo(sentences.Count()); }
+            else { ToDisplay.ViewInfo("sentences", sentences.Count()); }
 
             switch (task)
             {
@@ -395,7 +367,7 @@ namespace Task2.Menu
                 //if (sentence == null) { continue; }
 
                 str.Append(string.Format("{0}:{1}. {2}\n", item.ParagraphNumber, item.Number, item.Content));
-                if (++count >= SENTENCE_VIEW_LIMIT)
+                if (++count >= Const.SENTENCE_VIEW_LIMIT)
                 {
                     str.Append(string.Format("\n"));
                     break;
@@ -423,7 +395,7 @@ namespace Task2.Menu
                 str.Append(string.Format("({0} шт.) {1}\n",
                     item.Words.Count(),
                     item.Content));
-                if (++count >= SENTENCE_VIEW_LIMIT)
+                if (++count >= Const.SENTENCE_VIEW_LIMIT)
                 {
                     str.Append(string.Format("\n"));
                     break;
@@ -451,11 +423,11 @@ namespace Task2.Menu
         {
             IEnumerable<IContentable> words = GetWords();
 
-            if (words.Count() > WORD_VIEW_LIMIT)
+            if (words.Count() > Const.WORD_VIEW_LIMIT)
             {
-                ToDisplay.ViewInfo(words.Count(), WORD_VIEW_LIMIT);
+                ToDisplay.ViewInfo("words", words.Count(), Const.WORD_VIEW_LIMIT);
             }
-            else { ToDisplay.ViewInfo(words.Count()); }
+            else { ToDisplay.ViewInfo("words", words.Count()); }
 
 
             switch (task)
@@ -489,7 +461,7 @@ namespace Task2.Menu
                            .ForEach(x => str.Append(string.Format("\t{0, -20}", x)));
                 str.Append(string.Format("\n"));
 
-                if (++count >= WORD_VIEW_LIMIT)
+                if (++count >= Const.WORD_VIEW_LIMIT)
                 {
                     str.Append(string.Format("\n"));
                     break;
@@ -554,6 +526,44 @@ namespace Task2.Menu
 
         #region DISPLAY_TEXT
         //###############################################################################################################################
+
+        /// <summary>
+        /// View Paragraph information (number of displayed / from count)
+        /// </summary>
+        /// <param name="viewCount"></param>
+        private static void ViewParagraphInfo(int viewCount)
+        {
+            if (viewCount > Const.PARAGRAPH_VIEW_LIMIT)
+            {
+                ToDisplay.ViewInfo("paragraphs", viewCount, Const.PARAGRAPH_VIEW_LIMIT);
+            }
+            else { ToDisplay.ViewInfo("paragraphs", viewCount); }
+        }
+
+        /// <summary>
+        /// View Sentences information (number of displayed / from count)
+        /// </summary>
+        /// <param name="viewCount"></param>
+        private static void ViewSentenceInfo(int viewCount)
+        {
+            if (viewCount > Const.SENTENCE_VIEW_LIMIT)
+            {
+                ToDisplay.ViewInfo("lines", viewCount, Const.SENTENCE_VIEW_LIMIT);
+            }
+            else { ToDisplay.ViewInfo("lines", viewCount); }
+        }
+
+        /// <summary>
+        /// View Word information (number of displayed / from count)
+        /// </summary>
+        private static void ViewWordInfo()
+        {
+            if (UniqueWord.Count() > Const.WORD_VIEW_LIMIT)
+            {
+                ToDisplay.ViewInfo("words", UniqueWord.Count(), Const.WORD_VIEW_LIMIT);
+            }
+            else { ToDisplay.ViewInfo("words", UniqueWord.Count()); }
+        }
 
 
         /// <summary>

@@ -14,9 +14,9 @@ namespace Task2.Models
         /// </summary>
         public IDictionary<int, IDictionary<int, string>> Pages { get; private set; }
 
-        private TextLayoutModel(string content)
+        private TextLayoutModel(string content, IReadOnlyDictionary<Const.PageParameter, int> pageStandart)
         {
-            this.Pages = ConvertToPages(content);
+            this.Pages = ConvertToPages(content, pageStandart);
         }
 
         /// <summary>
@@ -24,10 +24,15 @@ namespace Task2.Models
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public static TextLayoutModel NewInstance(string content)
+        internal static TextLayoutModel NewInstance(string content, IReadOnlyDictionary<Const.PageParameter, int> pageStandart = null)
         {
-            return string.IsNullOrWhiteSpace(content) ? null : new TextLayoutModel(content);
+            if (pageStandart == null) { pageStandart = Const.Page_A4Standart; }
+            return string.IsNullOrWhiteSpace(content) ? null : new TextLayoutModel(content, pageStandart);
         }
+
+
+        #region CONVERTERS
+        //##############################################################################################################################
 
 
         /// <summary>
@@ -51,23 +56,66 @@ namespace Task2.Models
             StringBuilder line = new StringBuilder();
             foreach (var item in partsLst)
             {
-                if (item == "\r\n" || line.Length + item.Length > pageParam[Const.PageParameter.CharsLineCount])    // A4 - [PageParameter.CharsLineCount] = 60,
+                if (item == Const.NEW_PARAGRAPH || line.Length + item.Length > pageParam[Const.PageParameter.CharsLineCount])   
                 {
                     lines.Add(++nLine, line.ToString());
                     line.Clear();
                 }
-                if (lines.Count + 1 > pageParam[Const.PageParameter.LinesPageCount])    // A4 - [PageParameter.LinesPageCount] = 30,
+                if (lines.Count + 1 > pageParam[Const.PageParameter.LinesPageCount])   
                 {
                     pages.Add(++nPage, lines);
                     lines = new Dictionary<int, string>();
                 }
-                line.Append(item);
+                if (item != Const.NEW_PARAGRAPH)
+                {
+                    line.Append(item);
+                }                
             }
             if (line.ToString().Trim().Length > 0) { lines.Add(++nLine, line.ToString()); }
             if (lines.Count > 0) { pages.Add(++nPage, lines); }
 
             return pages;
         }
+
+
+
+        /// <summary>
+        /// Make string from TextLayoutModel object
+        /// </summary>
+        /// <param name="book">TextLayoutModel object</param>
+        /// <returns>string text</returns>
+        internal string ConvertToText()
+        {
+            if (Pages == null || this.Pages.Count() < 1) { return string.Empty; }
+            IEnumerable<string> lines = this.ConvertToLines();
+            return TextHandler.GetText(lines);
+        }
+
+
+        internal IEnumerable<string> ConvertToLines()
+        {
+            if (this.Pages == null || this.Pages.Count() < 1) { return null; }
+            return this.Pages.SelectMany(v => v.Value.Select(x => x.Value));
+        }
+
+
+        //    //TextModel tm = null;
+        //    //if (book == null) { tm = _textModel; }
+        //    //else
+        //    //{
+        //    //    StringBuilder s = new StringBuilder();
+        //    //    book.Pages.ToList().ForEach(x => x.Value.ToList().ForEach(p => s.Append(p.Value)));
+        //    //    string bookLines = s.ToString();
+        //    //    tm = TextModel.NewInstance(bookLines);
+        //    //}
+
+        //    //var lines = tm.Paragraphs.Select(x => x.Content).ToList();
+
+        //    // Слово(№ строки, количество слов в строке)
+
+
+
+        #endregion CONVERTERS
 
 
     }

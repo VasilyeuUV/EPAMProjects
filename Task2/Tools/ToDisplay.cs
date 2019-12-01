@@ -22,13 +22,18 @@ namespace Task2.Tools
         {
             if (!clear)
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(title + ":");
+                Console.ForegroundColor = ConsoleColor.White;
                 return;
             }    
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(title + ":");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
         }
+
 
         /// <summary>
         /// View operation Title
@@ -43,11 +48,11 @@ namespace Task2.Tools
         /// <summary>
         /// Show information if there are many objects
         /// </summary>
-        internal static void ViewInfo(int objCount, int viewCount = 0)
+        internal static void ViewInfo(string v, int objCount, int viewCount = 0)
         {
             if (viewCount == 0) { viewCount = objCount; } 
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine($"(показано {viewCount} из {objCount})");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"(Shown {viewCount} from {objCount} {v})");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -65,9 +70,15 @@ namespace Task2.Tools
                 Console.ForegroundColor = ConsoleColor.White;
             }
             Console.WriteLine();
-            Console.WriteLine("Для продолжения нажмите любую клавишу");
+            Console.WriteLine("Press key to continue");
             Console.ReadKey();
         }
 
+        internal static void ViewConcordanceTableHeader()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine(string.Format("     {0, -22} {1}           {2}", "WORDS", "N", "STRING NUMBERS"));
+            Console.ForegroundColor = ConsoleColor.White;
+        }
     }
 }

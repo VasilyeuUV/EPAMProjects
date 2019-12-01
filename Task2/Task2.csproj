@@ -48,6 +48,7 @@
     <Compile Include="Menu\ConcordanceManager.cs" />
     <Compile Include="Menu\ConsoleMenu.cs" />
     <Compile Include="Menu\MenuManager.cs" />
+    <Compile Include="Models\ConcordanceModel.cs" />
     <Compile Include="Models\ParagraphModel.cs" />
     <Compile Include="Models\SentenceModel.cs" />
     <Compile Include="Models\TextLayoutModel.cs" />

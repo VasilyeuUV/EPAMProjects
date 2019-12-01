@@ -30,17 +30,15 @@ namespace Task2.Tools
             words.AsParallel()
                  .ForAll(w =>
                  {
-                     //Console.WriteLine(w);
-                     if (w != null) {}
-                     w = GetWordContent(w);
-                     if (!string.IsNullOrWhiteSpace(w))
+                     var item = GetWordContent(w);
+                     if (!string.IsNullOrWhiteSpace(item))
                      {
                          // capital letter
-                         w = IsUpperCase(w) ? w
-                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
+                         item = IsUpperCase(item) ? item
+                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(item.ToLower());
 
                          // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
-                         result.Add(w);
+                         result.Add(item);
 
                      }
                  });
@@ -53,35 +51,47 @@ namespace Task2.Tools
         {
             if (string.IsNullOrWhiteSpace(text)) { return null; }
 
-            List<string> words = Task.Run(() =>
+            IEnumerable<string> words = Task.Run(() =>
                                  Regex.Split(text, Const.WORD_DELIMITER)
                                       .Where(s => (s = s.Trim()) != string.Empty)
                                       .ToList()).Result;
 
             List<string> result = new List<string>();
+
+            //foreach (var item in words)
+            //{
+            //    var w = GetWordContent(item);
+            //    if (!string.IsNullOrWhiteSpace(w))
+            //    {
+            //        // capital letter
+            //        w = IsUpperCase(w) ? w
+            //                           : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
+            //        result.Add(w);
+
+            //    }
+            //}
+
+
+
             words.AsParallel()
                  .ForAll(w =>
                  {
-                     //Console.WriteLine(w);
-                     if (w != null) { }
-                     w = GetWordContent(w);
-                     if (!string.IsNullOrWhiteSpace(w))
+                     var item = GetWordContent(w);
+                     if (!string.IsNullOrWhiteSpace(item))
                      {
                          // capital letter
-                         w = IsUpperCase(w) ? w
-                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
+                         item = IsUpperCase(item) ? item
+                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(item.ToLower());
 
                          // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
-                         result.Add(w);
+                         result.Add(item);
 
                      }
                  });
 
             return result.Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
         }
-
-
-
+               
 
         /// <summary>
         /// Create list concordance words from TextModelobject
@@ -100,8 +110,11 @@ namespace Task2.Tools
         }
 
 
-        #region TEXTMODEL_OPERATIONS
 
+
+
+        #region TEXTMODEL_OPERATIONS
+        //##############################################################################################################################
 
         /// <summary>
         /// Get all words, symbols, etc.
@@ -125,7 +138,7 @@ namespace Task2.Tools
             return result;
         }
 
-                     
+
         /// <summary>
         /// Check TextModel object for null or empty
         /// </summary>
@@ -170,13 +183,45 @@ namespace Task2.Tools
         #region TEXT_CONVERTERS
         //##############################################################################################################################
 
+
+
+
+
+
+
+
+        /// <summary>
+        /// Make string from List string </string>
+        /// </summary>
+        /// <param name="lines">strings list</param>
+        /// <returns>string</returns>
+        internal static string GetText(IEnumerable<string> lines)
+        {
+            if (IsEmpty(lines)) { return null; }
+
+            StringBuilder result = new StringBuilder();
+            int viewCountLimit = 0;
+            foreach (var line in lines)
+            {
+                result.Append(line + Const.NEW_PARAGRAPH);
+
+                if (++viewCountLimit > Const.SENTENCE_VIEW_LIMIT) { break; }
+            }
+
+            return result.ToString().Trim().Length > 0 ? result.ToString() : string.Empty;
+        }
+
+
+
+
+
         /// <summary>
         /// Convert IContentable list to needed class 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <returns></returns>
-        internal static List<T> ConvertIContentabletToList<T>(IEnumerable<IContentable> collection)
+        internal static IEnumerable<T> ConvertIContentableToList<T>(IEnumerable<IContentable> collection)
             where T : class, IContentable
         {
             if (TextHandler.IsEmpty(collection)) { return null; }
@@ -191,6 +236,7 @@ namespace Task2.Tools
             }
             return lst;
         }
+
 
 
 
@@ -263,7 +309,7 @@ namespace Task2.Tools
 
 
         #region PUNCTUATION
-        //##############################################################################################################################
+       
 
         /// <summary>
         /// Optimize text content punctuation

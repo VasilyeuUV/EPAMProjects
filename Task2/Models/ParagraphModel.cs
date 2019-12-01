@@ -21,9 +21,9 @@ namespace Task2.Models
         public string Content { get; private set; }
 
         /// <summary>
-        /// Paragraph Words list
+        /// Sentences Words list
         /// </summary>
-        internal IEnumerable<SentenceModel> Sentences => _sentences == null ? _sentences = GetSentences(Content) : _sentences;
+        internal IEnumerable<SentenceModel> Sentences => _sentences == null ? _sentences = SetSentences(Content) : _sentences;
 
         /// <summary>
         /// CTOR
@@ -54,7 +54,7 @@ namespace Task2.Models
         /// </summary>
         /// <param name="paragraph">string paragraph content</param>
         /// <returns>list converted sentences</returns>
-        private IEnumerable<SentenceModel> GetSentences(string paragraph)
+        private IEnumerable<SentenceModel> SetSentences(string paragraph)
         {
             if (string.IsNullOrWhiteSpace(paragraph)) { return null; }
 
@@ -87,6 +87,28 @@ namespace Task2.Models
             //            .Select((x, n) => SentenceModel.NewInstance(this.Number, ++n, x))
             //            .ToList();
         }
+
+
+        #region CONVERTERS
+        //##############################################################################################################################
+
+
+        /// <summary>
+        /// Get all words, punctuations mark and other symbols from this paragraph
+        /// </summary>
+        /// <returns>WordPartModel list</returns>
+        internal IEnumerable<WordPartModel> GetWords(int nSentence = 0)
+        {
+            var result = this.Sentences.SelectMany(s => s.Words.SelectMany(wp => wp.WordPartsModel));
+            if (nSentence > 0) { result = result.Where(s => s.SentenseNumber == nSentence); }
+            return result;
+        }
+
+
+        #endregion CONVERTERS
+
+
+
 
     }
 }
