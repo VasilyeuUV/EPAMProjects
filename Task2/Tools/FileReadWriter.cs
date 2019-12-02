@@ -25,8 +25,8 @@ namespace Task2.Tools
                 {
                     await SR.WriteAsync(text);
                 }
-            }
-            MessageBox.Show("Файл сохранен");
+                MessageBox.Show("Файл сохранен");
+            }            
         }
 
 
