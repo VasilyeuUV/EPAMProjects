@@ -31,7 +31,7 @@ namespace Task2.Models
         /// </summary>
         /// <param name="lines">text lines list</param>
         /// <returns>new ConcordanceModel object or null</returns>
-        internal static ConcordanceModel CreateConcordance(IEnumerable<string> lines = null)
+        internal static async Task<ConcordanceModel> CreateConcordanceAsync(IEnumerable<string> lines = null)
         {
             if (lines == null) { return null; }
 
@@ -41,7 +41,7 @@ namespace Task2.Models
             foreach (var line in lines)
             {
                 ++nLine;
-                var words = TextHandler.ParseTextToWords(line)/*.OrderByDescending(x => x.Length)*/;   // массив слов строки
+                var words = await TextHandler.ParseTextToWordsAsync(line);//  ParseTextToWords(line)/*.OrderByDescending(x => x.Length)*/;   // массив слов строки
                 var uWords = words.Distinct();
 
                 foreach (var word in uWords)

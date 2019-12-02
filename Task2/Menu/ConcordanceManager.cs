@@ -74,13 +74,13 @@ namespace Task2.Menu
         {
             ToDisplay.ViewTitle(items[0].ToUpper(), true);
 
-            ToDisplay.ViewTitle("PARAGRAPHS (АБЗАЦЫ)");
+            ToDisplay.ViewTitle("PARAGRAPHS");
             ToDisplay.ViewBody(MakeParagraphString(Const.Task.GetTextModel));
 
-            ToDisplay.ViewTitle("SENTENCES (ПРЕДЛОЖЕНИЯ)");
+            ToDisplay.ViewTitle("SENTENCES");
             ToDisplay.ViewBody(MakeSentencesString(Const.Task.GetTextModel));
 
-            ToDisplay.ViewTitle("WORDS (СЛОВА)");
+            ToDisplay.ViewTitle("WORDS");
             ToDisplay.ViewBody(MakeWordsString(Const.Task.GetTextModel));
 
             ToDisplay.WaitForContinue();
@@ -92,13 +92,13 @@ namespace Task2.Menu
         /// </summary>
         private static void ViewConcordance()
         {
-            var concordance = ConcordanceModel.CreateConcordance(_textModel.Paragraphs.Select(p => p.Content));
+            ConcordanceModel concordance = ConcordanceModel.CreateConcordanceAsync(_textModel.Paragraphs.Select(p => p.Content)).Result;
 
             ToDisplay.ViewTitle(items[1].ToUpper(), true);
 
             ToDisplay.ViewTitle("INITIAL TEXT");
             ViewParagraphInfo(_textModel.Paragraphs.Count());
-            ToDisplay.ViewBody(_textModel.Content);
+            ToDisplay.ViewBody(_textModel.ContentToView());
 
             ToDisplay.ViewTitle("CONCORDANCE");
             ViewWordInfo();
@@ -115,7 +115,7 @@ namespace Task2.Menu
         {
             TextLayoutModel textA4 = TextLayoutModel.NewInstance(_textModel.Content);
             var textA4Lines = textA4.ConvertToLines();
-            var concordance = ConcordanceModel.CreateConcordance(textA4Lines);
+            ConcordanceModel concordance = ConcordanceModel.CreateConcordanceAsync(textA4Lines).Result;
 
             ToDisplay.ViewTitle(items[2].ToUpper(), true);
             ToDisplay.ViewTitle("INITIAL TEXT");
@@ -137,9 +137,9 @@ namespace Task2.Menu
         {
             TextLayoutModel textA5 = TextLayoutModel.NewInstance(_textModel.Content, Const.Page_A5);
             var textA4Lines = textA5.ConvertToLines();
-            var concordance = ConcordanceModel.CreateConcordance(textA4Lines);
+            ConcordanceModel concordance = ConcordanceModel.CreateConcordanceAsync(textA4Lines).Result;
 
-            ToDisplay.ViewTitle(items[2].ToUpper(), true);
+            ToDisplay.ViewTitle(items[3].ToUpper(), true);
             ToDisplay.ViewTitle("INITIAL TEXT");
             ViewSentenceInfo(textA4Lines.Count());
             ToDisplay.ViewBody(textA5.ConvertToText());
@@ -152,43 +152,21 @@ namespace Task2.Menu
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// View sorted text by sentences lenght
         /// </summary>
         private static void SortSentencesByNumberOfWord()
         {
-            // Показать текст сортированный по количеству слов в предложении
-            ToDisplay.ViewTitle("СОРТИРОВКА ПРЕДЛОЖЕНИЙ ПО КОЛИЧЕСТВУ СЛОВ", true);
+            ToDisplay.ViewTitle(items[4].ToUpper(), true);
 
-            ToDisplay.ViewTitle("ИСХОДНЫЙ ТЕКСТ");
+            ToDisplay.ViewTitle("INITIAL TEXT");
             ToDisplay.ViewBody(MakeSentencesString(Const.Task.GetTextModel));
 
-            ToDisplay.ViewTitle("СОРТИРОВАННЫЙ ПО ПРЕДЛОЖЕНИЯМ ТЕКСТ");
-            ToDisplay.ViewBody(MakeSentencesString(Const.Task.SortTextBySentence));  
-            
+            ToDisplay.ViewTitle("RESULT");
+            ToDisplay.ViewBody(MakeSentencesString(Const.Task.SortTextBySentence));
+
             ToDisplay.WaitForContinue();
         }
-
-
-
 
 
         /// <summary>
@@ -196,8 +174,61 @@ namespace Task2.Menu
         /// </summary>
         private static void DisplayWordsQuestion()
         {
-            ToDisplay.WaitForContinue("Показать слова вопросительных предложений.");
+            IEnumerable<IContentable> needfulSentences = TextHandler.GetInterrogativeSentences(_textModel.GetSentences());
+            IEnumerable<IContentable> words = TextHandler.GetUniqueWords(needfulSentences);
+
+            ConsoleKeyInfo key;
+            do
+            {
+                ToDisplay.ViewTitle(items[5].ToUpper(), true);
+
+                ToDisplay.ViewTitle("INITIAL TEXT");
+                ToDisplay.ViewBody(MakeSentencesString(Const.Task.GetTextModel));
+
+                ToDisplay.ViewTitle("INTERROGATIVE SENTENCES");
+                ToDisplay.ViewBody(MakeSentencesString(Const.Task.InterrogativeSentences, needfulSentences));
+
+                int findWordLength = EnterWordLengthMenu();
+                var selectedWords = words.Where(w => w.Content.Length == findWordLength)
+                                  .GroupBy(w => w.Content)
+                                  .OrderBy(w => w.Key);
+                
+
+                ToDisplay.ViewTitle("FIND WORD RESULT");
+                ToDisplay.ViewBody(ConvertToString(selectedWords.Select(x => x.Key)));
+
+                key = ToDisplay.WaitForContinue("Press Esc for continue");
+
+            } while (key.Key != ConsoleKey.Escape);
+
+
+
+
+            
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// Replace words in selected sentences
@@ -330,9 +361,9 @@ namespace Task2.Menu
         /// <returns></returns>
         private static string MakeSentencesString(Const.Task task, IEnumerable<IContentable> sent = null)
         {
-            IEnumerable<IContentable> sentences = sent == null ? GetSentences() : sent;
-            List<SentenceModel> lst = null; // TextHandler.ConvertIContentableToList<SentenceModel>(sentences);
-
+            IEnumerable<IContentable> sentences = sent ?? GetSentences();
+            IEnumerable<SentenceModel> lst = TextHandler.ConvertIContentableToList<SentenceModel>(sentences);
+            
             if (sentences.Count() > Const.SENTENCE_VIEW_LIMIT)
             {
                 ToDisplay.ViewInfo("sentences", sentences.Count(), Const.SENTENCE_VIEW_LIMIT);
@@ -341,8 +372,9 @@ namespace Task2.Menu
 
             switch (task)
             {
-                case Const.Task.GetTextModel: return GetSentencesDefaultString(lst);
-                case Const.Task.SortTextBySentence: return GetSentencesSortedString(lst, false);
+                case Const.Task.GetTextModel:               return GetSentencesDefaultString(lst);
+                case Const.Task.SortTextBySentence:         return GetSentencesSortedString(lst, false);
+                case Const.Task.InterrogativeSentences:     return GetSentencesDefaultString(lst);
             }
             return string.Empty;
         }
@@ -357,7 +389,7 @@ namespace Task2.Menu
         /// <param name="viewCount"></param>
         /// <param name="sentences"></param>
         /// <returns></returns>
-        private static string GetSentencesDefaultString(List<SentenceModel> sentences)
+        private static string GetSentencesDefaultString(IEnumerable<SentenceModel> sentences)
         {
             StringBuilder str = new StringBuilder();
             int count = 1;
@@ -384,7 +416,7 @@ namespace Task2.Menu
         /// </summary>
         /// <param name="asc">sort by ascending (true) or descending (false)</param>
         /// <returns>sentences string sorted by length </returns>
-        private static string GetSentencesSortedString(List<SentenceModel> sentences, bool asc = true)
+        private static string GetSentencesSortedString(IEnumerable<SentenceModel> sentences, bool asc = true)
         {
             var sent = asc ? sentences.OrderBy(s => s.Words.Count()) : sentences.OrderByDescending(s => s.Words.Count());
 
@@ -419,9 +451,9 @@ namespace Task2.Menu
         /// </summary>
         /// <param name="getTextModel"></param>
         /// <returns></returns>
-        private static string MakeWordsString(Const.Task task)
+        private static string MakeWordsString(Const.Task task, IEnumerable<IContentable> words = null)
         {
-            IEnumerable<IContentable> words = GetWords();
+            if (words == null) { words = GetWords(); }           
 
             if (words.Count() > Const.WORD_VIEW_LIMIT)
             {
@@ -436,6 +468,7 @@ namespace Task2.Menu
             }
             return string.Empty;
         }
+
 
 
         /// <summary>
@@ -565,29 +598,72 @@ namespace Task2.Menu
             else { ToDisplay.ViewInfo("words", UniqueWord.Count()); }
         }
 
-
         /// <summary>
-        /// Show information if there are many objects
+        /// Enter Wordl length menu
         /// </summary>
-        private static void ViewIfMoreToDisplayLimit(int objCount, int viewCount)
+        /// <returns></returns>
+        private static int EnterWordLengthMenu()
         {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"(показано {viewCount} из {objCount})");
-                Console.ForegroundColor = ConsoleColor.White;
-        }
+            int findWordLength;
+            do
+            {
+                Console.Write("Enter word length: ");
+                try
+                {
+                    findWordLength = Convert.ToInt32(Console.ReadLine());
+                }
+                catch (Exception)
+                {
+                    findWordLength = 0;
+                }
+                if (findWordLength < 1 || findWordLength > Const.MAX_WORD_LENGTH)
+                {
+                    Console.Write("Недопустимое значение. Уточните значение.");
+                    ClearCurrentConsoleLine();
+                }
 
-
-        /// <summary>
-        /// View operation Title
-        /// </summary>
-        /// <param name="title"></param>
-        private static void ViewTitle(string title)
-        {
-            Console.Clear();
-            Console.WriteLine(title + ":");
+            } while (findWordLength < 1 || findWordLength > Const.MAX_WORD_LENGTH);
             Console.WriteLine();
+            ClearCurrentConsoleLine();
+            return findWordLength;
         }
+
+
+        /// <summary>
+        /// Clear console at current position
+        /// </summary>
+        private static void ClearCurrentConsoleLine()
+        {
+            int currentLineCursor = Console.CursorTop - 1;
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLineCursor);
+        }
+
+
+        /// <summary>
+        ///  Convert list to string
+        /// </summary>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        private static string ConvertToString(IEnumerable<string> words)
+        {
+            StringBuilder result = new StringBuilder();
+
+            int count = 0;
+            foreach (var item in words)
+            {
+                result.Append(item + Const.NEW_PARAGRAPH);
+
+                if (++count > Const.WORD_VIEW_LIMIT) { break; }
+            }
+            return result.ToString();
+        }
+
+
         #endregion // DISPLAY_TEXT
+
+
 
 
 

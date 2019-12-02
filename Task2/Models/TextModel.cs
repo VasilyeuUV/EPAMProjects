@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Task2.Interfaces;
 using Task2.Tools;
@@ -101,6 +103,23 @@ namespace Task2.Models
         internal IEnumerable<string> GetUniqueWords()
         {
            return (GetWords().Select(w => w.Content)).Distinct().Where(w => char.IsLetter(w[0]) || char.IsDigit(w[0]));
+        }
+
+
+
+
+        internal string ContentToView()
+        {
+            StringBuilder result = new StringBuilder();
+            int count = 0;
+            foreach (var item in this.Paragraphs)
+            {
+                result.Append(item.Content + Const.NEW_PARAGRAPH);
+
+                if (++count > Const.PARAGRAPH_VIEW_LIMIT) { break; }
+
+            }
+            return result.ToString();
         }
 
 

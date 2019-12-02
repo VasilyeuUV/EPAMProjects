@@ -21,12 +21,15 @@ namespace Task2.Tools
         {
             if (string.IsNullOrWhiteSpace(text)) { return null; }
 
-            List<string> words = Task.Run(() =>
+            List<string> words = await Task.Run(() =>
                                  Regex.Split(text, Const.WORD_DELIMITER)
                                       .Where(s => (s = s.Trim()) != string.Empty)
-                                      .ToList()).Result;
+                                      .ToList())/*.Result*/;
 
             List<string> result = new List<string>();
+
+            object _lock = new object();
+
             words.AsParallel()
                  .ForAll(w =>
                  {
@@ -38,7 +41,12 @@ namespace Task2.Tools
                                             : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(item.ToLower());
 
                          // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
-                         result.Add(item);
+
+                         lock(_lock)
+                         {
+                             result.Add(item);
+                         }
+                         // result.Add(item);
 
                      }
                  });
@@ -47,51 +55,29 @@ namespace Task2.Tools
         }
 
 
-        internal static IEnumerable<string> ParseTextToWords(string text)
+        /// <summary>
+        /// Get Words from text sentences
+        /// </summary>
+        /// <param name="needfulSentences"></param>
+        /// <returns></returns>
+        internal static IEnumerable<IContentable> GetUniqueWords(IEnumerable<IContentable> lst)
         {
-            if (string.IsNullOrWhiteSpace(text)) { return null; }
+            if (lst == null || lst.Count() < 1) { return null; }
 
-            IEnumerable<string> words = Task.Run(() =>
-                                 Regex.Split(text, Const.WORD_DELIMITER)
-                                      .Where(s => (s = s.Trim()) != string.Empty)
-                                      .ToList()).Result;
+            List<IContentable> result = new List<IContentable>();
 
-            List<string> result = new List<string>();
-
-            //foreach (var item in words)
-            //{
-            //    var w = GetWordContent(item);
-            //    if (!string.IsNullOrWhiteSpace(w))
-            //    {
-            //        // capital letter
-            //        w = IsUpperCase(w) ? w
-            //                           : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(w.ToLower());
-            //        result.Add(w);
-
-            //    }
-            //}
-
-
-
-            words.AsParallel()
-                 .ForAll(w =>
-                 {
-                     var item = GetWordContent(w);
-                     if (!string.IsNullOrWhiteSpace(item))
-                     {
-                         // capital letter
-                         item = IsUpperCase(item) ? item
-                                            : System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(item.ToLower());
-
-                         // ИНДЕКС НАХОДИТСЯ ВНЕ ГРАНИЦ (?)
-                         result.Add(item);
-
-                     }
-                 });
-
-            return result.Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
+            foreach (var item in lst)
+            {
+                var sentence = item as SentenceModel;
+                if (sentence == null) { continue; }
+                result.AddRange(sentence.GetWords());
+            }
+            return result.Distinct();
         }
-               
+
+
+
+
 
         /// <summary>
         /// Create list concordance words from TextModelobject
@@ -174,7 +160,20 @@ namespace Task2.Tools
             return elements.Skip(n - 1).Take(1).FirstOrDefault();
         }
 
-        #endregion
+
+        /// <summary>
+        /// Get Interrogative sentences
+        /// </summary>
+        /// <param name="enumerable">All sentences from TextModel object</param>
+        /// <returns>SentenceModel list or null</returns>
+        internal static IEnumerable<IContentable> GetInterrogativeSentences(IEnumerable<SentenceModel> sentences)
+        {
+            if (sentences == null || sentences.Count() < 1) { return null; }
+            return sentences.Where(s => s.Content[s.Content.Trim().Length - 1] == '?');
+        }
+
+
+        #endregion  // TEXTMODEL_OPERATIONS
 
 
 

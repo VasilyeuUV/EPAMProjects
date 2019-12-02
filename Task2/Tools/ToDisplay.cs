@@ -61,7 +61,7 @@ namespace Task2.Tools
         /// Wait push key 
         /// </summary>
         /// <param name="str"></param>
-        internal static void WaitForContinue(string str = "")
+        internal static ConsoleKeyInfo WaitForContinue(string str = "")
         {
             if (!String.IsNullOrEmpty(str.Trim()))
             {
@@ -71,7 +71,7 @@ namespace Task2.Tools
             }
             Console.WriteLine();
             Console.WriteLine("Press key to continue");
-            Console.ReadKey();
+            return Console.ReadKey();
         }
 
         internal static void ViewConcordanceTableHeader()

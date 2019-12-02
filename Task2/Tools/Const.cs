@@ -58,7 +58,11 @@ namespace Task2.Tools
         /// Paragraph mark
         /// </summary>
         internal const string NEW_PARAGRAPH = "\r\n";
-        
+
+        /// <summary>
+        /// Max word length 
+        /// </summary>
+        internal const int MAX_WORD_LENGTH = 30;
 
 
         /// <summary>
@@ -94,6 +98,7 @@ namespace Task2.Tools
             ViewConcordance,
             ViewConcordanceA4,
             ViewConcordanceA5,
+            InterrogativeSentences,
         }
 
         #endregion
