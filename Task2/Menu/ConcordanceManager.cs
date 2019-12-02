@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Task2.Interfaces;
 using Task2.Models;
 using Task2.Tools;
@@ -22,7 +23,17 @@ namespace Task2.Menu
 
         public static IEnumerable<string> UniqueWord => _uniqueWord ?? TextHandler.ParseTextToWordsAsync(_textModel.Content).Result;
 
-        internal static IEnumerable<WordPartModel> TmWordParts => _tmWordParts ?? TextHandler.GetTMWordParts(_textModel).Result;
+        internal static IEnumerable<WordPartModel> TmWordParts
+        {
+            get
+            {
+                return _tmWordParts ?? TextHandler.GetTMWordParts(_textModel).Result;
+            }
+            private set
+            {
+                _tmWordParts = value;
+            }
+        }
 
         private static string[] items = {
             "Text structure",
@@ -103,8 +114,18 @@ namespace Task2.Menu
             ToDisplay.ViewTitle("CONCORDANCE");
             ViewWordInfo();
             ToDisplay.ViewConcordanceTableHeader();
-            ToDisplay.ViewBody(concordance.ToString());
+            var conc = concordance.ToString();
+            ToDisplay.ViewBody(conc);
+
+            ToDisplay.ViewTitle("To save Concordance press Enter?");
+            ConsoleKeyInfo key = Console.ReadKey();
+            if (key.Key == ConsoleKey.Enter)
+            {
+                FileReadWriter.WriteTxtFileAsync(conc);
+            }
+
             ToDisplay.WaitForContinue();
+
         }
                
 
@@ -125,7 +146,16 @@ namespace Task2.Menu
             ToDisplay.ViewTitle(items[2].ToUpper());
             ViewWordInfo();
             ToDisplay.ViewConcordanceTableHeader();
-            ToDisplay.ViewBody(concordance.ToString());
+            var conc = concordance.ToString();
+            ToDisplay.ViewBody(conc);
+
+            ToDisplay.ViewTitle("To save Concordance press Enter?");
+            ConsoleKeyInfo key = Console.ReadKey();
+            if (key.Key == ConsoleKey.Enter)
+            {
+                FileReadWriter.WriteTxtFileAsync(concordance.ToString());
+            }
+
             ToDisplay.WaitForContinue();
         }
 
@@ -147,7 +177,16 @@ namespace Task2.Menu
             ToDisplay.ViewTitle(items[2].ToUpper());
             ViewWordInfo();
             ToDisplay.ViewConcordanceTableHeader();
-            ToDisplay.ViewBody(concordance.ToString());
+            var conc = concordance.ToString();
+            ToDisplay.ViewBody(conc);
+
+            ToDisplay.ViewTitle("To save Concordance press Enter?");
+            ConsoleKeyInfo key = Console.ReadKey();
+            if (key.Key == ConsoleKey.Enter)
+            {
+                FileReadWriter.WriteTxtFileAsync(concordance.ToString());
+            }
+
             ToDisplay.WaitForContinue();
         }
 
@@ -188,46 +227,19 @@ namespace Task2.Menu
                 ToDisplay.ViewTitle("INTERROGATIVE SENTENCES");
                 ToDisplay.ViewBody(MakeSentencesString(Const.Task.InterrogativeSentences, needfulSentences));
 
-                int findWordLength = EnterWordLengthMenu();
+                int findWordLength = EnterNumberMenu("Enter word length: ", Const.MAX_WORD_LENGTH);
                 var selectedWords = words.Where(w => w.Content.Length == findWordLength)
                                   .GroupBy(w => w.Content)
                                   .OrderBy(w => w.Key);
                 
 
-                ToDisplay.ViewTitle("FIND WORD RESULT");
+                ToDisplay.ViewTitle("SUITABLE WORDS");
                 ToDisplay.ViewBody(ConvertToString(selectedWords.Select(x => x.Key)));
 
-                key = ToDisplay.WaitForContinue("Press Esc for continue");
+                key = ToDisplay.WaitForContinue("Press Esc for back");
 
-            } while (key.Key != ConsoleKey.Escape);
-
-
-
-
-            
+            } while (key.Key != ConsoleKey.Escape);                        
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         /// <summary>
@@ -235,17 +247,94 @@ namespace Task2.Menu
         /// </summary>
         private static void ReplaceWords()
         {
-            ToDisplay.WaitForContinue("Заменить слова заданной длины в предложении.");
+            const int MAX_SENTENCE_COUNT = 10;
+
+            IEnumerable<IContentable> needfulSentences = _textModel.GetSentences().Take(MAX_SENTENCE_COUNT);
+            var sentences = needfulSentences.Select(x => x.Content).ToArray();
+
+            ConsoleKeyInfo key;
+            do
+            {
+                ToDisplay.ViewTitle(items[6].ToUpper(), true);
+
+                ToDisplay.ViewTitle("SENTENCES");
+                ToDisplay.ViewBody(ConvertToString(sentences));
+
+                int selectedSentenceNumber = EnterNumberMenu("Enter the sentence number: ", MAX_SENTENCE_COUNT);
+                if (selectedSentenceNumber > sentences.Count()) { selectedSentenceNumber = sentences.Count(); }
+
+                var selectedSentence = sentences[selectedSentenceNumber - 1];
+                var words = TextHandler.ParseTextToWordsAsync(selectedSentence).Result;
+
+                ToDisplay.ViewTitle("SELECTED SENTENCES");
+                ToDisplay.ViewBody(selectedSentence);
+
+                int findWordLength = EnterNumberMenu("Enter word length: ", Const.MAX_WORD_LENGTH);
+                var selectedWords = words.Where(w => w.Length == findWordLength)
+                                         .Distinct();
+                ToDisplay.ViewTitle("SUITABLE WORDS");
+                ToDisplay.ViewBody(ConvertToString(selectedWords));
+
+                if (selectedWords != null && selectedWords.Count() > 0)
+                {
+                    Console.WriteLine("Enter new text");
+                    string newWord = Console.ReadLine();
+
+                    string newSentence = selectedSentence;
+                    foreach (var item in selectedWords)
+                    {
+                        newSentence = newSentence.Replace(item.ToLower(), newWord);
+                    }
+
+                    ToDisplay.ViewTitle("RESULT");
+                    ToDisplay.ViewBody(newSentence);
+                }
+                else
+                {
+                    ToDisplay.ViewBody("No matching words");
+                }
+                
+                key = ToDisplay.WaitForContinue("Press Esc for back");
+
+            } while (key.Key != ConsoleKey.Escape);
         }
+
+
 
         /// <summary>
         /// Delete words in text
         /// </summary>
         private static void DeleteWords()
         {
-            ToDisplay.WaitForContinue("Удалить слова заданной длины в тексте.");
-        }
+            string consonantsRussian = "йцкнгшщзхфвпрлджбтмсч";
+            string consonantsEnglish = "qwrtplkjhgfdszxcvbnm";
+            string txt = _textModel.Content;
 
+            ConsoleKeyInfo key;
+            do
+            {
+                ToDisplay.ViewTitle(items[7].ToUpper(), true);
+
+                ToDisplay.ViewTitle("INITIAL TEXT");
+                ToDisplay.ViewBody(txt);
+
+                int findWordLength = EnterNumberMenu("Enter word length: ", Const.MAX_WORD_LENGTH);
+                var selectedWords = TmWordParts.Where(w => w.Content.Length == findWordLength
+                                               && (consonantsRussian.IndexOf(char.ToLower(w.Content[0])) != -1
+                                                   || consonantsEnglish.IndexOf(char.ToLower(w.Content[0])) != -1))
+                                               .Select(w => w.Content);
+                foreach (var item in selectedWords)
+                {
+                    txt =  Regex.Replace(txt, $@"\s*\w*{item}\b", "", RegexOptions.IgnoreCase).Trim();
+                } 
+
+                ToDisplay.ViewTitle("RESULT");
+                ToDisplay.ViewBody(txt);
+
+                key = ToDisplay.WaitForContinue("Press Esc for back");
+
+            } while (key.Key != ConsoleKey.Escape);
+        }
 
 
         /// <summary>
@@ -391,6 +480,8 @@ namespace Task2.Menu
         /// <returns></returns>
         private static string GetSentencesDefaultString(IEnumerable<SentenceModel> sentences)
         {
+            if (sentences == null) { return string.Empty; }
+
             StringBuilder str = new StringBuilder();
             int count = 1;
             foreach (var item in sentences)
@@ -602,30 +693,31 @@ namespace Task2.Menu
         /// Enter Wordl length menu
         /// </summary>
         /// <returns></returns>
-        private static int EnterWordLengthMenu()
+        private static int EnterNumberMenu(string v, int maxValue)
         {
-            int findWordLength;
+            int n;
             do
             {
-                Console.Write("Enter word length: ");
+                Console.Write(v);
                 try
                 {
-                    findWordLength = Convert.ToInt32(Console.ReadLine());
+                    n = Convert.ToInt32(Console.ReadLine());
                 }
                 catch (Exception)
                 {
-                    findWordLength = 0;
+                    n = 0;
                 }
-                if (findWordLength < 1 || findWordLength > Const.MAX_WORD_LENGTH)
+                if (n < 1 || n > maxValue)
                 {
-                    Console.Write("Недопустимое значение. Уточните значение.");
+                    Console.Write("Incorrect value. Enter a numerical value.");
                     ClearCurrentConsoleLine();
                 }
 
-            } while (findWordLength < 1 || findWordLength > Const.MAX_WORD_LENGTH);
+            } while (n < 1 || n > maxValue);
             Console.WriteLine();
             ClearCurrentConsoleLine();
-            return findWordLength;
+            Console.WriteLine();
+            return n;
         }
 
 

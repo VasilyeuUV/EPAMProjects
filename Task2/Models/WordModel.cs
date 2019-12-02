@@ -70,8 +70,8 @@ namespace Task2.Models
         /// <returns>new WordModel object</returns>
         internal static WordModel NewInstance(string word, int number, int paragraphNumber, int sentenceNumber)
         {
-            if (string.IsNullOrWhiteSpace(word)
-                || number < 1
+            if (/*string.IsNullOrWhiteSpace(word)*/
+                /*||*/ number < 1
                 || paragraphNumber < 1
                 || sentenceNumber < 1)
             {
@@ -115,7 +115,7 @@ namespace Task2.Models
         {
             if (TextHandler.IsEmpty(words)) { return null; }
 
-            return words.Where(w => w/*.Trim()*/.Length > 0)
+            return words.Where(w => w.Length > 0)
                  .Select((w, n) => WordPartModel.NewInstance(w, ++n, this.ParagraphNumber, this.Number))
                  .ToList();
         }

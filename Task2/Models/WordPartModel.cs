@@ -54,7 +54,7 @@ namespace Task2.Models
         /// <returns>new WordModel object</returns>
         internal static WordPartModel NewInstance(string word, int number, int paragraphNumber, int sentenceNumber)
         {
-            if (string.IsNullOrWhiteSpace(word)
+            if (string.IsNullOrEmpty(word)
                 || number < 1
                 || paragraphNumber < 1
                 || sentenceNumber < 1)

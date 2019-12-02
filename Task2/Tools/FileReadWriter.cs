@@ -1,20 +1,51 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Task2.Tools
 {
     internal static class FileReadWriter
         {
 
-            #region READ_STREAM
-            //###############################################################################################################################
+        #region SAVE_FILE
 
-            /// <summary>
-            /// Get text from file next types: *.txt (...)
-            /// </summary>
-            /// <returns></returns>
-            internal static string ReadFile(Stream fileStream)
+        internal static async void WriteTxtFileAsync(string text)
+        {
+            //Stream myStream;
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "txt files (*.txt)|*.txt";//|All files (*.*)|*.*";
+            //saveFileDialog1.FilterIndex = 2;
+            saveFileDialog1.RestoreDirectory = true;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string filename = saveFileDialog1.FileName;
+                using (StreamWriter SR = new StreamWriter(filename))
+                {
+                    await SR.WriteAsync(text);
+                }
+            }
+            MessageBox.Show("Файл сохранен");
+        }
+
+
+
+
+
+        #endregion
+
+
+
+
+        #region READ_STREAM
+        //###############################################################################################################################
+
+        /// <summary>
+        /// Get text from file next types: *.txt (...)
+        /// </summary>
+        /// <returns></returns>
+        internal static string ReadFile(Stream fileStream)
             {
 
                 // variants of read file content by it's extentions
