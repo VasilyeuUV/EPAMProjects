@@ -227,15 +227,21 @@ namespace Task2.Menu
                 ToDisplay.ViewTitle("INTERROGATIVE SENTENCES");
                 ToDisplay.ViewBody(MakeSentencesString(Const.Task.InterrogativeSentences, needfulSentences));
 
-                int findWordLength = EnterNumberMenu("Enter word length: ", Const.MAX_WORD_LENGTH);
-                var selectedWords = words.Where(w => w.Content.Length == findWordLength)
-                                  .GroupBy(w => w.Content)
-                                  .OrderBy(w => w.Key);
-                
+                if (needfulSentences != null && needfulSentences.Count() > 0)
+                {
+                    int findWordLength = EnterNumberMenu("Enter word length: ", Const.MAX_WORD_LENGTH);
+                    var selectedWords = words.Where(w => w.Content.Length == findWordLength)
+                                      .GroupBy(w => w.Content)
+                                      .OrderBy(w => w.Key);
 
-                ToDisplay.ViewTitle("SUITABLE WORDS");
-                ToDisplay.ViewBody(ConvertToString(selectedWords.Select(x => x.Key)));
 
+                    ToDisplay.ViewTitle("SUITABLE WORDS");
+                    ToDisplay.ViewBody(ConvertToString(selectedWords.Select(x => x.Key)));
+                }
+                else
+                {
+                    ToDisplay.ViewBody("There are no QUESTIONAL PROPOSALS in the text");
+                }
                 key = ToDisplay.WaitForContinue("Press Esc for back");
 
             } while (key.Key != ConsoleKey.Escape);                        
