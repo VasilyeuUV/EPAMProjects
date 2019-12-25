@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace emulatorWFA
@@ -17,7 +14,13 @@ namespace emulatorWFA
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            FormMain form = FormMain.StartForm(args);
+            bool start = false;
+            if (args.Length > 0)
+            {
+                start = Convert.ToBoolean(args[0]);
+            }
+
+            FormMain form = FormMain.StartForm(start);
             if (form != null)
             {
                 Application.Run(form);

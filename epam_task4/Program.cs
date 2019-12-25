@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace epam_task4
 {
@@ -10,7 +7,26 @@ namespace epam_task4
     {
         static void Main(string[] args)
         {
+            //InstallDataBase();
 
+            // START EMULATOR
+            Form emulator = GetEmulator();
+            Application.EnableVisualStyles();
+            Application.Run(emulator);
+
+
+            Console.WriteLine("Press any key to Exit");
+            Console.ReadKey();
+        }
+
+
+        /// <summary>
+        /// Run emulator
+        /// </summary>
+        /// <returns></returns>
+        private static Form GetEmulator()
+        {
+            return emulatorWFA.FormMain.StartForm(true);
         }
     }
 }

@@ -13,13 +13,9 @@ namespace emulatorWFA
             InitializeComponent();
         }
 
-        internal static FormMain StartForm(string[] args)
+        public static FormMain StartForm(bool go = false)
         {
-            bool start = true;                      // to production must be false
-            if (args.Length > 0)
-            {
-                start = Convert.ToBoolean(args[0]);
-            }
+            bool start = go;                      // to production must be false
             if (start)
             {
                 return new FormMain();
