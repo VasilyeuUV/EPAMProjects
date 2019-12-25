@@ -29,36 +29,34 @@ namespace fwService
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            _watchedFolder = CheckFolder(_watchedFolder).FullName;
+            _watchedFolder = CheckFolder(_watchedFolder);
 
-            _logger = FWLogger.CreateInstance(_watchedFolder);
-            Thread loggerThread = new Thread(new ThreadStart(_logger.Start));
-            loggerThread.Start();
-
-
-            //if (_logger == null) { _logger = FWLogger.CreateInstance(_watchedFolder); }
-            //if (_logger == null)
-            //{
-            //    _logger.RecordEntry("Service Startup Error. Wathcher do not exist");
-            //}
-            //else
-            //{
-            //    Thread loggerThread = new Thread(new ThreadStart(_logger.Start));
-            //    try
-            //    {
-            //        loggerThread.Start();
-            //        _logger.RecordEntry("Whatcher started");
-            //    }
-            //    catch (System.Exception)
-            //    {
-            //        _logger.RecordEntry("Service Startup Error");
-            //    }
-            //}
+            if (!string.IsNullOrWhiteSpace(_watchedFolder))
+            {                
+                _logger = FWLogger.CreateInstance(_watchedFolder);
+                _logger.RecordEntry("Service starting");
+                Thread loggerThread = new Thread(new ThreadStart(_logger.Start));
+                loggerThread.Start();
+            }
         }
 
-        private System.IO.DirectoryInfo CheckFolder(string path)
+        /// <summary>
+        /// Checking for a directory
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private string CheckFolder(string path)
         {
-            return System.IO.Directory.CreateDirectory(path);
+            System.IO.DirectoryInfo dirInfo;
+            try
+            {
+                dirInfo = System.IO.Directory.CreateDirectory(path);
+                return dirInfo.FullName;
+            }
+            catch (Exception)
+            {
+                return "";
+            }            
         }
 
 
@@ -69,7 +67,7 @@ namespace fwService
         {
             _logger?.Stop();
             Thread.Sleep(1000);
-            _logger.RecordEntry("Watcher stopped");
+            _logger.RecordEntry("Service stopped");
         }
     }
 }
