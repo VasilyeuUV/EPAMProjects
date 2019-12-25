@@ -9,13 +9,16 @@ namespace epam_task4
     {
         static void Main(string[] args)
         {
+            EmulatorThread eThread = null;
+
+
             //InstallDataBase();
 
             // START EMULATOR
             Form emulator = emulatorWFA.FormMain.StartForm(true);
             if (emulator != null)
             {
-                EmulatorThread eThread = new EmulatorThread(emulator);
+                eThread = new EmulatorThread(emulator);
 
                 //Thread emulatorThread = new Thread(new ThreadStart(StartEmulator));
                 //emulatorThread.Start();
@@ -25,6 +28,9 @@ namespace epam_task4
 
             Console.WriteLine("Press any key to Exit");
             Console.ReadKey();
+            eThread?.Close();
+
+
             //myThread.Abort();
         }
 

@@ -1,17 +1,20 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace epam_task4.Threads
 {
     internal class EmulatorThread
     {
-        Thread thread;
+        private Thread _thread = null;
+        private Form _form = null;
 
         public EmulatorThread(Form form)
         {
-            thread = new Thread(this.StartEmulator);
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start(form);
+            this._form = form;
+            this._thread = new Thread(this.StartEmulator);
+            this._thread.SetApartmentState(ApartmentState.STA);
+            this._thread.Start(form);
         }
 
         private void StartEmulator(object emulator)
@@ -20,5 +23,12 @@ namespace epam_task4.Threads
             Application.Run((Form)emulator);
         }
 
+        internal void Close()
+        {
+            if (this._thread.IsAlive)
+            {
+                Application.Exit();
+            }
+        }
     }
 }
