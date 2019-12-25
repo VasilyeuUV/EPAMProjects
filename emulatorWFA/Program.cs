@@ -12,11 +12,20 @@ namespace emulatorWFA
         /// Главная точка входа для приложения.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+
+            FormMain form = FormMain.StartForm(args);
+            if (form != null)
+            {
+                Application.Run(form);
+            }
+            else
+            {
+                MessageBox.Show("This application cannot be started.");
+            }
         }
     }
 }

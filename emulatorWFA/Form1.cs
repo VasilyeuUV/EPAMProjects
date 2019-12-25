@@ -1,13 +1,33 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace emulatorWFA
 {
+    public delegate void InstallPathsDlgt(string[] paths);
+
+
     public partial class FormMain : Form
     {
-        public FormMain()
+        private FormMain()
         {
             InitializeComponent();
         }
+
+        internal static FormMain StartForm(string[] args)
+        {
+            bool start = true;                      // to production must be false
+            if (args.Length > 0)
+            {
+                start = Convert.ToBoolean(args[0]);
+            }
+            if (start)
+            {
+                return new FormMain();
+            }
+            return null;
+        }
+
+
 
 
         /// <summary>
@@ -62,5 +82,26 @@ namespace emulatorWFA
         {
 
         }
+
+
+        /// <summary>
+        /// Install Paths
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPathsInstall_Click(object sender, System.EventArgs e)
+        {
+            string[] paths =
+            {
+                tbWatchedFolder.Text,
+                tbManagerErrorFolder.Text,
+                tbProductErrorFolder.Text,
+                tbContentErrorFolder.Text,
+                tbLogsFolder.Text
+            };
+            //InstallPathsDlgt(paths);
+        }
+
+
     }
 }
