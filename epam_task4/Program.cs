@@ -1,4 +1,6 @@
-﻿using System;
+﻿using epam_task4.Threads;
+using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace epam_task4
@@ -10,27 +12,27 @@ namespace epam_task4
             //InstallDataBase();
 
             // START EMULATOR
-            Form emulator = GetEmulator();
+            Form emulator = emulatorWFA.FormMain.StartForm(true);
             if (emulator != null)
             {
-                Application.EnableVisualStyles();
-                Application.Run(emulator);
+                EmulatorThread eThread = new EmulatorThread(emulator);
+
+                //Thread emulatorThread = new Thread(new ThreadStart(StartEmulator));
+                //emulatorThread.Start();
             }
 
 
 
             Console.WriteLine("Press any key to Exit");
             Console.ReadKey();
+            //myThread.Abort();
         }
 
+        //private static void StartEmulator(Form emulator)
+        //{
+        //    Application.EnableVisualStyles();
+        //    Application.Run(emulator);
+        //}
 
-        /// <summary>
-        /// Run emulator
-        /// </summary>
-        /// <returns></returns>
-        private static Form GetEmulator()
-        {
-            return emulatorWFA.FormMain.StartForm(true);
-        }
     }
 }
