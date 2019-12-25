@@ -11,8 +11,12 @@ namespace epam_task4
 
             // START EMULATOR
             Form emulator = GetEmulator();
-            Application.EnableVisualStyles();
-            Application.Run(emulator);
+            if (emulator != null)
+            {
+                Application.EnableVisualStyles();
+                Application.Run(emulator);
+            }
+
 
 
             Console.WriteLine("Press any key to Exit");
