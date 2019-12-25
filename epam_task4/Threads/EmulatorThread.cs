@@ -17,12 +17,19 @@ namespace epam_task4.Threads
             this._thread.Start(form);
         }
 
+        /// <summary>
+        /// Start emulatorWFA in new thread
+        /// </summary>
+        /// <param name="emulator"></param>
         private void StartEmulator(object emulator)
         {
             Application.EnableVisualStyles();
             Application.Run((Form)emulator);
         }
 
+        /// <summary>
+        /// Close emulatorWFA
+        /// </summary>
         internal void Close()
         {
             if (this._thread.IsAlive)
