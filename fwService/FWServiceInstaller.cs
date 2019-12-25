@@ -10,15 +10,5 @@ namespace fwService
         {
             InitializeComponent();
         }
-
-        private void serviceInstallerFW_AfterInstall(object sender, InstallEventArgs e)
-        {
-
-        }
-
-        private void serviceProcessInstallerFW_AfterInstall(object sender, InstallEventArgs e)
-        {
-
-        }
     }
 }

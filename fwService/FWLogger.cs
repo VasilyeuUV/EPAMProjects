@@ -7,7 +7,7 @@ namespace fwService
     internal class FWLogger
     {
 
-        private FileSystemWatcher watcher;
+        private FileSystemWatcher _watcher;
         private object obj = new object();
         private bool enabled = true;                // work will continue as long as the this variable is true
         
@@ -17,24 +17,30 @@ namespace fwService
         /// <summary>
         /// CTOR
         /// </summary>
-        private FWLogger(string path)
+        private FWLogger()
         {
+            try
+            {
+                _watcher = new FileSystemWatcher();                
+                //watcher.Path = path;
 
-            watcher = new FileSystemWatcher(path);
-            //watcher.Path = path;
-
-            // these options are set by default
-            watcher.NotifyFilter = NotifyFilters.LastWrite;          // Watch for changes in LastWrite times (Дата последней записи в файл или папку)
-                                 //| NotifyFilters.FileName;          // Watch for renaming
-                                 //| NotifyFilters.DirectoryName;     // Watch for changes in directories name
-            watcher.IncludeSubdirectories = true;
-            watcher.Filter = "*.csv";           // watch only csv files
+                // these options are set by default
+                _watcher.NotifyFilter = NotifyFilters.LastWrite;          // Watch for changes in LastWrite times (Дата последней записи в файл или папку)
+                                                                         //| NotifyFilters.FileName;          // Watch for renaming
+                                                                         //| NotifyFilters.DirectoryName;     // Watch for changes in directories name
+                _watcher.IncludeSubdirectories = false;
+                _watcher.Filter = "*.csv";           // watch only csv files
 
 
-            //watcher.Changed += Watcher_OnChanged;
-            //watcher.Created += Watcher_OnCreated;
-            //watcher.Deleted += Watcher_OnDeleted;
-            //watcher.Renamed += Watcher_OnRenamed;
+                _watcher.Changed += Watcher_OnChanged;
+                //watcher.Created += Watcher_OnCreated;
+                //watcher.Deleted += Watcher_OnDeleted;
+                //watcher.Renamed += Watcher_OnRenamed;
+            }
+            catch (Exception e)
+            {
+                RecordEntry("Error created Watcher" + e.Message);
+            }
         }
 
         /// <summary>
@@ -44,11 +50,39 @@ namespace fwService
         /// <returns></returns>
         internal static FWLogger CreateInstance(string path)
         {
-            if (Directory.Exists(path))
-            {                
-                return new FWLogger(path);
+            try
+            {
+                FWLogger logger = new FWLogger();
+                logger._watcher.Path = path;
+                return logger;
             }
-            return null;
+            catch (Exception)
+            {
+                return null;
+            }
+
+
+
+            //FWLogger logger = new FWLogger();
+
+            //if (!Directory.Exists(path))
+            //{
+            //    try
+            //    {
+            //        logger.RecordEntry("The folder for monitoring does not exist. Create a folder for monitoring");
+            //        if (Directory.CreateDirectory(path) != null)
+            //        {
+            //            logger._watcher.Path = path;
+            //            logger.RecordEntry($"Watcher for {path} was created");
+            //        }                    
+            //    }
+            //    catch (Exception)
+            //    {
+            //        logger.RecordEntry("Error Watcher create. Failed to create monitoring folder");
+            //        return null;
+            //    }
+            //}
+            //return logger;
         }
 
 
@@ -58,11 +92,8 @@ namespace fwService
         /// We will track changes in the folder through the FileSystemWatcher object.
         /// </summary>
         internal void Start()
-        {
-            
-            watcher.Changed += Watcher_OnChanged;
-            RecordEntry("add Changed event", "watcher");
-            watcher.EnableRaisingEvents = true;         // Begin watching
+        {            
+            _watcher.EnableRaisingEvents = true;         // Begin watching
             RecordEntry("Begin watching", "watcher");
             while (enabled)
             {
@@ -75,9 +106,7 @@ namespace fwService
         /// </summary>
         internal void Stop()
         {
-            watcher.EnableRaisingEvents = false;
-            watcher.Changed -= Watcher_OnChanged;
-            RecordEntry("remove Changed event", "watcher");
+            _watcher.EnableRaisingEvents = false;
             enabled = false;
             RecordEntry("Stop", "watcher");
         }
@@ -87,20 +116,41 @@ namespace fwService
         /// </summary>
         /// <param name="fileEvent"></param>
         /// <param name="filePath"></param>
-        private void RecordEntry(string fileEvent, string filePath)
+        internal void RecordEntry(string fileEvent, string filePath)
         {
             lock (obj)
             {
                 using (StreamWriter writer = new StreamWriter(_logFile, true))
                 {
-                    writer.WriteLine(string.Format("{0} file {1} was {2}",
+                    writer.WriteLine(string.Format("{0}: File {1} was {2}",
                         DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"), filePath, fileEvent));
                     writer.Flush();
                 }
             }
         }
 
+        /// <summary>
+        /// Save event result
+        /// </summary>
+        /// <param name="logEvent"></param>
+        internal void RecordEntry(string logEvent)
+        {
+            lock (obj)
+            {
+                using (StreamWriter writer = new StreamWriter(_logFile, true))
+                {
+                    writer.WriteLine(string.Format("{0}: {1}",
+                        DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"), logEvent));
+                    writer.Flush();
+                }
+            }
+        }
 
+        /// <summary>
+        /// Chechk for file ready to use
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         private static bool IsFileReady(string filename)
         {
             // If the file can be opened for exclusive access it means that the file

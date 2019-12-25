@@ -36,15 +36,14 @@
             this.serviceProcessInstallerFW.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.serviceProcessInstallerFW.Password = null;
             this.serviceProcessInstallerFW.Username = null;
-            this.serviceProcessInstallerFW.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceProcessInstallerFW_AfterInstall);
             // 
             // serviceInstallerFW
             // 
+            this.serviceInstallerFW.DelayedAutoStart = true;
             this.serviceInstallerFW.Description = "File Watcher Service";
             this.serviceInstallerFW.DisplayName = "FWService";
             this.serviceInstallerFW.ServiceName = "FWService";
             this.serviceInstallerFW.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
-            this.serviceInstallerFW.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceInstallerFW_AfterInstall);
             // 
             // FWServiceInstaller
             // 
