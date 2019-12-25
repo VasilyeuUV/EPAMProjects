@@ -33,6 +33,7 @@ namespace emulatorWFA
                         tbManagerErrorFolder.Text = tbWatchedFolder.Text + slash + @"FileNameErrors";
                         tbProductErrorFolder.Text = tbWatchedFolder.Text + slash + @"ProductErrors";
                         tbContentErrorFolder.Text = tbWatchedFolder.Text + slash + @"ContentErrors";
+                        tbLogsFolder.Text = tbWatchedFolder.Text + slash + @"Logs";
                         break;
                     case "btnManagerErrorFolder":
                         tbManagerErrorFolder.Text = DirDialog.SelectedPath;
@@ -42,6 +43,9 @@ namespace emulatorWFA
                         break;
                     case "btnContentErrorFolder":
                         tbContentErrorFolder.Text = DirDialog.SelectedPath;
+                        break;
+                    case "btnLogsFolderSelect":
+                        tbLogsFolder.Text = DirDialog.SelectedPath;
                         break;
                     default:
                         break;
