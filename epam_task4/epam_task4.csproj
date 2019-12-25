@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\emulatorWFA\emulatorWFA.csproj">
+      <Project>{98080723-0566-4d03-a981-7687e9fa62ce}</Project>
+      <Name>emulatorWFA</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
