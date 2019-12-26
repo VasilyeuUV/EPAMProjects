@@ -92,7 +92,14 @@ namespace emulatorWFA.Threads
                 soldGoods.Append(startData.ToString("dd.MM.yyyy HH:mm:ss") + delimiter);
                 soldGoods.Append("Client" + Const.RND.Next(1, clientCount) + delimiter);
                 var product = products.ElementAt(Const.RND.Next(0, products.Count));
-                soldGoods.Append(product.Key + delimiter + product.Value + string.Format("\r\n"));
+                soldGoods.Append(product.Key + delimiter);
+
+                // the probability of an error recording the amount
+                var dice1 = Const.RND.Next(0, 100);
+                var dice2 = Const.RND2.Next(0, 100);
+                if (dice1 == dice2) { soldGoods.Append("wrong price"); }
+                else { soldGoods.Append(product.Value); }
+                soldGoods.Append(string.Format("\r\n"));
 
                 int sleep = Const.RND.Next(500, 1000);
                 Thread.Sleep(sleep);
