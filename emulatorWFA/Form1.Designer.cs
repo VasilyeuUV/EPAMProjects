@@ -29,88 +29,88 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            System.Windows.Forms.ListViewItem listViewItem29 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
             "Boat",
             "500000"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem30 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem(new string[] {
             "Car",
             "120000000"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem31 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
             "Helicopter",
             "130000000"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem32 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem(new string[] {
             "Calculator",
             "1200"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem33 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem(new string[] {
             "Clamp",
             "50"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem34 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem(new string[] {
             "Clipboard",
             "1320"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem35 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem(new string[] {
             "Corrector",
             "980"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem36 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem(new string[] {
             "Envelope",
             "120"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem37 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem(new string[] {
             "Eraser",
             "80"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem38 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem(new string[] {
             "File",
             "200"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem39 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem11 = new System.Windows.Forms.ListViewItem(new string[] {
             "Folder",
             "230"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem40 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem12 = new System.Windows.Forms.ListViewItem(new string[] {
             "Glue",
             "349"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem41 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem13 = new System.Windows.Forms.ListViewItem(new string[] {
             "Highlighter",
             "120"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem42 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem14 = new System.Windows.Forms.ListViewItem(new string[] {
             "Marker",
             "100"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem43 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem15 = new System.Windows.Forms.ListViewItem(new string[] {
             "Notebook",
             "580"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem44 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem16 = new System.Windows.Forms.ListViewItem(new string[] {
             "Notepad",
             "620"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem45 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem17 = new System.Windows.Forms.ListViewItem(new string[] {
             "Paper",
             "2500"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem46 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem18 = new System.Windows.Forms.ListViewItem(new string[] {
             "Pen",
             "150"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem47 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem19 = new System.Windows.Forms.ListViewItem(new string[] {
             "Pencil",
             "100"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem48 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem20 = new System.Windows.Forms.ListViewItem(new string[] {
             "Punch",
             "820"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem49 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem21 = new System.Windows.Forms.ListViewItem(new string[] {
             "Pushpins",
             "680"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem50 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem22 = new System.Windows.Forms.ListViewItem(new string[] {
             "Ruler",
             "559"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem51 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem23 = new System.Windows.Forms.ListViewItem(new string[] {
             "Scissors",
             "889"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem52 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem24 = new System.Windows.Forms.ListViewItem(new string[] {
             "Scotch",
             "420"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem53 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem25 = new System.Windows.Forms.ListViewItem(new string[] {
             "Stapler",
             "1000"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem54 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem26 = new System.Windows.Forms.ListViewItem(new string[] {
             "Staples",
             "300"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem55 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem27 = new System.Windows.Forms.ListViewItem(new string[] {
             "Stickers",
             "310"}, -1);
-            System.Windows.Forms.ListViewItem listViewItem56 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem28 = new System.Windows.Forms.ListViewItem(new string[] {
             "Сlips",
             "550"}, -1);
             this.tcMain = new System.Windows.Forms.TabControl();
@@ -154,14 +154,14 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tpProcess = new System.Windows.Forms.TabPage();
-            this.tpDB = new System.Windows.Forms.TabPage();
             this.scProcess = new System.Windows.Forms.SplitContainer();
             this.scProcessLeft = new System.Windows.Forms.SplitContainer();
+            this.gbManagerThreads = new System.Windows.Forms.GroupBox();
+            this.lbManagerThreads = new System.Windows.Forms.ListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnStartProcess = new System.Windows.Forms.ToolStripButton();
             this.btnStopProcess = new System.Windows.Forms.ToolStripButton();
-            this.gbManagerThreads = new System.Windows.Forms.GroupBox();
-            this.lbManagerThreads = new System.Windows.Forms.ListBox();
+            this.tpDB = new System.Windows.Forms.TabPage();
             this.tcMain.SuspendLayout();
             this.tpInstall.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scMain)).BeginInit();
@@ -185,8 +185,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.scProcessLeft)).BeginInit();
             this.scProcessLeft.Panel1.SuspendLayout();
             this.scProcessLeft.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             this.gbManagerThreads.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tcMain
@@ -288,7 +288,7 @@
             this.tbLogsFolder.ReadOnly = true;
             this.tbLogsFolder.Size = new System.Drawing.Size(256, 22);
             this.tbLogsFolder.TabIndex = 13;
-            this.tbLogsFolder.Text = "D:\\epam_task4_test\\Logs";
+            this.tbLogsFolder.Text = "D:\\epam_task4_test\\Logs\\";
             // 
             // label5
             // 
@@ -319,7 +319,7 @@
             this.tbContentErrorFolder.ReadOnly = true;
             this.tbContentErrorFolder.Size = new System.Drawing.Size(256, 22);
             this.tbContentErrorFolder.TabIndex = 10;
-            this.tbContentErrorFolder.Text = "D:\\epam_task4_test\\ContentErrors";
+            this.tbContentErrorFolder.Text = "D:\\epam_task4_test\\ContentErrors\\";
             // 
             // label4
             // 
@@ -350,7 +350,7 @@
             this.tbProductErrorFolder.ReadOnly = true;
             this.tbProductErrorFolder.Size = new System.Drawing.Size(256, 22);
             this.tbProductErrorFolder.TabIndex = 7;
-            this.tbProductErrorFolder.Text = "D:\\epam_task4_test\\ProductErrors";
+            this.tbProductErrorFolder.Text = "D:\\epam_task4_test\\ProductErrors\\";
             // 
             // label3
             // 
@@ -381,7 +381,7 @@
             this.tbManagerErrorFolder.ReadOnly = true;
             this.tbManagerErrorFolder.Size = new System.Drawing.Size(256, 22);
             this.tbManagerErrorFolder.TabIndex = 4;
-            this.tbManagerErrorFolder.Text = "D:\\epam_task4_test\\FileNameErrors";
+            this.tbManagerErrorFolder.Text = "D:\\epam_task4_test\\FileNameErrors\\";
             // 
             // label2
             // 
@@ -595,9 +595,9 @@
             this.lvNotProducts.GridLines = true;
             this.lvNotProducts.HideSelection = false;
             this.lvNotProducts.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem29,
-            listViewItem30,
-            listViewItem31});
+            listViewItem1,
+            listViewItem2,
+            listViewItem3});
             this.lvNotProducts.LabelWrap = false;
             this.lvNotProducts.Location = new System.Drawing.Point(3, 18);
             this.lvNotProducts.MultiSelect = false;
@@ -639,31 +639,31 @@
             this.lvProduct.GridLines = true;
             this.lvProduct.HideSelection = false;
             this.lvProduct.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem32,
-            listViewItem33,
-            listViewItem34,
-            listViewItem35,
-            listViewItem36,
-            listViewItem37,
-            listViewItem38,
-            listViewItem39,
-            listViewItem40,
-            listViewItem41,
-            listViewItem42,
-            listViewItem43,
-            listViewItem44,
-            listViewItem45,
-            listViewItem46,
-            listViewItem47,
-            listViewItem48,
-            listViewItem49,
-            listViewItem50,
-            listViewItem51,
-            listViewItem52,
-            listViewItem53,
-            listViewItem54,
-            listViewItem55,
-            listViewItem56});
+            listViewItem4,
+            listViewItem5,
+            listViewItem6,
+            listViewItem7,
+            listViewItem8,
+            listViewItem9,
+            listViewItem10,
+            listViewItem11,
+            listViewItem12,
+            listViewItem13,
+            listViewItem14,
+            listViewItem15,
+            listViewItem16,
+            listViewItem17,
+            listViewItem18,
+            listViewItem19,
+            listViewItem20,
+            listViewItem21,
+            listViewItem22,
+            listViewItem23,
+            listViewItem24,
+            listViewItem25,
+            listViewItem26,
+            listViewItem27,
+            listViewItem28});
             this.lvProduct.LabelWrap = false;
             this.lvProduct.Location = new System.Drawing.Point(3, 18);
             this.lvProduct.MultiSelect = false;
@@ -695,16 +695,6 @@
             this.tpProcess.Text = "Process";
             this.tpProcess.UseVisualStyleBackColor = true;
             // 
-            // tpDB
-            // 
-            this.tpDB.Location = new System.Drawing.Point(4, 25);
-            this.tpDB.Name = "tpDB";
-            this.tpDB.Padding = new System.Windows.Forms.Padding(3);
-            this.tpDB.Size = new System.Drawing.Size(792, 421);
-            this.tpDB.TabIndex = 2;
-            this.tpDB.Text = "DataBase";
-            this.tpDB.UseVisualStyleBackColor = true;
-            // 
             // scProcess
             // 
             this.scProcess.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -731,6 +721,27 @@
             this.scProcessLeft.Size = new System.Drawing.Size(385, 415);
             this.scProcessLeft.SplitterDistance = 190;
             this.scProcessLeft.TabIndex = 0;
+            // 
+            // gbManagerThreads
+            // 
+            this.gbManagerThreads.Controls.Add(this.lbManagerThreads);
+            this.gbManagerThreads.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbManagerThreads.Location = new System.Drawing.Point(0, 27);
+            this.gbManagerThreads.Name = "gbManagerThreads";
+            this.gbManagerThreads.Size = new System.Drawing.Size(190, 388);
+            this.gbManagerThreads.TabIndex = 2;
+            this.gbManagerThreads.TabStop = false;
+            this.gbManagerThreads.Text = "Threads: ";
+            // 
+            // lbManagerThreads
+            // 
+            this.lbManagerThreads.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbManagerThreads.FormattingEnabled = true;
+            this.lbManagerThreads.ItemHeight = 16;
+            this.lbManagerThreads.Location = new System.Drawing.Point(3, 18);
+            this.lbManagerThreads.Name = "lbManagerThreads";
+            this.lbManagerThreads.Size = new System.Drawing.Size(184, 367);
+            this.lbManagerThreads.TabIndex = 0;
             // 
             // toolStrip1
             // 
@@ -760,29 +771,18 @@
             this.btnStopProcess.Image = global::emulatorWFA.Properties.Resources.Stop;
             this.btnStopProcess.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnStopProcess.Name = "btnStopProcess";
-            this.btnStopProcess.Size = new System.Drawing.Size(29, 28);
+            this.btnStopProcess.Size = new System.Drawing.Size(29, 24);
             this.btnStopProcess.ToolTipText = "Stop Process";
             // 
-            // gbManagerThreads
+            // tpDB
             // 
-            this.gbManagerThreads.Controls.Add(this.lbManagerThreads);
-            this.gbManagerThreads.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbManagerThreads.Location = new System.Drawing.Point(0, 27);
-            this.gbManagerThreads.Name = "gbManagerThreads";
-            this.gbManagerThreads.Size = new System.Drawing.Size(190, 388);
-            this.gbManagerThreads.TabIndex = 2;
-            this.gbManagerThreads.TabStop = false;
-            this.gbManagerThreads.Text = "Threads: ";
-            // 
-            // lbManagerThreads
-            // 
-            this.lbManagerThreads.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbManagerThreads.FormattingEnabled = true;
-            this.lbManagerThreads.ItemHeight = 16;
-            this.lbManagerThreads.Location = new System.Drawing.Point(3, 18);
-            this.lbManagerThreads.Name = "lbManagerThreads";
-            this.lbManagerThreads.Size = new System.Drawing.Size(184, 367);
-            this.lbManagerThreads.TabIndex = 0;
+            this.tpDB.Location = new System.Drawing.Point(4, 25);
+            this.tpDB.Name = "tpDB";
+            this.tpDB.Padding = new System.Windows.Forms.Padding(3);
+            this.tpDB.Size = new System.Drawing.Size(792, 421);
+            this.tpDB.TabIndex = 2;
+            this.tpDB.Text = "DataBase";
+            this.tpDB.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -817,9 +817,9 @@
             this.scProcessLeft.Panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scProcessLeft)).EndInit();
             this.scProcessLeft.ResumeLayout(false);
+            this.gbManagerThreads.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.gbManagerThreads.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

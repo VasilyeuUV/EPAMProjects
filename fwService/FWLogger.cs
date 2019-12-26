@@ -6,11 +6,13 @@ namespace fwService
 {
     internal class FWLogger
     {
-
-        private FileSystemWatcher _watcher;
-        private object obj = new object();
+        private FileSystemWatcher _watcher;         // Watcher
+        private object obj = new object();          // some object for lock
         private bool enabled = true;                // work will continue as long as the this variable is true
-        
+
+        public delegate void NewFileDetectedHandler(string file);
+        public event NewFileDetectedHandler NewFileDetectedEvent;
+
         private string _logFile = @"D:\fwLogFile.txt";
 
 
@@ -22,12 +24,11 @@ namespace fwService
             try
             {
                 _watcher = new FileSystemWatcher();                
-                //watcher.Path = path;
 
                 // these options are set by default
                 _watcher.NotifyFilter = NotifyFilters.LastWrite;          // Watch for changes in LastWrite times (Дата последней записи в файл или папку)
-                                                                         //| NotifyFilters.FileName;          // Watch for renaming
-                                                                         //| NotifyFilters.DirectoryName;     // Watch for changes in directories name
+                                    //| NotifyFilters.FileName;          // Watch for renaming
+                                    //| NotifyFilters.DirectoryName;     // Watch for changes in directories name
                 _watcher.IncludeSubdirectories = false;
                 _watcher.Filter = "*.csv";           // watch only csv files
 
@@ -60,33 +61,7 @@ namespace fwService
             {
                 return null;
             }
-
-
-
-            //FWLogger logger = new FWLogger();
-
-            //if (!Directory.Exists(path))
-            //{
-            //    try
-            //    {
-            //        logger.RecordEntry("The folder for monitoring does not exist. Create a folder for monitoring");
-            //        if (Directory.CreateDirectory(path) != null)
-            //        {
-            //            logger._watcher.Path = path;
-            //            logger.RecordEntry($"Watcher for {path} was created");
-            //        }                    
-            //    }
-            //    catch (Exception)
-            //    {
-            //        logger.RecordEntry("Error Watcher create. Failed to create monitoring folder");
-            //        return null;
-            //    }
-            //}
-            //return logger;
         }
-
-
-
 
         /// <summary>
         /// We will track changes in the folder through the FileSystemWatcher object.
@@ -187,7 +162,8 @@ namespace fwService
             if (IsFileReady(filePath)) 
             {
                 string fileEvent = "changed";                
-                RecordEntry(fileEvent, filePath); 
+                RecordEntry(fileEvent, filePath);
+                NewFileDetectedEvent?.Invoke(filePath);
             } 
             else
             {
