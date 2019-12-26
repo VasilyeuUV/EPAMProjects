@@ -14,7 +14,7 @@ namespace emulatorWFA
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            bool start = false;
+            bool start = true;
             if (args.Length > 0)
             {
                 start = Convert.ToBoolean(args[0]);

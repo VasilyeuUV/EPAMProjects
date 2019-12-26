@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows.Forms;
 
 namespace epam_task4.Threads
@@ -9,6 +8,10 @@ namespace epam_task4.Threads
         private Thread _thread = null;
         private Form _form = null;
 
+        /// <summary>
+        /// CTOR
+        /// </summary>
+        /// <param name="form"></param>
         public EmulatorThread(Form form)
         {
             this._form = form;

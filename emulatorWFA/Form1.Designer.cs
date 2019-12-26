@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             System.Windows.Forms.ListViewItem listViewItem29 = new System.Windows.Forms.ListViewItem(new string[] {
             "Boat",
             "500000"}, -1);
@@ -112,12 +113,14 @@
             System.Windows.Forms.ListViewItem listViewItem56 = new System.Windows.Forms.ListViewItem(new string[] {
             "Сlips",
             "550"}, -1);
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.tcMain = new System.Windows.Forms.TabControl();
             this.tpInstall = new System.Windows.Forms.TabPage();
             this.scMain = new System.Windows.Forms.SplitContainer();
             this.btnPathsInstall = new System.Windows.Forms.Button();
             this.gbPath = new System.Windows.Forms.GroupBox();
+            this.btnLogsFolderSelect = new System.Windows.Forms.Button();
+            this.tbLogsFolder = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.btnContentErrorFolder = new System.Windows.Forms.Button();
             this.tbContentErrorFolder = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -152,9 +155,13 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tpProcess = new System.Windows.Forms.TabPage();
             this.tpDB = new System.Windows.Forms.TabPage();
-            this.btnLogsFolderSelect = new System.Windows.Forms.Button();
-            this.tbLogsFolder = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
+            this.scProcess = new System.Windows.Forms.SplitContainer();
+            this.scProcessLeft = new System.Windows.Forms.SplitContainer();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btnStartProcess = new System.Windows.Forms.ToolStripButton();
+            this.btnStopProcess = new System.Windows.Forms.ToolStripButton();
+            this.gbManagerThreads = new System.Windows.Forms.GroupBox();
+            this.lbManagerThreads = new System.Windows.Forms.ListBox();
             this.tcMain.SuspendLayout();
             this.tpInstall.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scMain)).BeginInit();
@@ -171,6 +178,15 @@
             this.gbManager.SuspendLayout();
             this.gbNotProduct.SuspendLayout();
             this.gbProduct.SuspendLayout();
+            this.tpProcess.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.scProcess)).BeginInit();
+            this.scProcess.Panel1.SuspendLayout();
+            this.scProcess.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.scProcessLeft)).BeginInit();
+            this.scProcessLeft.Panel1.SuspendLayout();
+            this.scProcessLeft.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
+            this.gbManagerThreads.SuspendLayout();
             this.SuspendLayout();
             // 
             // tcMain
@@ -251,6 +267,37 @@
             this.gbPath.TabIndex = 1;
             this.gbPath.TabStop = false;
             this.gbPath.Text = "Paths: ";
+            // 
+            // btnLogsFolderSelect
+            // 
+            this.btnLogsFolderSelect.AutoEllipsis = true;
+            this.btnLogsFolderSelect.Image = ((System.Drawing.Image)(resources.GetObject("btnLogsFolderSelect.Image")));
+            this.btnLogsFolderSelect.Location = new System.Drawing.Point(268, 239);
+            this.btnLogsFolderSelect.Name = "btnLogsFolderSelect";
+            this.btnLogsFolderSelect.Size = new System.Drawing.Size(24, 24);
+            this.btnLogsFolderSelect.TabIndex = 14;
+            this.btnLogsFolderSelect.UseVisualStyleBackColor = true;
+            this.btnLogsFolderSelect.Click += new System.EventHandler(this.btnWatchedFolderSelect_Click);
+            // 
+            // tbLogsFolder
+            // 
+            this.tbLogsFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbLogsFolder.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.tbLogsFolder.Location = new System.Drawing.Point(6, 240);
+            this.tbLogsFolder.Name = "tbLogsFolder";
+            this.tbLogsFolder.ReadOnly = true;
+            this.tbLogsFolder.Size = new System.Drawing.Size(256, 22);
+            this.tbLogsFolder.TabIndex = 13;
+            this.tbLogsFolder.Text = "D:\\epam_task4_test\\Logs";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 220);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(79, 17);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Logs folder";
             // 
             // btnContentErrorFolder
             // 
@@ -639,6 +686,7 @@
             // 
             // tpProcess
             // 
+            this.tpProcess.Controls.Add(this.scProcess);
             this.tpProcess.Location = new System.Drawing.Point(4, 25);
             this.tpProcess.Name = "tpProcess";
             this.tpProcess.Padding = new System.Windows.Forms.Padding(3);
@@ -657,36 +705,84 @@
             this.tpDB.Text = "DataBase";
             this.tpDB.UseVisualStyleBackColor = true;
             // 
-            // btnLogsFolderSelect
+            // scProcess
             // 
-            this.btnLogsFolderSelect.AutoEllipsis = true;
-            this.btnLogsFolderSelect.Image = ((System.Drawing.Image)(resources.GetObject("btnLogsFolderSelect.Image")));
-            this.btnLogsFolderSelect.Location = new System.Drawing.Point(268, 239);
-            this.btnLogsFolderSelect.Name = "btnLogsFolderSelect";
-            this.btnLogsFolderSelect.Size = new System.Drawing.Size(24, 24);
-            this.btnLogsFolderSelect.TabIndex = 14;
-            this.btnLogsFolderSelect.UseVisualStyleBackColor = true;
-            this.btnLogsFolderSelect.Click += new System.EventHandler(this.btnWatchedFolderSelect_Click);
+            this.scProcess.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scProcess.Location = new System.Drawing.Point(3, 3);
+            this.scProcess.Name = "scProcess";
             // 
-            // tbLogsFolder
+            // scProcess.Panel1
             // 
-            this.tbLogsFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.tbLogsFolder.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.tbLogsFolder.Location = new System.Drawing.Point(6, 240);
-            this.tbLogsFolder.Name = "tbLogsFolder";
-            this.tbLogsFolder.ReadOnly = true;
-            this.tbLogsFolder.Size = new System.Drawing.Size(256, 22);
-            this.tbLogsFolder.TabIndex = 13;
-            this.tbLogsFolder.Text = "D:\\epam_task4_test\\Logs";
+            this.scProcess.Panel1.Controls.Add(this.scProcessLeft);
+            this.scProcess.Size = new System.Drawing.Size(786, 415);
+            this.scProcess.SplitterDistance = 385;
+            this.scProcess.TabIndex = 0;
             // 
-            // label5
+            // scProcessLeft
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 220);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(79, 17);
-            this.label5.TabIndex = 12;
-            this.label5.Text = "Logs folder";
+            this.scProcessLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scProcessLeft.Location = new System.Drawing.Point(0, 0);
+            this.scProcessLeft.Name = "scProcessLeft";
+            // 
+            // scProcessLeft.Panel1
+            // 
+            this.scProcessLeft.Panel1.Controls.Add(this.gbManagerThreads);
+            this.scProcessLeft.Panel1.Controls.Add(this.toolStrip1);
+            this.scProcessLeft.Size = new System.Drawing.Size(385, 415);
+            this.scProcessLeft.SplitterDistance = 190;
+            this.scProcessLeft.TabIndex = 0;
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnStartProcess,
+            this.btnStopProcess});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(190, 27);
+            this.toolStrip1.TabIndex = 1;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // btnStartProcess
+            // 
+            this.btnStartProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnStartProcess.Image = global::emulatorWFA.Properties.Resources.Forward;
+            this.btnStartProcess.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnStartProcess.Name = "btnStartProcess";
+            this.btnStartProcess.Size = new System.Drawing.Size(29, 24);
+            this.btnStartProcess.ToolTipText = "Start Process";
+            this.btnStartProcess.Click += new System.EventHandler(this.btnStartProcess_Click);
+            // 
+            // btnStopProcess
+            // 
+            this.btnStopProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnStopProcess.Image = global::emulatorWFA.Properties.Resources.Stop;
+            this.btnStopProcess.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnStopProcess.Name = "btnStopProcess";
+            this.btnStopProcess.Size = new System.Drawing.Size(29, 28);
+            this.btnStopProcess.ToolTipText = "Stop Process";
+            // 
+            // gbManagerThreads
+            // 
+            this.gbManagerThreads.Controls.Add(this.lbManagerThreads);
+            this.gbManagerThreads.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbManagerThreads.Location = new System.Drawing.Point(0, 27);
+            this.gbManagerThreads.Name = "gbManagerThreads";
+            this.gbManagerThreads.Size = new System.Drawing.Size(190, 388);
+            this.gbManagerThreads.TabIndex = 2;
+            this.gbManagerThreads.TabStop = false;
+            this.gbManagerThreads.Text = "Threads: ";
+            // 
+            // lbManagerThreads
+            // 
+            this.lbManagerThreads.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbManagerThreads.FormattingEnabled = true;
+            this.lbManagerThreads.ItemHeight = 16;
+            this.lbManagerThreads.Location = new System.Drawing.Point(3, 18);
+            this.lbManagerThreads.Name = "lbManagerThreads";
+            this.lbManagerThreads.Size = new System.Drawing.Size(184, 367);
+            this.lbManagerThreads.TabIndex = 0;
             // 
             // FormMain
             // 
@@ -713,6 +809,17 @@
             this.gbManager.ResumeLayout(false);
             this.gbNotProduct.ResumeLayout(false);
             this.gbProduct.ResumeLayout(false);
+            this.tpProcess.ResumeLayout(false);
+            this.scProcess.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.scProcess)).EndInit();
+            this.scProcess.ResumeLayout(false);
+            this.scProcessLeft.Panel1.ResumeLayout(false);
+            this.scProcessLeft.Panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.scProcessLeft)).EndInit();
+            this.scProcessLeft.ResumeLayout(false);
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
+            this.gbManagerThreads.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -761,6 +868,13 @@
         private System.Windows.Forms.Button btnLogsFolderSelect;
         private System.Windows.Forms.TextBox tbLogsFolder;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.SplitContainer scProcess;
+        private System.Windows.Forms.SplitContainer scProcessLeft;
+        private System.Windows.Forms.GroupBox gbManagerThreads;
+        private System.Windows.Forms.ListBox lbManagerThreads;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton btnStartProcess;
+        private System.Windows.Forms.ToolStripButton btnStopProcess;
     }
 }
 
