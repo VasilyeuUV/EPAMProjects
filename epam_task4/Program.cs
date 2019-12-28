@@ -1,5 +1,7 @@
 ﻿using epam_task4.Threads;
 using System;
+using System.ServiceProcess;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace epam_task4
@@ -8,12 +10,29 @@ namespace epam_task4
     {
         static void Main(string[] args)
         {
-            EmulatorThread eThread = null;
+
 
             // DATABASE
             //InstallDataBase();
 
+            //START SERVICE
+            ServiceController svcController = new ServiceController("FWService");
+            try
+            {
+                if (svcController.Status != ServiceControllerStatus.Running) 
+                { 
+                    StartService(svcController); 
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+
+            
+
             // START EMULATOR
+            EmulatorThread eThread = null;
             Form emulator = emulatorWFA.FormMain.StartForm(true);
             if (emulator != null) { eThread = new EmulatorThread(emulator); }
 
@@ -21,7 +40,19 @@ namespace epam_task4
 
             Console.WriteLine("Press any key to Exit");
             Console.ReadKey();
+
             eThread?.Close();
+            svcController.Stop();
+        }
+
+        private static void StartService(ServiceController svcController)
+        {
+            svcController.Start();
+            while (svcController.Status != ServiceControllerStatus.Running)
+            {
+                Thread.Sleep(100);
+                svcController.Refresh();
+            }
         }
     }
 }

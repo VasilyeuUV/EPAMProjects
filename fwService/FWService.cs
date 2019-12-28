@@ -6,6 +6,8 @@ namespace fwService
 {
     public partial class FWService : ServiceBase
     {
+        //public delegate void NewFileDetected(string file);
+        //public event NewFileDetected NewFileDetectedEvent;
 
         private FWLogger _logger;
         private string _watchedFolder = @"D:\epam_temp";
@@ -34,11 +36,17 @@ namespace fwService
             if (!string.IsNullOrWhiteSpace(_watchedFolder))
             {                
                 _logger = FWLogger.CreateInstance(_watchedFolder);
+                //_logger.NewFileDetectedEvent += NewFileDetectedHandler; 
                 _logger.RecordEntry("Service starting");
                 Thread loggerThread = new Thread(new ThreadStart(_logger.Start));
                 loggerThread.Start();
             }
         }
+
+        //private void NewFileDetectedHandler(string file)
+        //{
+        //    NewFileDetectedEvent?.Invoke(file);
+        //}
 
         /// <summary>
         /// Checking for a directory

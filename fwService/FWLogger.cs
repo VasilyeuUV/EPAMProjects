@@ -7,6 +7,9 @@ namespace fwService
     internal class FWLogger
     {
         private FileSystemWatcher _watcher;         // Watcher
+        public FileSystemWatcher Watcher => _watcher;
+
+
         private object obj = new object();          // some object for lock
         private bool enabled = true;                // work will continue as long as the this variable is true
 
@@ -14,6 +17,8 @@ namespace fwService
         public event NewFileDetectedHandler NewFileDetectedEvent;
 
         private string _logFile = @"D:\fwLogFile.txt";
+
+        
 
 
         /// <summary>
@@ -163,7 +168,6 @@ namespace fwService
             {
                 string fileEvent = "changed";                
                 RecordEntry(fileEvent, filePath);
-                NewFileDetectedEvent?.Invoke(filePath);
             } 
             else
             {
