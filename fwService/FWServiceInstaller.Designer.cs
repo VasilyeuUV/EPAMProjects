@@ -1,4 +1,7 @@
-﻿namespace fwService
+﻿using System.Configuration.Install;
+using System.ServiceProcess;
+
+namespace fwService
 {
     partial class FWServiceInstaller
     {
@@ -51,11 +54,45 @@
             this.serviceProcessInstallerFW,
             this.serviceInstallerFW});
 
+            this.serviceInstallerFW.AfterInstall += ServiceInstaller_AfterInstall;
+            this.serviceInstallerFW.BeforeUninstall += ServiceInstaller_BeforeUninstall;
+
         }
 
         #endregion
 
         private System.ServiceProcess.ServiceProcessInstaller serviceProcessInstallerFW;
         private System.ServiceProcess.ServiceInstaller serviceInstallerFW;
+
+
+        private void ServiceInstaller_AfterInstall(object sender, InstallEventArgs e)
+        {
+            try
+            {
+                ServiceController sc = new ServiceController("FWService");
+                sc.Start();
+            }
+            catch (System.Exception)
+            {
+            }
+
+        }
+
+        private void ServiceInstaller_BeforeUninstall(object sender, InstallEventArgs e)
+        {
+            try
+            {
+                this.serviceInstallerFW.AfterInstall -= ServiceInstaller_AfterInstall;
+                this.serviceInstallerFW.BeforeUninstall -= ServiceInstaller_BeforeUninstall;
+                ServiceController sc = new ServiceController("FWService");
+                sc.Stop();
+            }
+            catch (System.Exception)
+            {
+            }
+
+        }
+
+
     }
 }

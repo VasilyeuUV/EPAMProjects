@@ -15,9 +15,14 @@ namespace fwService
         /// <summary>
         /// CTOR
         /// </summary>
-        public FWService()
+        public FWService(/*string[] args*/)
         {
             InitializeComponent();
+
+            //if (args.Length > 0)
+            //{
+            //    this._watchedFolder = args[0];
+            //}
 
             this.CanStop = true;                    // service can be stopped
             this.CanPauseAndContinue = true;        // service can be paused and then continued

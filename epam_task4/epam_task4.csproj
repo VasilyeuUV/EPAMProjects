@@ -34,7 +34,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management.Instrumentation" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -52,11 +58,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\emulatorWFA\emulatorWFA.csproj">
       <Project>{98080723-0566-4d03-a981-7687e9fa62ce}</Project>
       <Name>emulatorWFA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\fwService\fwService.csproj">
+      <Project>{2cb21cc4-53e1-4748-8049-2869b6c77959}</Project>
+      <Name>fwService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
