@@ -65,6 +65,11 @@ namespace fwService
         private System.ServiceProcess.ServiceInstaller serviceInstallerFW;
 
 
+        /// <summary>
+        /// Service autostart after install
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ServiceInstaller_AfterInstall(object sender, InstallEventArgs e)
         {
             try
@@ -78,6 +83,11 @@ namespace fwService
 
         }
 
+        /// <summary>
+        /// Service stop before uninstall
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ServiceInstaller_BeforeUninstall(object sender, InstallEventArgs e)
         {
             try
@@ -90,7 +100,6 @@ namespace fwService
             catch (System.Exception)
             {
             }
-
         }
 
 

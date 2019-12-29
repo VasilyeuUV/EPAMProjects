@@ -1,14 +1,12 @@
 ﻿using epam_task4.Threads;
 using System;
+using System.Configuration.Install;
+using System.Diagnostics;
+using System.Security.Permissions;
+using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
-using System.Configuration.Install;
-using System.Management.Automation.Runspaces;
-using System.Management.Automation;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
 
 namespace epam_task4
 {
@@ -16,13 +14,14 @@ namespace epam_task4
     {
         static void Main(string[] args)
         {
+            string servicePath = @"E:\_projects\epam\task4\epam_task4\fwService\bin\Debug\fwService.exe";
 
 
             // DATABASE
             //InstallDataBase();
 
-            // INSTALL SERVICE
-            InstallService(@"E:\_projects\epam\task4\epam_task4\fwService\bin\Debug\", @"fwService.exe");
+            // INSTALL SERVICE            
+            InstallService(servicePath);
             //ManagedInstallerClass.InstallHelper(new[] {"FWService.exe"});
 
             //START SERVICE
@@ -52,12 +51,17 @@ namespace epam_task4
             if (emulator != null) { eThread = new EmulatorThread(emulator); }
 
 
-
-            Console.WriteLine("Press any key to Exit");
+            Console.WriteLine("");
+            Console.WriteLine("Run the CSV file generator in Window Form Application (emulatorWFA)");
+            Console.WriteLine("");
+            Console.WriteLine("Press any key to Stop");
             Console.ReadKey();
 
+            Console.Clear();
             eThread?.Close();
-            StopService();
+            UninstallService(servicePath);
+
+            Console.WriteLine("Press any key to Exit");
         }
 
 
@@ -65,21 +69,43 @@ namespace epam_task4
         /// <summary>
         /// Install Service
         /// </summary>
-        /// <param name="v"></param>
-        private static void InstallService(string path, string serviceFile)
+        /// <param name="v"></param>        
+        private static void InstallService(string servicePath)
         {
-            string servicePath = path + serviceFile; 
+            //string servicePath = path + serviceFile; 
             if (System.IO.File.Exists(servicePath))
             {
                 try
                 {
                     ManagedInstallerClass.InstallHelper(new[] { servicePath });
+                    Console.Clear();
+                    Console.WriteLine("Service is installed.");
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Failed to install the service. Set manually.");
                 }
             }
         }
+
+
+        private static void UninstallService(string servicePath)
+        {
+            //string servicePath = path + serviceFile;
+            if (System.IO.File.Exists(servicePath))
+            {
+                try
+                {
+                    ManagedInstallerClass.InstallHelper(new[] { "/u", servicePath });
+                    Console.WriteLine("Service is uninstalled.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to uninstall the service. Uninstall manually.");
+                }
+            }
+        }
+
 
 
         /// <summary>
@@ -96,9 +122,11 @@ namespace epam_task4
                         svcController.Start();
                         WaitStatus(svcController, ServiceControllerStatus.Running);
                     }
+                    Console.WriteLine("Service is running.");
                 }
                 catch (Exception)
                 {
+                    Console.WriteLine("Failed to run the service. Run manually.");
                 }
                 svcController.Close();
             }
@@ -121,6 +149,7 @@ namespace epam_task4
                         svcController.Stop();
                         WaitStatus(svcController, ServiceControllerStatus.Stopped);
                     }
+                    Console.WriteLine("Service is stopped.");
                 }
                 catch (Exception)
                 {
@@ -143,62 +172,5 @@ namespace epam_task4
                 svcController.Refresh();
             }
         }
-
-
-
-
-
-        private IEnumerable<string> PowerShellCall(string script, Hashtable args)
-        {
-        // создаю конфигурацию сессии PowerShell
-        InitialSessionState state = InitialSessionState.CreateDefault();
-
-        // меняем политику обработки ошибок в скриптах: 
-        // любая ошибка будет приводить к моментальному завершению и выбросу исключения, 
-        // которое мы можем легко и не принуждённо поймать и обработать
-        state.Variables.Add(new SessionStateVariableEntry(
-                "ErrorActionPreference", "Stop", null));
-
-        // передаю параметры моему скрипту как переменная с именем Arguments и типом hashtable:
-        // $DeviceMAC = $Arguments["DeviceMAC"]
-        state.Variables.Add(new SessionStateVariableEntry(
-            "Arguments", args, null));
-
-        // создаю и открываю командную оболочку PowerShell,
-        // представленную экземпляром класса System.Management.Automation.Runspaces.Runspace. 
-        using (Runspace runspace = RunspaceFactory.CreateRunspace(state))
-            {
-                runspace.Open();
-
-                // присоединяю новый конвейер команд (pipeline) PowerShell`а:
-                using (PowerShell shell = PowerShell.Create())
-                {
-                    shell.Runspace = runspace;
-
-                    // добавить свою команду к скрипту
-                    shell.AddScript("Set-PSDebug -Strict\n" + script);
-
-                    // вызвать скрипт, прочитать результат
-                    try
-                    {
-                        return new List<string>(
-                            from PSObject obj in shell.Invoke()
-                            where obj != null
-                            select obj.ToString());
-                    }
-                    // обработать ошибки
-                    catch (RuntimeException psError)
-                    {
-                        ErrorRecord error = psError.ErrorRecord;
-                        return new List<string>(error.Exception.HResult);
-                        //return error.InvocationInfo == null
-                        //    ? FormatErrorSimple(error.Exception)
-                        //    : FormatError(error.InvocationInfo, error.Exception);
-                    }
-                }
-            }
-        }
-
-
     }
 }
