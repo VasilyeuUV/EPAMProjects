@@ -288,7 +288,7 @@
             this.tbLogsFolder.ReadOnly = true;
             this.tbLogsFolder.Size = new System.Drawing.Size(256, 22);
             this.tbLogsFolder.TabIndex = 13;
-            this.tbLogsFolder.Text = "D:\\epam_task4_test\\Logs\\";
+            this.tbLogsFolder.Text = "D:\\epam_temp\\Logs\\";
             // 
             // label5
             // 
@@ -319,7 +319,7 @@
             this.tbContentErrorFolder.ReadOnly = true;
             this.tbContentErrorFolder.Size = new System.Drawing.Size(256, 22);
             this.tbContentErrorFolder.TabIndex = 10;
-            this.tbContentErrorFolder.Text = "D:\\epam_task4_test\\ContentErrors\\";
+            this.tbContentErrorFolder.Text = "D:\\epam_temp\\ContentErrors\\";
             // 
             // label4
             // 
@@ -350,7 +350,7 @@
             this.tbProductErrorFolder.ReadOnly = true;
             this.tbProductErrorFolder.Size = new System.Drawing.Size(256, 22);
             this.tbProductErrorFolder.TabIndex = 7;
-            this.tbProductErrorFolder.Text = "D:\\epam_task4_test\\ProductErrors\\";
+            this.tbProductErrorFolder.Text = "D:\\epam_temp\\ProductErrors\\";
             // 
             // label3
             // 
@@ -381,7 +381,7 @@
             this.tbManagerErrorFolder.ReadOnly = true;
             this.tbManagerErrorFolder.Size = new System.Drawing.Size(256, 22);
             this.tbManagerErrorFolder.TabIndex = 4;
-            this.tbManagerErrorFolder.Text = "D:\\epam_task4_test\\FileNameErrors\\";
+            this.tbManagerErrorFolder.Text = "D:\\epam_temp\\FileNameErrors\\";
             // 
             // label2
             // 
@@ -412,7 +412,7 @@
             this.tbWatchedFolder.ReadOnly = true;
             this.tbWatchedFolder.Size = new System.Drawing.Size(256, 22);
             this.tbWatchedFolder.TabIndex = 1;
-            this.tbWatchedFolder.Text = "D:\\epam_task4_test\\";
+            this.tbWatchedFolder.Text = "D:\\epam_temp\\";
             // 
             // label1
             // 

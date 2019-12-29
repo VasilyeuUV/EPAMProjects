@@ -1,9 +1,6 @@
 ﻿using epam_task4.Threads;
 using System;
 using System.Configuration.Install;
-using System.Diagnostics;
-using System.Security.Permissions;
-using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
@@ -22,29 +19,10 @@ namespace epam_task4
 
             // INSTALL SERVICE            
             InstallService(servicePath);
-            //ManagedInstallerClass.InstallHelper(new[] {"FWService.exe"});
 
             //START SERVICE
             StartService();
-
-
-
-
-            //ServiceController svcController = new ServiceController("FWService");
-            //try
-            //{
-            //    if (svcController.Status != ServiceControllerStatus.Running) 
-            //    { 
-            //        StartService(svcController); 
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //}
-
-
-
-
+            
             // START EMULATOR
             EmulatorThread eThread = null;
             Form emulator = emulatorWFA.FormMain.StartForm(true);
