@@ -9,12 +9,35 @@ using System.Threading;
 namespace emulatorWFA.Threads
 {
     internal class ManagerThread
-    {        
+    {
+        //internal delegate void SendFileHandler(string file);
+        //internal event SendFileHandler OnSendFileEvent;
+
+        public event EventHandler<EventFileSendedEventArgs> FileSended;
+
+        public class EventFileSendedEventArgs : EventArgs
+        {
+            public string Manager { get; private set; }
+            public string FileName { get; private set; }
+            public EventFileSendedEventArgs(string manager, string fileName)
+            {
+                Manager = manager;
+                FileName = fileName;
+            }
+        }
+
+        void OnFileSended(string manager, string fileName)
+        {
+            FileSended?.Invoke(this, new EventFileSendedEventArgs(manager, fileName));
+        }
+
+
+
+
         private Thread _thread = null;
-        private string _folder = "";
+        private string _folder = "";        
 
         internal string Name { get; private set; }
-
 
         /// <summary>
         /// CTOR
@@ -71,6 +94,10 @@ namespace emulatorWFA.Threads
                 writer.Write(sales);
                 writer.Flush();
             }
+
+            OnFileSended(this._thread.Name, reportFileName);
+            //OnSendFileEvent?.Invoke(reportFile);
+            //SendFile.Invoke
         }
 
 

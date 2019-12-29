@@ -40,6 +40,7 @@ namespace epam_task4
             UninstallService(servicePath);
 
             Console.WriteLine("Press any key to Exit");
+            Console.ReadKey();
         }
 
 

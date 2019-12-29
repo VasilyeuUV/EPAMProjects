@@ -49,16 +49,45 @@ namespace emulatorWFA
             foreach (var good in goods) { products.Add(good.Key, good.Value); }
 
 
-            bool flag = false;            
+            bool flag = false;
             foreach (var manager in managers)
             {
                 flag = !flag;
                 Dictionary<string, int> usingProducts = flag ? goods : products;
                 ManagerThread managerThread = new ManagerThread(manager, usingProducts, tbWatchedFolder.Text);
+                managerThread.FileSended += ManagerThread_FileSended; ;
                 lbManagerThreads.Items.Add(managerThread.Name);
             }
         }
 
+
+        private delegate void SafeCallDelegate(object sender, ManagerThread.EventFileSendedEventArgs e);
+        private object obj = new object();          // some object for lock
+        private void ManagerThread_FileSended(object sender, ManagerThread.EventFileSendedEventArgs e)
+        {
+            string s = $"{e.Manager} send {e.FileName}" + Environment.NewLine;
+            if (tbLog.InvokeRequired)
+            {
+                var d = new SafeCallDelegate(ManagerThread_FileSended);
+                tbLog.Invoke(d, new object[] { sender, e });
+            }
+            else
+            {
+                tbLog.Text += s;
+            }
+            //lock (obj)
+            //{
+
+
+
+
+
+            //    //s += $"{e.Manager} send {e.FileName} {string.Format(@"\r\n")}";
+            //    //tbLog.Text += s;
+            //}
+        }
+
+       
         private Dictionary<string, int> GetProduct(ListView.ListViewItemCollection products)
         {
             return products.Cast<ListViewItem>()
@@ -164,6 +193,8 @@ namespace emulatorWFA
 
             // Set the paths to dispatcher and reinstall
         }
+
+
     }
 }
 
