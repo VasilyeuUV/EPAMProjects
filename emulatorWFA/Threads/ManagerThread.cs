@@ -47,7 +47,7 @@ namespace emulatorWFA.Threads
             this._folder = folder;
             this.Name = name;
 
-            this._thread = new Thread(this.RunProcess);
+            this._thread = new Thread(this.RunProcess);            
             this._thread.Name = name;            
             this._thread.IsBackground = true;
             this._thread.Start(products);
@@ -78,6 +78,13 @@ namespace emulatorWFA.Threads
                 startData = new DateTime(2019, 12, day, 4, 0, 0);
             }
         }
+
+        internal void Close()
+        {
+            this._thread.Abort();                   // !!! bad decision. In future rewrite
+        }
+
+
 
         /// <summary>
         /// Manager Report

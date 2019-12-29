@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace emulatorWFA
@@ -13,6 +12,8 @@ namespace emulatorWFA
 
     public partial class FormMain : Form
     {
+        private List<ManagerThread> _threadPool = null;
+
         private FormMain()
         {
             InitializeComponent();
@@ -48,6 +49,7 @@ namespace emulatorWFA
             Dictionary<string, int> products = GetProduct(lvNotProducts.Items);
             foreach (var good in goods) { products.Add(good.Key, good.Value); }
 
+            this._threadPool = new List<ManagerThread>();
 
             bool flag = false;
             foreach (var manager in managers)
@@ -57,8 +59,24 @@ namespace emulatorWFA
                 ManagerThread managerThread = new ManagerThread(manager, usingProducts, tbWatchedFolder.Text);
                 managerThread.FileSended += ManagerThread_FileSended; ;
                 lbManagerThreads.Items.Add(managerThread.Name);
+                this._threadPool.Add(managerThread);
             }
         }
+
+        /// <summary>
+        /// Stop threads
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnStopProcess_Click(object sender, EventArgs e)
+        {
+            foreach (var thread in this._threadPool)
+            {
+                lbManagerThreads.Items.Remove(thread.Name);
+                thread.Close();
+            }
+        }
+
 
 
         private delegate void SafeCallDelegate(object sender, ManagerThread.EventFileSendedEventArgs e);
