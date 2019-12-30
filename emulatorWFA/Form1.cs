@@ -49,6 +49,7 @@ namespace emulatorWFA
         private void btnStartProcess_Click(object sender, EventArgs e)
         {
             btnStartProcess.Enabled = false;
+            tbLog.Text = "";
 
             var managers = lbManagers.Items.Cast<string>().ToList();
             managers.AddRange(lbNotManager.Items.Cast<string>().ToList());
@@ -70,17 +71,17 @@ namespace emulatorWFA
                 managerJobThread.ThreadCompleted += ManagerJobThread_ThreadCompleted;
                 managerJobThread.Start(usingProducts);
 
-
-                //ManagerThread managerThread = new ManagerThread(manager, usingProducts, tbWatchedFolder.Text);
-                //managerThread.FileSended += ManagerThread_FileSended;
-
-
                 lbManagerThreads.Items.Add(managerJobThread.Name);
                 this._threadPool.Add(managerJobThread);
-                tbLog.Text += $"{managerJobThread.Name} started work." + Environment.NewLine;
+                tbLog.Text += $"{managerJobThread.Name} started work" + Environment.NewLine;
             }
         }
 
+        /// <summary>
+        /// Manager file send event sender
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="fileName"></param>
         private void ManagerJobThread_FileSended(object sender, string fileName)
         {
             Action action = () =>
@@ -93,6 +94,11 @@ namespace emulatorWFA
             Invoke(action);
         }
 
+        /// <summary>
+        /// Manager job completed event sender
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="canceled"></param>
         private void ManagerJobThread_ThreadCompleted(object sender, bool canceled)
         {
             ManagerJobThread thread = sender as ManagerJobThread;
@@ -102,8 +108,8 @@ namespace emulatorWFA
             {
                 lock (obj)
                 {
-                    string log = canceled ? $"{thread.Name} completed"
-                                          : $"{thread.Name} breaked";
+                    string log = !canceled ? $"{thread.Name} work completed"
+                                          : $"{thread.Name} work breaked";
                     tbLog.Text += log + Environment.NewLine;  
                     
                     lbManagerThreads.Items.Remove(thread.Name);
