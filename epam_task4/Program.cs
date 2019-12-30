@@ -36,13 +36,12 @@ namespace epam_task4
         /// </summary>
         private static void UseConsole()
         {
-            //Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
             Stream fileStream = null;
             try
             {
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
-                    openFileDialog.InitialDirectory = "D:\\";
+                    //openFileDialog.InitialDirectory = "D:\\";
                     openFileDialog.Filter = "CSV files (*.csv)|*.csv";
                     openFileDialog.RestoreDirectory = true;
 

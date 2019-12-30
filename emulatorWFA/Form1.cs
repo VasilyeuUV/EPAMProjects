@@ -12,12 +12,18 @@ namespace emulatorWFA
 
     public partial class FormMain : Form
     {
-        private List<ManagerThread> _threadPool = null;
+        private List<ManagerJobThread> _threadPool = null;
+        private object obj = new object();          // some object for lock
 
+
+        /// <summary>
+        /// CTOR
+        /// </summary>
         private FormMain()
         {
             InitializeComponent();
         }
+
 
         /// <summary>
         /// Create Form
@@ -42,6 +48,8 @@ namespace emulatorWFA
         /// <param name="e"></param>
         private void btnStartProcess_Click(object sender, EventArgs e)
         {
+            btnStartProcess.Enabled = false;
+
             var managers = lbManagers.Items.Cast<string>().ToList();
             managers.AddRange(lbNotManager.Items.Cast<string>().ToList());
 
@@ -49,19 +57,67 @@ namespace emulatorWFA
             Dictionary<string, int> products = GetProduct(lvNotProducts.Items);
             foreach (var good in goods) { products.Add(good.Key, good.Value); }
 
-            this._threadPool = new List<ManagerThread>();
+            this._threadPool = new List<ManagerJobThread>();
 
             bool flag = false;
             foreach (var manager in managers)
             {
                 flag = !flag;
                 Dictionary<string, int> usingProducts = flag ? goods : products;
-                ManagerThread managerThread = new ManagerThread(manager, usingProducts, tbWatchedFolder.Text);
-                managerThread.FileSended += ManagerThread_FileSended; ;
-                lbManagerThreads.Items.Add(managerThread.Name);
-                this._threadPool.Add(managerThread);
+
+                ManagerJobThread managerJobThread = new ManagerJobThread(manager, tbWatchedFolder.Text);
+                managerJobThread.FileSended += ManagerJobThread_FileSended;
+                managerJobThread.ThreadCompleted += ManagerJobThread_ThreadCompleted;
+                managerJobThread.Start(usingProducts);
+
+
+                //ManagerThread managerThread = new ManagerThread(manager, usingProducts, tbWatchedFolder.Text);
+                //managerThread.FileSended += ManagerThread_FileSended;
+
+
+                lbManagerThreads.Items.Add(managerJobThread.Name);
+                this._threadPool.Add(managerJobThread);
+                tbLog.Text += $"{managerJobThread.Name} started work." + Environment.NewLine;
             }
         }
+
+        private void ManagerJobThread_FileSended(object sender, string fileName)
+        {
+            Action action = () =>
+            {
+                lock (obj)
+                {
+                    tbLog.Text += $"{(sender as ManagerJobThread)?.Name} send {fileName}" + Environment.NewLine;
+                }
+            };
+            Invoke(action);
+        }
+
+        private void ManagerJobThread_ThreadCompleted(object sender, bool canceled)
+        {
+            ManagerJobThread thread = sender as ManagerJobThread;
+            if (thread == null) { return; }
+
+            Action action = () =>
+            {
+                lock (obj)
+                {
+                    string log = canceled ? $"{thread.Name} completed"
+                                          : $"{thread.Name} breaked";
+                    tbLog.Text += log + Environment.NewLine;  
+                    
+                    lbManagerThreads.Items.Remove(thread.Name);
+                    _threadPool.Remove(thread);
+                    if (_threadPool?.Count() == 0)
+                    {
+                        btnStartProcess.Enabled = true;
+                    }
+                }
+            };
+            Invoke(action);         
+        }
+
+
 
         /// <summary>
         /// Stop threads
@@ -72,38 +128,26 @@ namespace emulatorWFA
         {
             foreach (var thread in this._threadPool)
             {
-                lbManagerThreads.Items.Remove(thread.Name);
+                //lbManagerThreads.Items.Remove(thread.Name);
                 thread.Close();
             }
         }
 
-
-
-        private delegate void SafeCallDelegate(object sender, ManagerThread.EventFileSendedEventArgs e);
-        private object obj = new object();          // some object for lock
-        private void ManagerThread_FileSended(object sender, ManagerThread.EventFileSendedEventArgs e)
-        {
-            string s = $"{e.Manager} send {e.FileName}" + Environment.NewLine;
-            if (tbLog.InvokeRequired)
-            {
-                var d = new SafeCallDelegate(ManagerThread_FileSended);
-                tbLog.Invoke(d, new object[] { sender, e });
-            }
-            else
-            {
-                tbLog.Text += s;
-            }
-            //lock (obj)
-            //{
-
-
-
-
-
-            //    //s += $"{e.Manager} send {e.FileName} {string.Format(@"\r\n")}";
-            //    //tbLog.Text += s;
-            //}
-        }
+               
+        //private delegate void SafeCallDelegate(object sender, ManagerThread.EventFileSendedEventArgs e);        
+        //private void ManagerThread_FileSended(object sender, ManagerThread.EventFileSendedEventArgs e)
+        //{
+        //    string s = $"{e.Manager} send {e.FileName}" + Environment.NewLine;
+        //    if (tbLog.InvokeRequired)
+        //    {
+        //        var d = new SafeCallDelegate(ManagerThread_FileSended);
+        //        tbLog.Invoke(d, new object[] { sender, e });
+        //    }
+        //    else
+        //    {
+        //        tbLog.Text += s;
+        //    }
+        //}
 
        
         private Dictionary<string, int> GetProduct(ListView.ListViewItemCollection products)
