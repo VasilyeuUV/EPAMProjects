@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileParsers\CSVParser.cs" />
+    <Compile Include="Parsers\CSVParser.cs" />
     <Compile Include="Models\FileNameDataModel.cs" />
     <Compile Include="Models\ProcessModel.cs" />
     <Compile Include="Program.cs" />
