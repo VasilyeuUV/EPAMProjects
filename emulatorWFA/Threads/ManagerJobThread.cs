@@ -65,7 +65,10 @@ namespace emulatorWFA.Threads
         /// <param name="products"></param>
         internal void Start(Dictionary<string, int> products)
         {
-            this._thread.Start(products);
+            if (products != null)
+            {
+                this._thread?.Start(products);
+            }            
         }
 
 
