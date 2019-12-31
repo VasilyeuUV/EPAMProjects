@@ -35,14 +35,6 @@ namespace emulatorWFA.Threads
 
         internal event EventHandler<bool> ThreadCompleted;
         internal event EventHandler<string> FileSended;
-        //internal class EventFileSendedEventArgs : EventArgs
-        //{
-        //    public string FileName { get; private set; }
-        //    public EventFileSendedEventArgs(string fileName)
-        //    {
-        //        FileName = fileName;
-        //    }
-        //}
 
         /// <summary>
         /// CTOR
@@ -84,7 +76,7 @@ namespace emulatorWFA.Threads
         private void RunProcess(object obj)
         {
             Dictionary<string, int> products = (Dictionary<string, int>)obj;
-            int day = 20;
+            int day = 23;
             DateTime startData = new DateTime(2019, 12, day, 4, 0, 0);
 
             while (startData <= DateTime.Now.AddDays(-1) && !this._canceled)
@@ -121,15 +113,11 @@ namespace emulatorWFA.Threads
             }
 
             FileSended(this, reportFileName);
-
-            //OnFileSended(this._thread.Name, reportFileName);
-            //OnSendFileEvent?.Invoke(reportFile);
-            //SendFile.Invoke
         }
 
 
         /// <summary>
-        /// Sales process
+        /// Sales process (csv file context generation)
         /// </summary>
         /// <param name="startData">Date of sale</param>
         /// <param name="salesCount">quantity of goods sold in one report</param>
@@ -142,6 +130,10 @@ namespace emulatorWFA.Threads
             StringBuilder soldGoods = new StringBuilder();
             for (int i = 0; i < salesCount; i++)
             {
+                if (i == 0)
+                {
+                    soldGoods.Append(string.Format("DTG,Client,Product,Cost\r\n"));
+                }
                 startData = startData.AddMinutes(Const.RND.Next(1, 40));
                 soldGoods.Append(startData.ToString("dd.MM.yyyy HH:mm:ss") + delimiter);
                 soldGoods.Append("Client" + Const.RND.Next(1, clientCount) + delimiter);
