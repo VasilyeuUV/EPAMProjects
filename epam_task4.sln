@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emulatorWFA", "emulatorWFA\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fwService", "fwService\fwService.csproj", "{2CB21CC4-53E1-4748-8049-2869B6C77959}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParser", "Dispatcher\FileParser.csproj", "{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2CB21CC4-53E1-4748-8049-2869B6C77959}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CB21CC4-53E1-4748-8049-2869B6C77959}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CB21CC4-53E1-4748-8049-2869B6C77959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
