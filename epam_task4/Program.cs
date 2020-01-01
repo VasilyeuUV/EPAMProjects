@@ -2,7 +2,6 @@
 using epam_task4.Threads;
 using System;
 using System.Configuration.Install;
-using System.IO;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
@@ -36,19 +35,28 @@ namespace epam_task4
         /// </summary>
         private static void UseConsole()
         {
-            Stream fileStream = null;
             try
             {
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                using (OpenFileDialog openFileDialog = new OpenFileDialog
                 {
-                    //openFileDialog.InitialDirectory = "D:\\";
-                    openFileDialog.Filter = "CSV files (*.csv)|*.csv";
-                    openFileDialog.RestoreDirectory = true;
-
+                    Title = "Select files",
+                    Multiselect = true,                    
+                    Filter = "CSV files (*.csv)|*.csv",
+                    RestoreDirectory = true
+                })
+                {
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         // START PROCESS!!!
-                        //fileStream = openFileDialog.OpenFile();     //Read the contents of the file into a stream
+                        foreach (string filePath in openFileDialog.FileNames)
+                        {
+                            FileProcessingThread fileHandler = new FileProcessingThread();
+                            fileHandler.WorkCompleted += FileHandler_WorkCompleted;
+                            fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
+                            fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
+                            fileHandler.WrongProductErrorEvent += FileHandler_WrongProductErrorEvent;
+                            fileHandler.Start(filePath);
+                        }
                     }
                     openFileDialog.Dispose();
                 }
@@ -60,7 +68,6 @@ namespace epam_task4
                 return;
             }
         }
-
 
         /// <summary>
         /// Start as Service
@@ -125,10 +132,39 @@ namespace epam_task4
             return Console.ReadKey();
         }
 
+        #region FILE_PROCESSING_THREAD_EVENTS
+        //##################################################################################################
+
+        private static void FileHandler_WrongProductErrorEvent(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void FileHandler_FileNamingErrorEvent(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void FileHandler_WorkCompleted(object sender, bool e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        #endregion // FILE_PROCESSING_THREAD_EVENTS
+
+
+
+
+
 
         #region FOR_WINDOWS_SERVICE
         //##################################################################################################
-        
+
         /// <summary>
         /// Install Service
         /// </summary>
@@ -236,7 +272,7 @@ namespace epam_task4
         }
     }
 
-    #endregion
+    #endregion // FOR_WINDOWS_SERVICE
 
 
 

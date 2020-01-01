@@ -39,8 +39,7 @@ namespace emulatorWFA.Threads
         /// <summary>
         /// CTOR
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="products"></param>
+        /// <param name="name">Manager name</param>
         /// <param name="folder"></param>
         internal ManagerJobThread(string name, string folder)
         {

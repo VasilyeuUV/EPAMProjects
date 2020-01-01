@@ -1,5 +1,5 @@
-﻿using Dispatcher.Interfaces;
-using Dispatcher.Models;
+﻿using FileParcer.Interfaces;
+using FileParser.Models;
 using System.IO;
 
 namespace Dispatcher.Parsers
@@ -16,7 +16,7 @@ namespace Dispatcher.Parsers
             {
                 switch (returnData)
                 {
-                    case 0: return ManagerFileNameDataModel.CreateInstance(fileInf);
+                    case 0: return SalesFileNameDataModel.CreateInstance(fileInf);
                     default: return null;
                 }
             }

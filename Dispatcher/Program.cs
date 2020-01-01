@@ -8,7 +8,7 @@ namespace FileParcer
 {
     class Program
     {
-        string fileCSV = @"D:\Ivanov_20.12.2019_1.csv";
+        //string fileCSV = @"D:\Ivanov_20.12.2019_1.csv";
 
         static void Main(string[] args)
         {

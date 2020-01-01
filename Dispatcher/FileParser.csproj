@@ -45,9 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\IFileNameData.cs" />
+    <Compile Include="Models\SalesFieldDataModel.cs" />
     <Compile Include="Parsers\CSVParser.cs" />
-    <Compile Include="Models\ManagerFileNameDataModel.cs" />
-    <Compile Include="Models\ProcessModel.cs" />
+    <Compile Include="Models\SalesFileNameDataModel.cs" />
     <Compile Include="Parsers\FileNameParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

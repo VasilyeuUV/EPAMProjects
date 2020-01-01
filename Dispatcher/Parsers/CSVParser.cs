@@ -1,17 +1,18 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using FileParser.Models;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dispatcher.Parsers
+namespace FileParser.Parsers
 {
-    internal class CSVParser
+    public class CSVParser
     {
         private bool _abort = false;   // for stop parsing
 
-        internal event EventHandler<string[]> HeaderParsed;
-        internal event EventHandler<string[]> FieldParsed;
-        internal event EventHandler<bool> ParsingCompleted;
+        public event EventHandler<SalesFieldDataModel> HeaderParsed;
+        public event EventHandler<SalesFieldDataModel> FieldParsed;
+        public event EventHandler<bool> ParsingCompleted;
 
         /// <summary>
         /// CSV file parsing process
@@ -19,7 +20,7 @@ namespace Dispatcher.Parsers
         /// <param name="filePath">CSV file</param>
         /// <param name="delimiters">array of delimiters (string[])</param>
         /// <returns>string array of string fields</returns>
-        internal IEnumerable<string[]> Parse(string filePath, string[] delimiters = null )
+        public IEnumerable<SalesFieldDataModel> Parse(string filePath, string[] delimiters = null )
         {
             if (!System.IO.File.Exists(filePath)) { return null; }
 
@@ -31,13 +32,25 @@ namespace Dispatcher.Parsers
                     tfp.TextFieldType = FieldType.Delimited;
                     tfp.SetDelimiters(delimiters);
 
-                    List<string[]> lstFields = new List<string[]>();
+                    List<SalesFieldDataModel> lstFields = new List<SalesFieldDataModel>();
+                    int count = 0;
                     while (!tfp.EndOfData && !this._abort)
                     {
                         string[] fields = tfp.ReadFields();
-                        if (fields.Length == 1) { HeaderParsed(this, fields); }
-                        else { FieldParsed(this, fields); }
-                        lstFields.Add(fields);
+                        SalesFieldDataModel sale = new SalesFieldDataModel()
+                        {
+                            DTG = fields[0],
+                            Client = fields[1],
+                            Product = fields[2],
+                            Cost = fields[3]
+                        };
+                        if (++count == 1) 
+                        {
+                            HeaderParsed(this, sale);
+                            continue;
+                        }
+                        else { FieldParsed(this, sale); }
+                        lstFields.Add(sale);
                     }
                     ParsingCompleted(this, this._abort);
                     return lstFields.Count() < 1 ? null : lstFields;
@@ -49,7 +62,7 @@ namespace Dispatcher.Parsers
             }
         }
 
-        internal void Stop()
+        public void Stop()
         {
             this._abort = true;
         }

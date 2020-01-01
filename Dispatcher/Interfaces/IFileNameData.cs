@@ -1,6 +1,6 @@
-﻿namespace Dispatcher.Interfaces
+﻿namespace FileParcer.Interfaces
 {
-    interface IFileNameData
+    public interface IFileNameData
     {
         string FileName { get; }
         string FileExtention { get; }

@@ -1,22 +1,22 @@
-﻿using Dispatcher.Interfaces;
+﻿using FileParcer.Interfaces;
 using System;
 using System.IO;
 
-namespace Dispatcher.Models
+namespace FileParser.Models
 {
-    internal class ManagerFileNameDataModel : IFileNameData
+    public class SalesFileNameDataModel : IFileNameData
     {
         public string FileName { get; private set; } = "";
         public string FileExtention { get; private set; } = "";
 
-        internal string Manager { get; private set; } = "";
-        internal DateTime DTG { get; private set; }
+        public string Manager { get; private set; } = "";
+        public DateTime DTG { get; private set; }
 
 
         /// <summary>
         /// CTOR
         /// </summary>
-        private ManagerFileNameDataModel(System.IO.FileInfo fileInf)
+        private SalesFileNameDataModel(System.IO.FileInfo fileInf)
         {
             this.FileName = fileInf.Name;
             this.FileExtention = fileInf.Extension;
@@ -25,10 +25,10 @@ namespace Dispatcher.Models
         }
 
 
-        internal static IFileNameData CreateInstance(FileInfo fileInf)
+        public static SalesFileNameDataModel CreateInstance(FileInfo fileInf)
         {
             if (fileInf == null) { return null; }
-            return new ManagerFileNameDataModel(fileInf);
+            return new SalesFileNameDataModel(fileInf);
         }
 
 
