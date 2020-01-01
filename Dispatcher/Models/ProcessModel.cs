@@ -27,7 +27,7 @@ namespace FileParser.Models
         internal void Start()
         {
             string fileName = this._filePath.Name.ToLower();
-            FileNameDataModel fileNameData = FileNameDataModel.CreateInstance(fileName);
+            ManagerFileNameDataModel fileNameData = ManagerFileNameDataModel.CreateInstance(fileName);
 
             // Parsing file context
             switch (Path.GetExtension(fileName))

@@ -13,7 +13,6 @@ namespace Dispatcher.Parsers
         internal event EventHandler<string[]> FieldParsed;
         internal event EventHandler<bool> ParsingCompleted;
 
-
         /// <summary>
         /// CSV file parsing process
         /// </summary>
