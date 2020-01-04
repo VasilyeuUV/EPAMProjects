@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace efc.DataModels
 {
-    //[Table("FileNameTable")]
-    public class FileNameData
+    //[Table("File")]
+    public class FileName
     {
-        [Key]
         public int Id { get; set; }
 
         [
@@ -25,7 +25,7 @@ namespace efc.DataModels
         public /*virtual*/ ICollection<Sale> Sales { get; set; }
 
 
-        public FileNameData()
+        public FileName()
         {
             this.Sales = new List<Sale>();
         }

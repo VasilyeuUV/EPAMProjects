@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace efc.DataModels
 {
     //[Table("SaleTable")]
     public class Sale
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -20,23 +20,27 @@ namespace efc.DataModels
 
         //public int ManagerId { get; set; }
         //[ForeignKey("ManagerId")]
-        [Required]
+        //[Required]
+        public int ManagerId { get; set; }
         public /*virtual*/ Manager Manager { get; set; }
 
         //public int ProductId { get; set; }
         //[ForeignKey("ProductId")]
-        [Required]
+        //[Required]
+        public int ProductId { get; set; }
         public /*virtual*/ Product Product { get; set; }
 
         //public int Id { get; set; }
         //[ForeignKey("Id")]
-        [Required]
+        //[Required]
+        public int ClientId { get; set; }
         public /*virtual*/ Client Client { get; set; }
 
         //public int FileNameId { get; set; }
         //[ForeignKey("FileNameId")]
-        [Required]
-        public /*virtual*/ FileNameData FileName { get; set; }
+        //[Required]
+        public int FileNameId { get; set; }
+        public /*virtual*/ FileName FileName { get; set; }
 
     }
 }
