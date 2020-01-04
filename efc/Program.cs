@@ -20,10 +20,7 @@ namespace efc
                 Repository.SaveToDB(RND);
             }
 
-            DisplayManagers();
-            //DisplayProducts();
-            //DisplayClients();
-            //DisplaySales();
+            DisplayData();
 
 
             Console.WriteLine("");
@@ -37,7 +34,7 @@ namespace efc
 
 
 
-        private static void DisplayManagers()
+        private static void DisplayData()
         {
             Console.WriteLine("");
             Console.WriteLine("MANAGERS:");
