@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fwService", "fwService\fwSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParser", "Dispatcher\FileParser.csproj", "{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "efdb", "efdb\efdb.csproj", "{9771DA28-681B-48C8-9D8A-584B861562F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "efc", "efc\efc.csproj", "{FDD18CDD-EF80-4785-96E8-8E681A66B46B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2024AEA4-F4E4-40EF-899E-C2D920C10FC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9771DA28-681B-48C8-9D8A-584B861562F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9771DA28-681B-48C8-9D8A-584B861562F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9771DA28-681B-48C8-9D8A-584B861562F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9771DA28-681B-48C8-9D8A-584B861562F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
