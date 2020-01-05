@@ -1,32 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace efc.DataModels
 {
-    //[Table("File")]
     public class FileName : EntityBase
     {
-        //public int Id { get; set; }
-
-        [
-        Required,
-        MinLength(16, ErrorMessage = "Name must be 16 characters or more"),
-        MaxLength(100, ErrorMessage = "Name must be 100 characters or less"),
+        [   Required,
+            MinLength(16, ErrorMessage = "Name must be 16 characters or more"),
+            MaxLength(100, ErrorMessage = "Name must be 100 characters or less"),
         ]
         public override string Name { get; set; }
 
         [Required]
         public DateTime DTG { get; set; }
-
-
-        //public /*virtual*/ ICollection<Sale> Sales { get; set; }
-
-
-        //public FileName()
-        //{
-        //    this.Sales = new List<Sale>();
-        //}
     }
 }

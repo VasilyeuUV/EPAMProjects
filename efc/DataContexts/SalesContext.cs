@@ -15,7 +15,7 @@ namespace efc.DataContexts
         /// <summary>
         /// CTOR
         /// </summary>
-        public SalesContext(DbContextOptions<SalesContext> options)
+        internal SalesContext(DbContextOptions<SalesContext> options)
             : base(options)
         {
             Database.EnsureCreated();
@@ -53,12 +53,12 @@ namespace efc.DataContexts
 
 
         // устанавливаем фабрику логгера
-        public static readonly ILoggerFactory SalesLoggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder.AddFilter((category, level) => category == DbLoggerCategory.Database.Command.Name
-                                                && level == LogLevel.Error)
-                   .AddProvider(new SalesLoggerProvider());    // указываем наш провайдер логгирования
-        });
+        //public static readonly ILoggerFactory SalesLoggerFactory = LoggerFactory.Create(builder =>
+        //{
+        //    builder.AddFilter((category, level) => category == DbLoggerCategory.Database.Command.Name
+        //                                        && level == LogLevel.Error)
+        //           .AddProvider(new SalesLoggerProvider());    // указываем наш провайдер логгирования
+        //});
 
     }
 }
