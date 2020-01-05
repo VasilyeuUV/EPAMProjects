@@ -16,10 +16,10 @@ namespace efc
             using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
 
 
-            for (int i = 0; i < 15; i++)
-            {
-                SaveToDB(repo, RND);
-            }
+            //for (int i = 0; i < 15; i++)
+            //{
+            //    SaveToDB(repo, RND);
+            //}
             DisplayData(repo);
 
 
@@ -109,18 +109,17 @@ namespace efc
 
 
         private static void DisplayData(Repository repo)
-        {            
-
+        {        
+            Console.WriteLine("FILE NAMES:");
             Console.WriteLine("");
-            Console.WriteLine("MANAGERS:");
 
-            var managers = repo.Select<Manager>()
-                .Include(m => m.Sales).ThenInclude(mp => mp.Product)
+            var managers = repo.Select<FileName>()
+                .Include(m => m.Sales).ThenInclude(mp => mp.Manager)
                 .Include(m => m.Sales).ThenInclude(mc => mc.Client)
-                .Include(m => m.Sales).ThenInclude(mf => mf.FileName)
+                .Include(m => m.Sales).ThenInclude(mf => mf.Product)
                 .ToList();
 
-            foreach (Manager manager in managers)
+            foreach (FileName manager in managers)
             {
                 Console.WriteLine("{0}.{1}:", manager.Id, manager.Name);
                 foreach (Sale sale in manager.Sales)
@@ -135,35 +134,6 @@ namespace efc
                         );
                 }
                 Console.WriteLine();
-
-
-                //using (var context = new SalesContext())
-                //{
-
-                //    var managers = context.Managers
-                //                  .Include(m => m.Sales).ThenInclude(mp => mp.Product)
-                //                  .Include(m => m.Sales).ThenInclude(mc => mc.Client)
-                //                  .Include(m => m.Sales).ThenInclude(mf => mf.FileName)
-                //                  .ToList();
-
-                //    foreach (Manager manager in managers)
-                //    {
-                //        Console.WriteLine("{0}.{1}:", manager.Id, manager.Name);
-                //        foreach (Sale sale in manager.Sales)
-                //        {
-                //            Console.WriteLine("- sale {0}: {1}; {2}.{3}; {4}.{5}-{6}; {7}.{8}; {9}.{10}"
-                //                , sale.Id
-                //                , sale.DTG.ToString("dd.MM.yyyy hh:mm")
-                //                , sale.Manager?.Id, sale.Manager?.Name
-                //                , sale.Product?.Id, sale.Product?.Name, sale.Product?.Cost
-                //                , sale.Client?.Id, sale.Client?.Name
-                //                , sale.FileName?.Id, sale.FileName?.Name
-                //                );
-                //        }
-                //        Console.WriteLine();
-
-                //    }
-                //}
             }
         }
     }

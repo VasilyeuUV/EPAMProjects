@@ -1,11 +1,11 @@
 ﻿using epam_task4.ConsoleMenu;
 using epam_task4.Threads;
 using System;
+using System.Configuration;
 using System.Configuration.Install;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
-
 
 namespace epam_task4
 {
@@ -16,6 +16,21 @@ namespace epam_task4
         [STAThread]
         static void Main(string[] args)
         {
+            // DATABASE            
+            //var repo = new Repository();
+            ////using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
+            //Sale sale = new Sale()
+            //{
+            //    DTG = DateTime.Now,
+            //    Client = new Client() { Name = "VLAD" },
+            //    Manager = new Manager() { Name = "VVV" },
+            //    Product = new Product() { Name = "PR", Cost = 1000 },
+            //    FileName = new FileName() { Name = "1111111111111111.cvs", DTG = new DateTime() },
+            //    Sum = 123
+            //};
+            //var result = repo.Insert(sale);
+            
+
             // MENU
             string[] items = { "Create file", "Use Windows Service", "Exit" };
             method[] methods = new method[] { UseConsole, UseService, Exit };
@@ -74,12 +89,12 @@ namespace epam_task4
         /// </summary>
         private static void UseService()
         {
+            var watchFolder = ConfigurationManager.AppSettings["defaultFolder"];
+            string servicePath = ConfigurationManager.AppSettings["servicePath"];
+            //@"E:\_projects\epam\task4\epam_task4\fwService\bin\Debug\fwService.exe";
 
-            string servicePath = @"E:\_projects\epam\task4\epam_task4\fwService\bin\Debug\fwService.exe";
 
 
-            // DATABASE
-            //InstallDataBase();
 
             // INSTALL SERVICE            
             InstallService(servicePath);
