@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace efdb.DataModel
+namespace efdb.DataModels
 {
 
     //[Table("SaleTable")]
@@ -23,22 +23,22 @@ namespace efdb.DataModel
         //public int ManagerId { get; set; }
         //[ForeignKey("ManagerId")]
         [Required]
-        public /*virtual*/ Manager Manager { get; set; }
+        public Manager Manager { get; set; }
 
         //public int ProductId { get; set; }
         //[ForeignKey("ProductId")]
         [Required]
-        public /*virtual*/ Product Product { get; set; }
+        public Product Product { get; set; }
                      
         //public int Id { get; set; }
         //[ForeignKey("Id")]
         [Required]
-        public /*virtual*/ Client Client { get; set; }
+        public Client Client { get; set; }
  
         //public int FileNameId { get; set; }
         //[ForeignKey("FileNameId")]
         [Required]
-        public /*virtual*/ FileNameData FileName { get; set; }
+        public FileName FileName { get; set; }
 
     }
 }

@@ -1,7 +1,8 @@
-﻿using efdb.DataModel;
+﻿using efdb.DataContexts;
+using efdb.DataModels;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Validation;
+using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -12,18 +13,17 @@ namespace efdb
     {
         static void Main(string[] args)
         {
+            var repo = new Repository();
             Random RND = new Random(DateTime.Now.Millisecond);
 
-            //for (int i = 0; i < 15; i++)
+            using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
+
+
+            //for (int i = 0; i < 30; i++)
             //{
-            //    SaveToDB(RND);
+            //    SaveToDB(repo, RND);
             //}
-
-            DisplayManagers();
-            //DisplayProducts();
-            //DisplayClients();
-            //DisplaySales();
-
+            DisplayData(repo);
 
             Console.WriteLine("");
             Console.WriteLine("Press any key to continue");
@@ -31,105 +31,160 @@ namespace efdb
         }
 
 
-
-        private static void SaveToDB(Random RND)
+        internal static void SaveToDB(Repository repo, Random rnd)
         {
-            using (SalesContext context = new SalesContext())
+
+            string client = "Client" + rnd.Next(1, 15).ToString();
+            string fileName = "fileNameDefault.csv";
+            string manager = "Manager" + rnd.Next(1, 15).ToString();
+            string product = "Product" + rnd.Next(1, 15).ToString();
+
+            Sale sale = new Sale
             {
-                Sale sale = new Sale
-                {
-                    Client = GetClient(context, "Client" + RND.Next(1, 15).ToString()),
-                    FileName = GetFileName(context, "fileNameManager02.csv"),
-                    Manager = GetManager(context, "Manager" + RND.Next(1, 15).ToString()),
-                    Product = GetProduct(context, "Product" + RND.Next(1, 15).ToString()),
-                    DTG = DateTime.Now.AddMinutes(-RND.Next(1, 10))
-                };
-                sale.Sum = sale.Product.Cost;
+                Client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(client)) ?? new Client() { Name = client },
+                FileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileName)) ?? new FileName() { Name = fileName, DTG = DateTime.Now },
+                Manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(manager)) ?? new Manager() { Name = manager },
+                Product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(product)) ?? new Product() { Name = product, Cost = rnd.Next(100, 300) },
+                DTG = DateTime.Now.AddMinutes(-rnd.Next(1, 50))
+            };
+            sale.Sum = sale.Product.Cost;
+            repo.Insert(sale);
+        }
 
-                context.Sales.Add(sale);
+        private static void DisplayData(Repository repo)
+        {
+            Console.WriteLine("RESULT:");
+            Console.WriteLine("");
 
-                try
+            var managers = repo.Select<Manager>()
+                .Include(m => m.Sales.Select(mm => mm.Manager))
+                .Include(m => m.Sales.Select(mc => mc.Client))
+                .Include(m => m.Sales.Select(mp => mp.Product))
+                .Include(m => m.Sales.Select(mf => mf.FileName))
+                .ToList();
+
+            foreach (var manager in managers)
+            {
+                Console.WriteLine("{0}.{1}:", manager.Id, manager.Name);
+                foreach (Sale sale in manager.Sales)
                 {
-                    context.SaveChanges();
+                    Console.WriteLine("- sale {0, 2}: {1, 2}  | {2, 3}. {3, -10} | {4, 3}. {5, -10} - {6, 3} | {7, 3}. {8, -10} | {9, 3}. {10, 3}"
+                        , sale.Id
+                        , sale.DTG.ToString("dd.MM.yyyy HH:mm")
+                        , sale.Manager?.Id, sale.Manager?.Name
+                        , sale.Product?.Id, sale.Product?.Name, sale.Product?.Cost
+                        , sale.Client?.Id, sale.Client?.Name
+                        , sale.FileName?.Id, sale.FileName?.Name
+                        );
                 }
-                catch (DbEntityValidationException ex)
-                {
-                    foreach (DbEntityValidationResult validationError in ex.EntityValidationErrors)
-                    {
-                        Console.WriteLine("Object: " + validationError.Entry.Entity.ToString());
-                        Console.WriteLine("");
-                        foreach (DbValidationError err in validationError.ValidationErrors)
-                        {
-                            Console.Write(err.ErrorMessage + "");
-                        }
-                    }
-                }
-                catch (SqlException ex)
-                {
-                    DisplaySqlErrors(ex);
-                    //var sqlException = ex.GetBaseException() as SqlException;
-                    //if (sqlException?.Errors.Count > 0)
-                    //{
-                    //    switch (sqlException.Errors[0].Number)
-                    //    {
-                    //        case 547: // Foreign Key violation
-                    //        default:
-                    //            break;
-                    //    }
-
-                    //}
-
-
-                }
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine(e.Message);
-                //}
-
+                Console.WriteLine();
             }
         }
 
-        private static Product GetProduct(SalesContext context, string name)
-        {
-            var product = context.Products.FirstOrDefault(x => x.Name.Equals(name));
-            return product == null
-                ? new Product()
-                {
-                    Name = name,
-                    Cost = 200
-                }
-                : product;
-        }
 
-        private static Manager GetManager(SalesContext context, string name)
-        {
-            var manager = context.Managers.FirstOrDefault(x => x.Name.Equals(name));
 
-            return manager == null
-                ? new Manager() { Name = name }
-                : manager;
-        }
 
-        private static FileNameData GetFileName(SalesContext context, string name)
-        {
-            var fileName = context.Files.FirstOrDefault(x => x.Name.Equals(name));
-            return fileName == null
-                ? new FileNameData()
-                {
-                    Name = name,
-                    DTG = DateTime.Now
-                }
-                : fileName;
-        }
 
-        private static Client GetClient(SalesContext context, string name)
-        {
-            var client = context.Clients.FirstOrDefault(x => x.Name.Equals(name));
 
-            return client == null
-                ? new Client() { Name = name }
-                : client;
-        }
+
+        //private static void SaveToDB(Random RND)
+        //{
+        //    using (SalesContext context = new SalesContext())
+        //    {
+        //        Sale sale = new Sale
+        //        {
+        //            Client = GetClient(context, "Client" + RND.Next(1, 15).ToString()),
+        //            FileName = GetFileName(context, "fileNameManager02.csv"),
+        //            Manager = GetManager(context, "Manager" + RND.Next(1, 15).ToString()),
+        //            Product = GetProduct(context, "Product" + RND.Next(1, 15).ToString()),
+        //            DTG = DateTime.Now.AddMinutes(-RND.Next(1, 10))
+        //        };
+        //        sale.Sum = sale.Product.Cost;
+
+        //        context.Sales.Add(sale);
+
+        //        try
+        //        {
+        //            context.SaveChanges();
+        //        }
+        //        catch (DbEntityValidationException ex)
+        //        {
+        //            foreach (DbEntityValidationResult validationError in ex.EntityValidationErrors)
+        //            {
+        //                Console.WriteLine("Object: " + validationError.Entry.Entity.ToString());
+        //                Console.WriteLine("");
+        //                foreach (DbValidationError err in validationError.ValidationErrors)
+        //                {
+        //                    Console.Write(err.ErrorMessage + "");
+        //                }
+        //            }
+        //        }
+        //        catch (SqlException ex)
+        //        {
+        //            DisplaySqlErrors(ex);
+        //            //var sqlException = ex.GetBaseException() as SqlException;
+        //            //if (sqlException?.Errors.Count > 0)
+        //            //{
+        //            //    switch (sqlException.Errors[0].Number)
+        //            //    {
+        //            //        case 547: // Foreign Key violation
+        //            //        default:
+        //            //            break;
+        //            //    }
+
+        //            //}
+
+
+        //        }
+        //        //catch (Exception e)
+        //        //{
+        //        //    Console.WriteLine(e.Message);
+        //        //}
+
+        //    }
+        //}
+
+        //private static Product GetProduct(SalesContext context, string name)
+        //{
+        //    var product = context.Products.FirstOrDefault(x => x.Name.Equals(name));
+        //    return product == null
+        //        ? new Product()
+        //        {
+        //            Name = name,
+        //            Cost = 200
+        //        }
+        //        : product;
+        //}
+
+        //private static Manager GetManager(SalesContext context, string name)
+        //{
+        //    var manager = context.Managers.FirstOrDefault(x => x.Name.Equals(name));
+
+        //    return manager == null
+        //        ? new Manager() { Name = name }
+        //        : manager;
+        //}
+
+        //private static FileName GetFileName(SalesContext context, string name)
+        //{
+        //    var fileName = context.Files.FirstOrDefault(x => x.Name.Equals(name));
+        //    return fileName == null
+        //        ? new FileName()
+        //        {
+        //            Name = name,
+        //            DTG = DateTime.Now
+        //        }
+        //        : fileName;
+        //}
+
+        //private static Client GetClient(SalesContext context, string name)
+        //{
+        //    var client = context.Clients.FirstOrDefault(x => x.Name.Equals(name));
+
+        //    return client == null
+        //        ? new Client() { Name = name }
+        //        : client;
+        //}
 
 
 
@@ -255,6 +310,99 @@ namespace efdb
             return sales;
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        internal static void SaveToDB(Repository repo, Random rnd)
+//{
+
+//    string client = "Client" + rnd.Next(1, 15).ToString();
+//    string fileName = "fileNameDefault.csv";
+//    string manager = "Manager" + rnd.Next(1, 15).ToString();
+//    string product = "Product" + rnd.Next(1, 15).ToString();
+
+
+//    Sale sale = new Sale
+//    {
+//        Client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(client)) ?? new Client() { Name = client },
+//        FileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileName)) ?? new FileName() { Name = fileName, DTG = DateTime.Now },
+//        Manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(manager)) ?? new Manager() { Name = manager },
+//        Product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(product)) ?? new Product() { Name = product, Cost = rnd.Next(100, 300) },
+//        DTG = DateTime.Now.AddMinutes(-rnd.Next(1, 50))
+//    };
+//    sale.Sum = sale.Product.Cost;
+//    repo.Insert(sale);
+
+
+//    //using (SalesContext context = new SalesContext())
+//    //{
+//    //    Sale sale = new Sale
+//    //    {
+//    //        Client = GetClient(context, "Client" + rnd.Next(1, 15).ToString()),
+//    //        FileName = GetFileName(context, "fileNameManager02.csv"),
+//    //        Manager = GetManager(context, "Manager" + rnd.Next(1, 15).ToString()),
+//    //        Product = GetProduct(context, "Product" + rnd.Next(1, 15).ToString()),
+//    //        DTG = DateTime.Now.AddMinutes(-rnd.Next(1, 10))
+//    //    };
+//    //    sale.Sum = sale.Product.Cost;
+
+//    //    context.TmpSales.Add(sale);
+//    //    bool result = SaveToDB(context);
+//    //    context.Dispose();
+//    //    //    try
+//    //    //    {
+//    //    //        context.SaveChanges();
+//    //    //    }
+//    //    //    //catch (DbEntityValidationException ex)
+//    //    //    //{
+//    //    //    //    foreach (DbEntityValidationResult validationError in ex.EntityValidationErrors)
+//    //    //    //    {
+//    //    //    //        Console.WriteLine("Object: " + validationError.Entry.Entity.ToString());
+//    //    //    //        Console.WriteLine("");
+//    //    //    //        foreach (DbValidationError err in validationError.ValidationErrors)
+//    //    //    //        {
+//    //    //    //            Console.Write(err.ErrorMessage + "");
+//    //    //    //        }
+//    //    //    //    }
+//    //    //    //}
+//    //    //    //catch (SqlException ex)
+//    //    //    //{
+//    //    //    //    DisplaySqlErrors(ex);
+//    //    //    //    //var sqlException = ex.GetBaseException() as SqlException;
+//    //    //    //    //if (sqlException?.Errors.Count > 0)
+//    //    //    //    //{
+//    //    //    //    //    switch (sqlException.Errors[0].Number)
+//    //    //    //    //    {
+//    //    //    //    //        case 547: // Foreign Key violation
+//    //    //    //    //        default:
+//    //    //    //    //            break;
+//    //    //    //    //    }
+
+//    //    //    //    //}
+//    //    //    //}
+//    //    //    catch (Exception e)
+//    //    //    {
+//    //    //        Console.WriteLine(e.Message);
+//    //    //    }
+
+//    //}
+//}
 
     }
 }

@@ -2,28 +2,27 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace efdb.DataModel
+namespace efdb.DataModels
 {
-    //[Table("ManagerTable")]
-    public class Manager
+    public abstract class EntityBase
     {
-        [Key]
         public int Id { get; set; }
 
         [
         Required,
         MinLength(2, ErrorMessage = "Name must be 2 characters or more"),
-        MaxLength(56, ErrorMessage = "Name must be 56 characters or less"),
+        MaxLength(100, ErrorMessage = "Name must be 100 characters or less"),
         Index("Name_Index", IsUnique = true)
         ]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
-        public /*virtual*/ ICollection<Sale> Sales { get; set; }
+        public ICollection<Sale> Sales { get; set; }
 
 
-        public Manager()
+        public EntityBase()
         {
             this.Sales = new List<Sale>();
         }
+
     }
 }

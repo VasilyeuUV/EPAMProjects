@@ -52,12 +52,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataModel\Client.cs" />
-    <Compile Include="DataModel\FileNameData.cs" />
-    <Compile Include="DataModel\Manager.cs" />
-    <Compile Include="DataModel\Product.cs" />
-    <Compile Include="DataModel\Sale.cs" />
-    <Compile Include="DataModel\SalesContext.cs" />
+    <Compile Include="DataContexts\Repository.cs" />
+    <Compile Include="DataModels\Client.cs" />
+    <Compile Include="DataModels\EntityBase.cs" />
+    <Compile Include="DataModels\FileName.cs" />
+    <Compile Include="DataModels\Manager.cs" />
+    <Compile Include="DataModels\Product.cs" />
+    <Compile Include="DataModels\Sale.cs" />
+    <Compile Include="DataContexts\SalesContext.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
