@@ -19,10 +19,10 @@ namespace efdb
             using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
 
 
-            //for (int i = 0; i < 30; i++)
-            //{
-            //    SaveToDB(repo, RND);
-            //}
+            for (int i = 0; i < 30; i++)
+            {
+                SaveToDB(repo, RND);
+            }
             DisplayData(repo);
 
             Console.WriteLine("");

@@ -64,7 +64,7 @@ namespace efdb.DataContexts
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException.Message);
+                //Console.WriteLine(ex.Message);
                 return false;
             }
         }

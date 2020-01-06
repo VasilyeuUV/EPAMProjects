@@ -6,6 +6,8 @@ using System.Configuration.Install;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
+using efdb.DataContexts;
+using efdb.DataModels;
 
 namespace epam_task4
 {
@@ -17,19 +19,19 @@ namespace epam_task4
         static void Main(string[] args)
         {
             // DATABASE            
-            //var repo = new Repository();
-            ////using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
-            //Sale sale = new Sale()
-            //{
-            //    DTG = DateTime.Now,
-            //    Client = new Client() { Name = "VLAD" },
-            //    Manager = new Manager() { Name = "VVV" },
-            //    Product = new Product() { Name = "PR", Cost = 1000 },
-            //    FileName = new FileName() { Name = "1111111111111111.cvs", DTG = new DateTime() },
-            //    Sum = 123
-            //};
-            //var result = repo.Insert(sale);
-            
+            var repo = new Repository();
+            //using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
+            Sale sale = new Sale()
+            {
+                DTG = DateTime.Now,
+                Client = new Client() { Name = "VLAD" },
+                Manager = new Manager() { Name = "VVV" },
+                Product = new Product() { Name = "PR", Cost = 1000 },
+                FileName = new FileName() { Name = "1111111111111111.cvs", DTG = DateTime.Now },
+                Sum = 123
+            };
+            var result = repo.Insert(sale);
+
 
             // MENU
             string[] items = { "Create file", "Use Windows Service", "Exit" };
