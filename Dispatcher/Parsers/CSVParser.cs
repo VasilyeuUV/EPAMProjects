@@ -13,6 +13,8 @@ namespace FileParser.Parsers
         public event EventHandler<SalesFieldDataModel> HeaderParsed;
         public event EventHandler<SalesFieldDataModel> FieldParsed;
         public event EventHandler<bool> ParsingCompleted;
+        public event EventHandler ErrorParsing;
+
 
         /// <summary>
         /// CSV file parsing process
@@ -37,13 +39,24 @@ namespace FileParser.Parsers
                     while (!tfp.EndOfData && !this._abort)
                     {
                         string[] fields = tfp.ReadFields();
-                        SalesFieldDataModel sale = new SalesFieldDataModel()
+
+                        SalesFieldDataModel sale = null;
+                        if (fields.Length == 4)
                         {
-                            DTG = fields[0],
-                            Client = fields[1],
-                            Product = fields[2],
-                            Cost = fields[3]
-                        };
+                            sale = new SalesFieldDataModel()
+                            {
+                                DTG = fields[0],
+                                Client = fields[1],
+                                Product = fields[2],
+                                Cost = fields[3]
+                            };
+                        }
+                        else 
+                        {
+                            ErrorParsing(this, EventArgs.Empty);
+                            return null;
+                        }
+
                         if (++count == 1) 
                         {
                             HeaderParsed(this, sale);

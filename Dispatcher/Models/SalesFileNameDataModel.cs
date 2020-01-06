@@ -1,6 +1,7 @@
 ﻿using FileParcer.Interfaces;
 using System;
 using System.IO;
+using System.Text;
 
 namespace FileParser.Models
 {
@@ -18,8 +19,8 @@ namespace FileParser.Models
         /// </summary>
         private SalesFileNameDataModel(System.IO.FileInfo fileInf)
         {
-            this.FileName = fileInf.Name;
-            this.FileExtention = fileInf.Extension;
+            this.FileName = fileInf.Name.ToLower();
+            this.FileExtention = fileInf.Extension.ToLower();
             this.Manager = GetManager(this.FileName);
             this.DTG = GetDate(this.FileName);
         }
@@ -42,7 +43,9 @@ namespace FileParser.Models
             var data = fileName.Split('_');
             if (data.Length > 0)
             {
-                return data[0];
+                var name = new StringBuilder(data[0]);
+                name[0] = char.ToUpper(name[0]);
+                return name.ToString();
             }
             return string.Empty;     
         }

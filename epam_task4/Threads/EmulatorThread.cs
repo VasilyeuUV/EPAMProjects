@@ -31,7 +31,7 @@ namespace epam_task4.Threads
         }
 
         /// <summary>
-        /// Close emulatorWFA
+        /// Stop emulatorWFA
         /// </summary>
         internal void Close()
         {

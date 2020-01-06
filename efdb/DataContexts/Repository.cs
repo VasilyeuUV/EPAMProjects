@@ -4,8 +4,9 @@ using System.Linq;
 
 namespace efdb.DataContexts
 {
-    public class Repository
+    public sealed class Repository : IDisposable
     {
+        private bool disposed = false;                      // Flag: Has Dispose already been called?
         private readonly SalesContext _context = null;
 
         /// <summary>
@@ -14,7 +15,24 @@ namespace efdb.DataContexts
         public Repository()
         {
             this._context = new SalesContext();
-        }              
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);                     
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposed) { return; }
+            if (disposing)      // Free any managed objects
+            {
+                this._context.Dispose();
+            }
+            disposed = true;
+        }
+
+
 
 
         #region CRUD  
@@ -39,7 +57,7 @@ namespace efdb.DataContexts
             static void Main()
             {
                  var managers = Select<Manager>()
-                    .Include(m => m.Sales).ThenInclude(mp => mp.Product)
+                    .Include(m => m.Sales.Select(mp => mp.Product)
                     .Where(c => c.id > 25)
                     .ToList();
             }
@@ -136,122 +154,8 @@ namespace efdb.DataContexts
         }
 
 
+
         #endregion // GET_FROM_BD_OR_NEW
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        ///// <summary>
-        ///// Insert some Entities
-        ///// </summary>
-        ///// <typeparam name="TEntity"></typeparam>
-        ///// <param name="entities"></param>
-        //public static void Inserts<TEntity>(IEnumerable<TEntity> entities, DbContext context = null) 
-        //    where TEntity : class
-        //{
-            
-        //    if (entities?.Count() > 0)
-        //    {
-        //        //if (context == null) { context = new SalesContext(GetConnection()); }
-        //        using (context ?? new SalesContext(GetConnection()))
-        //        {
-        //            // Отключаем отслеживание и проверку изменений для оптимизации вставки множества полей
-        //            //context.Configuration.AutoDetectChangesEnabled = false;
-        //            //context.Configuration.ValidateOnSaveEnabled = false;
-
-        //            //context.Database.Log = (s => System.Diagnostics.Debug.WriteLine(s));
-
-        //            foreach (TEntity entity in entities)
-        //            { context.Entry(entity).State = EntityState.Added; }
-        //            bool result = SaveToDB(context);
-
-        //            //context.Configuration.AutoDetectChangesEnabled = true;
-        //            //context.Configuration.ValidateOnSaveEnabled = true;
-
-        //            context.Dispose();
-        //        }
-        //    }
-
-
-
-
-
-
-
-            /*
-             * USING
-            static void Main()
-            {
-                Repository.Inserts(
-                    new List<Customer>
-                    {
-                        new Customer {
-                            FirstName = "Сидор",
-                            LastName = "Сидоров",
-                            Age = 23
-                        },
-                        new Customer {
-                            FirstName = "Павел",
-                            LastName = "Васин",
-                            Age = 20
-                        }                    });
-}
-            */
-        //}
-
-
-        ///// <summary>
-        ///// Update any entity
-        ///// </summary>
-        ///// <typeparam name="TEntity"></typeparam>
-        ///// <param name="entity"></param>
-        ///// <param name="context"></param>
-        //public static void Update<TEntity>(TEntity entity, DbContext context = null)
-        //    where TEntity : class
-        //{
-        //    //if (context == null) { context = new SalesContext(); }
-
-        //    // Настройки контекста
-        //    //context.Database.Log = (s => System.Diagnostics.Debug.WriteLine(s));
-
-        //    using (context ?? new SalesContext(GetConnection()))
-        //    {
-        //        context.Entry<TEntity>(entity).State = EntityState.Modified;
-        //        bool result = SaveToDB(context);
-        //        context.Dispose();
-        //    }
-        //}
-
-
-        ///// <summary>
-        ///// Delete any entity
-        ///// </summary>
-        ///// <typeparam name="TEntity"></typeparam>
-        ///// <param name="entity"></param>
-        //public void Delete<TEntity>(TEntity entity, DbContext context = null)
-        //    where TEntity : class
-        //{
-        //    //if (context == null) { context = new SalesContext(); }
-        //    //context.Database.Log = (s => System.Diagnostics.Debug.WriteLine(s));
-
-        //    using (context ?? new SalesContext(GetConnection()))
-        //    {
-        //        context.Entry<TEntity>(entity).State = EntityState.Deleted;
-        //        bool result = SaveToDB(context);
-        //        context.Dispose();
-        //    }
-        //}
-
 
     }
 }

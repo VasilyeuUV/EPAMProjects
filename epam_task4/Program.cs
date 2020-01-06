@@ -6,8 +6,6 @@ using System.Configuration.Install;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
-using efdb.DataContexts;
-using efdb.DataModels;
 
 namespace epam_task4
 {
@@ -18,21 +16,6 @@ namespace epam_task4
         [STAThread]
         static void Main(string[] args)
         {
-            // DATABASE            
-            var repo = new Repository();
-            //using (var context = new SalesContext()) { context.Dispose(); }     // as install DB
-            Sale sale = new Sale()
-            {
-                DTG = DateTime.Now,
-                Client = new Client() { Name = "VLAD" },
-                Manager = new Manager() { Name = "VVV" },
-                Product = new Product() { Name = "PR", Cost = 1000 },
-                FileName = new FileName() { Name = "1111111111111111.cvs", DTG = DateTime.Now },
-                Sum = 123
-            };
-            var result = repo.Insert(sale);
-
-
             // MENU
             string[] items = { "Create file", "Use Windows Service", "Exit" };
             method[] methods = new method[] { UseConsole, UseService, Exit };
@@ -72,16 +55,15 @@ namespace epam_task4
                             fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
                             fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
                             fileHandler.WrongProductErrorEvent += FileHandler_WrongProductErrorEvent;
+                            DisplayMessage($"Processing of file {filePath} starting");
                             fileHandler.Start(filePath);
                         }
                     }
-                    openFileDialog.Dispose();
                 }
-                WaitForContinue(string.Format("File processed successfully"));
             }
             catch (Exception e)
             {
-                WaitForContinue(string.Format("Error opening file:\n" + e.Message));
+                DisplayMessage(string.Format("Error opening file:\n" + e.Message, ConsoleColor.Red));
                 return;
             }
         }
@@ -136,11 +118,11 @@ namespace epam_task4
         /// Wait push key 
         /// </summary>
         /// <param name="str"></param>
-        private static ConsoleKeyInfo WaitForContinue(string str = "")
+        private static ConsoleKeyInfo WaitForContinue(string str = "", ConsoleColor color = ConsoleColor.Green)
         {
             if (!String.IsNullOrEmpty(str.Trim()))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = color;
                 Console.WriteLine(str);
                 Console.ForegroundColor = ConsoleColor.White;
             }
@@ -149,27 +131,39 @@ namespace epam_task4
             return Console.ReadKey();
         }
 
+        private static void DisplayMessage(string str, ConsoleColor color = ConsoleColor.Green)
+        {
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                Console.ForegroundColor = color;
+                Console.WriteLine(str);
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
+
+
         #region FILE_PROCESSING_THREAD_EVENTS
         //##################################################################################################
 
         private static void FileHandler_WrongProductErrorEvent(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            DisplayMessage("Error product data", ConsoleColor.Red);
         }
 
         private static void FileHandler_FileNamingErrorEvent(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            DisplayMessage("Error file name", ConsoleColor.Red);
         }
 
         private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            DisplayMessage("Error file content", ConsoleColor.Red);
         }
 
-        private static void FileHandler_WorkCompleted(object sender, bool e)
+        private static void FileHandler_WorkCompleted(object sender, bool aborted)
         {
-            //throw new NotImplementedException();
+            if (aborted) { WaitForContinue($"Processing of file {(sender as FileProcessingThread)?.Name} aborted"); }
+            else { WaitForContinue($"Processing of file {(sender as FileProcessingThread)?.Name} completed"); }
         }
 
         #endregion // FILE_PROCESSING_THREAD_EVENTS
