@@ -29,7 +29,7 @@ namespace epam_task4.Threads
         internal event EventHandler<bool> WorkCompleted;
         internal event EventHandler<bool> FileNamingErrorEvent;
         internal event EventHandler FileContentErrorEvent;
-
+        internal event EventHandler<string> SendMessageEvent;
 
         /// <summary>
         /// CTOR
@@ -44,15 +44,6 @@ namespace epam_task4.Threads
             
         }
 
-
-        /// <summary>
-        /// Stop this thread
-        /// </summary>
-        internal void Stop()
-        {
-            this._csvParser?.Stop();
-        }
-
         /// <summary>
         /// Start this Thread
         /// </summary>
@@ -64,6 +55,15 @@ namespace epam_task4.Threads
                 this._thread.IsBackground = true;
                 this._thread?.Start(filePath);
             }
+        }
+
+
+        /// <summary>
+        /// Stop this thread
+        /// </summary>
+        internal void Stop()
+        {
+            this._csvParser?.Stop();
         }
 
 
@@ -99,6 +99,7 @@ namespace epam_task4.Threads
             OnWorkCompleting(this._abort);
         }
 
+
         /// <summary>
         /// CSV Parser work process
         /// </summary>
@@ -115,6 +116,211 @@ namespace epam_task4.Threads
         }
 
 
+
+
+
+        #region ON_THIS_EVENTS
+        //############################################################################################################
+
+
+        /// <summary>
+        /// Thread work completed event
+        /// </summary>
+        /// <param name="abort"> true if thread aborted</param>
+        private void OnWorkCompleting(bool abort)
+        {
+            this._abort = abort;
+            this.Stop();
+
+            if (abort) { DeleteTmpData(this._fileNameData.FileName); }  // delete data from temporary table
+            else { SaveTmpData(this._fileNameData.FileName); }          // save data from temporary table to main table
+
+            WorkCompleted?.Invoke(this, abort);
+        }
+
+
+        /// <summary>
+        /// File naming error event        
+        /// </summary>
+        /// <param name="isProcessed">
+        /// true - if the file was processed earlier;
+        /// false - if the file name is incorrect;
+        /// </param>
+        private void OnFileNamingErrorEvent(bool isProcessed)
+        {
+            FileNamingErrorEvent?.Invoke(this.Name, isProcessed);
+            this.Stop();
+        }
+
+
+        /// <summary>
+        /// File Content Error Event
+        /// </summary>
+        private void OnFileContentErrorEvent()
+        {
+            FileContentErrorEvent?.Invoke(this, EventArgs.Empty);
+            this.Stop();
+        }
+
+
+        #endregion
+
+
+
+        #region CSV_PARSER_EVENTS
+        //############################################################################################################
+
+        /// <summary>
+        /// Table row parsed event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="parsedData"></param>
+        private void CsvParser_FieldParsed(object sender, SalesFieldDataModel parsedData)
+        {
+            using (var repo = new Repository())
+            {
+                TmpSale sale = ConvertToSale(repo, parsedData);
+                if (sale == null) { return; }
+
+                if (!repo.Insert(sale))
+                {
+                    SendMessageEvent?.Invoke(this, "Error saving temporary data");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Table Header parsed event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CsvParser_HeaderParsed(object sender, SalesFieldDataModel e)
+        {
+        }
+
+
+        /// <summary>
+        /// On error parsing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CsvParser_ErrorParsing(object sender, EventArgs e)
+        {
+            FileContentErrorEvent(this, EventArgs.Empty);
+            this.Stop();
+        }
+
+
+
+        /// <summary>
+        /// Parse completed Event Handler 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CsvParser_ParsingCompleted(object sender, bool abort)
+        {
+            this._csvParser.ParsingCompleted -= CsvParser_ParsingCompleted;
+            this._csvParser.HeaderParsed -= CsvParser_HeaderParsed;
+            this._csvParser.FieldParsed -= CsvParser_FieldParsed;
+            this._csvParser.ErrorParsing -= CsvParser_ErrorParsing;
+            this._csvParser = null;            
+        }
+
+
+        #endregion // CSV_PARSER_EVENTS
+
+
+
+
+        #region DATA_MANAGMENT
+        //############################################################################################################
+
+
+
+
+        private void SaveTmpData(string fileName)
+        {
+            try
+            {
+                using (var repo = new Repository())
+                {
+                    FileName fileData = GetFileNameData(repo, fileName);
+                    ICollection<TmpSale> tmpSales = GetTmpSalesData(repo, fileData);
+                    IEnumerable<Sale> sales = ConvertToSaleList<Sale, TmpSale>(tmpSales);
+
+                    if (!repo.Inserts(sales))
+                    {
+                        SendMessageEvent?.Invoke(this, "Error saving data from temporary table");
+                    }
+                    if (!repo.Deletes(tmpSales))
+                    {
+                        SendMessageEvent?.Invoke(this, "Error deleting temporary data after saving");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SendMessageEvent?.Invoke(this, $"Error accessing database while saving temporary data: {ex.Message}");
+            }
+        }
+
+
+        /// <summary>
+        /// Delete TmpSales from DB by filename
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void DeleteTmpData(string fileName)
+        {
+            try
+            {
+                using (var repo = new Repository())
+                {
+                    FileName fileData = GetFileNameData(repo, fileName);
+                    List<TmpSale> tmpSales = GetTmpSalesData(repo, fileData);
+
+                    if (fileData != null && tmpSales?.Count > 0 && !repo.Delete(fileData))
+                    {
+                        SendMessageEvent?.Invoke(this, "Error deleting temporary data from the database");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SendMessageEvent?.Invoke(this, $"Error accessing database while deleting temporary data: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get sales from temporary table by filename
+        /// </summary>
+        /// <param name="repo"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private List<TmpSale> GetTmpSalesData(Repository repo, FileName fileName)
+        {
+            if (repo == null || fileName == null) { return null; }
+            return repo.Select<TmpSale>()
+                       .Include(m => m.Manager)
+                       .Include(p => p.Product)
+                       .Include(c => c.Client)
+                       .Where(f => f.FileName.Id == fileName.Id)
+                       .ToList();
+        }
+
+        /// <summary>
+        /// Get Filename object data
+        /// </summary>
+        /// <param name="repo"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private FileName GetFileNameData(Repository repo, string fileName)
+        {
+            if (repo == null || string.IsNullOrWhiteSpace(fileName)) { return null; }
+            return repo.Select<FileName>()
+                       .FirstOrDefault(x => x.Name.Equals(fileName));
+        }
+        
+
         private SalesFileNameDataModel GetFileNameData(FileInfo fileInf)
         {
             SalesFileNameDataModel fileNameData = SalesFileNameDataModel.CreateInstance(fileInf);
@@ -124,12 +330,21 @@ namespace epam_task4.Threads
                 || fileNameData.FileName.Trim().Length < 16
                 || fileNameData.FileExtention.Trim().Length < 4
                 )
-            {                
+            {
                 return null;
             }
             return fileNameData;
         }
 
+
+        #endregion // DATA_MANAGMENT
+
+
+
+
+
+        #region CONVERTERS
+        //############################################################################################################
 
 
         /// <summary>
@@ -175,208 +390,40 @@ namespace epam_task4.Threads
             return sale;
         }
 
-
-
-        #region ON_THIS_EVENTS
-        //############################################################################################################
-
         /// <summary>
-        /// Thread work completed event
+        /// Convert TmpSale to Sale and back
         /// </summary>
-        /// <param name="abort"> true if thread aborted</param>
-        private void OnWorkCompleting(bool abort)
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="lstFrom"></param>
+        /// <returns></returns>
+        private IEnumerable<T> ConvertToSaleList<T, U>(ICollection<U> lstFrom)
+            where U : SaleBase
+            where T : SaleBase, new()
         {
-            this._abort = abort;
-            this.Stop();
-
-            if (abort)  // delete data from temporary table
+            ICollection<T> lstTo = new List<T>();
+            if (lstFrom?.Count > 0)
             {
-                try
+                foreach (var item in lstFrom)
                 {
-                    using (var repo = new Repository())
+                    T sale = new T()
                     {
-                        FileName fileName = repo.Select<FileName>()
-                                                .FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
-
-                        List<TmpSale> tmpSales = repo.Select<TmpSale>()
-                                                     .Include(m => m.Manager)
-                                                     .Include(p => p.Product)
-                                                     .Include(c => c.Client)
-                                                     .Where(f => f.FileName.Id == fileName.Id)
-                                                     .ToList();
-
-                        if (fileName != null && tmpSales?.Count > 0 && !repo.Delete(fileName))
-                        {
-                            Console.WriteLine("Error delete data");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
+                        Client = item.Client,
+                        DTG = item.DTG,
+                        FileName = item.FileName,
+                        Manager = item.Manager,
+                        Product = item.Product,
+                        Sum = item.Sum
+                    };
+                    lstTo.Add(sale);
                 }
             }
-            else // save data from temporary table to main table
-            {
-                try
-                {
-                    using (var repo = new Repository())
-                    {
-                        FileName fileName = repo.Select<FileName>()
-                                                .FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
-                        List<TmpSale> tmpSales = repo.Select<TmpSale>()
-                                                     .Include(m => m.Manager)
-                                                     .Include(p => p.Product)
-                                                     .Include(c => c.Client)
-                                                     .Where(f => f.FileName.Id == fileName.Id)
-                                                     .ToList();
-
-                        List<Sale> sales = new List<Sale>();
-                        if (tmpSales?.Count > 0)
-                        {
-                            foreach (var tmpSale in tmpSales)
-                            {
-                                Sale sale = new Sale()
-                                {
-                                    Client = tmpSale.Client,
-                                    DTG = tmpSale.DTG,
-                                    FileName = tmpSale.FileName,
-                                    Manager = tmpSale.Manager,
-                                    Product = tmpSale.Product,
-                                    Sum = tmpSale.Sum
-                                };
-                                sales.Add(sale);
-                            }
-                        }
-                        if (!repo.Inserts(sales))
-                        {
-                            Console.WriteLine("Error insert sales data");
-                        }
-                        if (!repo.Deletes(tmpSales))
-                        {
-                            Console.WriteLine("Error delete sales from temporary table");
-                        }
-                    }
-
-
-                        //IQueryable<Sale> sale = saleBase as IQueryable<Sale>;
-
-                        
-                        //if (fileName != null && !repo.Insert(sale))
-                        //{
-                        //    Console.WriteLine("Error saving data");
-                        //}
-
-                }
-                catch (Exception ex)
-                {
-                }
-            }
-
-            //var managers = repo.Select<FileName>()
-            //    .Include(m => m.Sales).ThenInclude(mp => mp.Manager)
-            //    .Include(m => m.Sales).ThenInclude(mc => mc.Client)
-            //    .Include(m => m.Sales).ThenInclude(mf => mf.Product)
-            //    .ToList();
-
-
-
-
-
-
-
-
-            WorkCompleted?.Invoke(this, abort);
-        }
-
-
-
-
-
-        /// <summary>
-        /// File naming error event        
-        /// </summary>
-        /// <param name="isProcessed">
-        /// true - if the file was processed earlier;
-        /// false - if the file name is incorrect;
-        /// </param>
-        private void OnFileNamingErrorEvent(bool isProcessed)
-        {
-            FileNamingErrorEvent?.Invoke(this.Name, isProcessed);
-            OnWorkCompleting(true);
-        }
-
-        private void OnFileContentErrorEvent()
-        {
-
+            return lstTo;
         }
 
         #endregion
 
 
-
-        #region CSV_PARSER_EVENTS
-        //############################################################################################################
-
-        /// <summary>
-        /// Table row parsed event handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="parsedData"></param>
-        private void CsvParser_FieldParsed(object sender, SalesFieldDataModel parsedData)
-        {
-            using (var repo = new Repository())
-            {
-                TmpSale sale = ConvertToSale(repo, parsedData);
-                if (sale == null) { return; }
-
-                if (!repo.Insert(sale))
-                {
-                    Console.WriteLine("Error saving data");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Table Header parsed event handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CsvParser_HeaderParsed(object sender, SalesFieldDataModel e)
-        {
-        }
-
-
-        /// <summary>
-        /// On error parsing
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CsvParser_ErrorParsing(object sender, EventArgs e)
-        {
-            FileContentErrorEvent(this, EventArgs.Empty);
-            this.Stop();
-        }
-
-
-
-        /// <summary>
-        /// Parse completed Event Handler 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CsvParser_ParsingCompleted(object sender, bool abort)
-        {
-            this._csvParser.ParsingCompleted -= CsvParser_ParsingCompleted;
-            this._csvParser.HeaderParsed -= CsvParser_HeaderParsed;
-            this._csvParser.FieldParsed -= CsvParser_FieldParsed;
-            this._csvParser.ErrorParsing -= CsvParser_ErrorParsing;
-            this._csvParser = null;
-
-            OnWorkCompleting(abort);
-        }
-
-
-        #endregion // CSV_PARSER_EVENTS
 
     }
 }
