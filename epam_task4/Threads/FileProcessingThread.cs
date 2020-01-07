@@ -197,9 +197,17 @@ namespace epam_task4.Threads
                     {
                         FileName fileName = repo.Select<FileName>()
                                                 .FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
-                        if (fileName != null && !repo.Delete(fileName))
+
+                        List<TmpSale> tmpSales = repo.Select<TmpSale>()
+                                                     .Include(m => m.Manager)
+                                                     .Include(p => p.Product)
+                                                     .Include(c => c.Client)
+                                                     .Where(f => f.FileName.Id == fileName.Id)
+                                                     .ToList();
+
+                        if (fileName != null && tmpSales?.Count > 0 && !repo.Delete(fileName))
                         {
-                            Console.WriteLine("Error saving data");
+                            Console.WriteLine("Error delete data");
                         }
                     }
                 }
@@ -209,11 +217,80 @@ namespace epam_task4.Threads
             }
             else // save data from temporary table to main table
             {
+                try
+                {
+                    using (var repo = new Repository())
+                    {
+                        FileName fileName = repo.Select<FileName>()
+                                                .FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
+                        List<TmpSale> tmpSales = repo.Select<TmpSale>()
+                                                     .Include(m => m.Manager)
+                                                     .Include(p => p.Product)
+                                                     .Include(c => c.Client)
+                                                     .Where(f => f.FileName.Id == fileName.Id)
+                                                     .ToList();
 
+                        List<Sale> sales = new List<Sale>();
+                        if (tmpSales?.Count > 0)
+                        {
+                            foreach (var tmpSale in tmpSales)
+                            {
+                                Sale sale = new Sale()
+                                {
+                                    Client = tmpSale.Client,
+                                    DTG = tmpSale.DTG,
+                                    FileName = tmpSale.FileName,
+                                    Manager = tmpSale.Manager,
+                                    Product = tmpSale.Product,
+                                    Sum = tmpSale.Sum
+                                };
+                                sales.Add(sale);
+                            }
+                        }
+                        if (!repo.Inserts(sales))
+                        {
+                            Console.WriteLine("Error insert sales data");
+                        }
+                        if (!repo.Deletes(tmpSales))
+                        {
+                            Console.WriteLine("Error delete sales from temporary table");
+                        }
+                    }
+
+
+                        //IQueryable<Sale> sale = saleBase as IQueryable<Sale>;
+
+                        
+                        //if (fileName != null && !repo.Insert(sale))
+                        //{
+                        //    Console.WriteLine("Error saving data");
+                        //}
+
+                }
+                catch (Exception ex)
+                {
+                }
             }
+
+            //var managers = repo.Select<FileName>()
+            //    .Include(m => m.Sales).ThenInclude(mp => mp.Manager)
+            //    .Include(m => m.Sales).ThenInclude(mc => mc.Client)
+            //    .Include(m => m.Sales).ThenInclude(mf => mf.Product)
+            //    .ToList();
+
+
+
+
+
+
+
 
             WorkCompleted?.Invoke(this, abort);
         }
+
+
+
+
 
         /// <summary>
         /// File naming error event        

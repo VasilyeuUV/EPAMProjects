@@ -1,5 +1,6 @@
 ﻿using efdb.DataModels;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
@@ -88,6 +89,24 @@ namespace efdb.DataContexts
             }
         }
 
+        /// <summary>
+        /// Insert some Entities
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entities"></param>
+        public bool Inserts<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+        {
+            if (entities?.Count() > 0)
+            {
+                foreach (TEntity entity in entities)
+                {
+                    if (!this.Insert(entity)) { return false; }                                  
+                }
+                return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Delete any entity
@@ -111,40 +130,22 @@ namespace efdb.DataContexts
         }
 
 
-        //public void Delete<TEntity>(TEntity entity)
-        //    where TEntity : class
-        //{
-        //    // Настройки контекста
-
-        //    var dbSet = this._context.Set<TEntity>();
-
-
-
-        //    //SampleContext context = new SampleContext();
-        //    //context.Database.Log = (s => System.Diagnostics.Debug.WriteLine(s));
-
-        //    context.Entry<TEntity>(entity).State = EntityState.Deleted;
-        //    context.SaveChanges();
-        //}
+        public bool Deletes<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+        {
+            if (entities?.Count() > 0)
+            {
+                foreach (TEntity entity in entities)
+                {
+                    if (!this.Delete(entity)) { return false; }
+                }
+                return true;
+            }
+            return false;
+        }
 
 
 
         #endregion // CRUD
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         #region GET_FROM_BD_OR_NEW  
