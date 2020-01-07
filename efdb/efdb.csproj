@@ -63,6 +63,8 @@
     <Compile Include="DataModels\Product.cs" />
     <Compile Include="DataModels\Sale.cs" />
     <Compile Include="DataContexts\SalesContext.cs" />
+    <Compile Include="DataModels\SaleBase.cs" />
+    <Compile Include="DataModels\TmpSale.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,18 +1,18 @@
 ﻿using efdb.DataContexts;
 using efdb.DataModels;
-using epam_task4.Models;
 using FileParser.Models;
 using FileParser.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
 namespace epam_task4.Threads
 {
-    internal class FileProcessingThread
+    internal sealed class FileProcessingThread
     {        
         private Thread _thread = null;
         private bool _abort = false;
@@ -27,8 +27,7 @@ namespace epam_task4.Threads
         internal string Name { get; private set; }
 
         internal event EventHandler<bool> WorkCompleted;
-        internal event EventHandler FileNamingErrorEvent;
-        internal event EventHandler WrongProductErrorEvent;
+        internal event EventHandler<bool> FileNamingErrorEvent;
         internal event EventHandler FileContentErrorEvent;
 
 
@@ -41,7 +40,8 @@ namespace epam_task4.Threads
             Boolean.TryParse(ConfigurationManager.AppSettings["CheckManagers"], out this._checkManagersDB);
             Boolean.TryParse(ConfigurationManager.AppSettings["CheckProducts"], out this._checkProductsDB);
 
-            this._thread = new Thread(this.RunProcess);            
+            this._thread = new Thread(this.RunProcess);  
+            
         }
 
 
@@ -51,7 +51,6 @@ namespace epam_task4.Threads
         internal void Stop()
         {
             this._csvParser?.Stop();
-            this._abort = true;            
         }
 
         /// <summary>
@@ -76,24 +75,28 @@ namespace epam_task4.Threads
         {
             string filePath = (string)obj;
             FileInfo fileInf = new FileInfo(filePath);
-            if (!fileInf.Exists) { FileNamingErrorEvent(this, EventArgs.Empty); return; }
+            if (!fileInf.Exists) { OnFileNamingErrorEvent(false); return; }
 
             this._thread.Name = fileInf.Name;
             this.Name = fileInf.Name;
 
             this._fileNameData = GetFileNameData(fileInf);
-            if (this._fileNameData == null) { FileNamingErrorEvent(this, EventArgs.Empty); return; }
+            if (this._fileNameData == null) { OnFileNamingErrorEvent(false); return; }
 
             FileName fileName = null;
             using (var repo = new Repository())
             {
-                fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));                
+                try
+                {
+                    fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
+                }
+                catch (Exception ex) { }                             
             }
-            if (fileName != null) { WorkCompleted(this, this._abort); return; }
+            if (fileName != null) { OnFileNamingErrorEvent(true); return; }
 
             IEnumerable<SalesFieldDataModel> tableRows = RunCSVParser(fileInf);
 
-            WorkCompleted(this, this._abort);
+            OnWorkCompleting(this._abort);
         }
 
         /// <summary>
@@ -135,7 +138,7 @@ namespace epam_task4.Threads
         /// <param name="repo">Current repository</param>
         /// <param name="parsedData">parsed Data</param>
         /// <returns></returns>
-        private Sale ConvertToSale(Repository repo, SalesFieldDataModel parsedData)
+        private TmpSale ConvertToSale(Repository repo, SalesFieldDataModel parsedData)
         {
             if (parsedData == null
                 || string.IsNullOrWhiteSpace(parsedData.Client)
@@ -145,7 +148,7 @@ namespace epam_task4.Threads
                 )
             { return null; }
 
-            Sale sale = new Sale();
+            TmpSale sale = new TmpSale();
             try
             {
                 sale.Sum = Convert.ToInt32(parsedData.Cost);
@@ -174,11 +177,63 @@ namespace epam_task4.Threads
 
 
 
-        private bool SaveFieldData(SaleModel sale)
+        #region ON_THIS_EVENTS
+        //############################################################################################################
+
+        /// <summary>
+        /// Thread work completed event
+        /// </summary>
+        /// <param name="abort"> true if thread aborted</param>
+        private void OnWorkCompleting(bool abort)
         {
-            return false;
+            this._abort = abort;
+            this.Stop();
+
+            if (abort)  // delete data from temporary table
+            {
+                try
+                {
+                    using (var repo = new Repository())
+                    {
+                        FileName fileName = repo.Select<FileName>()
+                                                .FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
+                        if (fileName != null && !repo.Delete(fileName))
+                        {
+                            Console.WriteLine("Error saving data");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            else // save data from temporary table to main table
+            {
+
+            }
+
+            WorkCompleted?.Invoke(this, abort);
         }
 
+        /// <summary>
+        /// File naming error event        
+        /// </summary>
+        /// <param name="isProcessed">
+        /// true - if the file was processed earlier;
+        /// false - if the file name is incorrect;
+        /// </param>
+        private void OnFileNamingErrorEvent(bool isProcessed)
+        {
+            FileNamingErrorEvent?.Invoke(this.Name, isProcessed);
+            OnWorkCompleting(true);
+        }
+
+        private void OnFileContentErrorEvent()
+        {
+
+        }
+
+        #endregion
 
 
 
@@ -194,7 +249,7 @@ namespace epam_task4.Threads
         {
             using (var repo = new Repository())
             {
-                Sale sale = ConvertToSale(repo, parsedData);
+                TmpSale sale = ConvertToSale(repo, parsedData);
                 if (sale == null) { return; }
 
                 if (!repo.Insert(sale))
@@ -211,7 +266,6 @@ namespace epam_task4.Threads
         /// <param name="e"></param>
         private void CsvParser_HeaderParsed(object sender, SalesFieldDataModel e)
         {
-            // throw new NotImplementedException();
         }
 
 
@@ -241,30 +295,11 @@ namespace epam_task4.Threads
             this._csvParser.ErrorParsing -= CsvParser_ErrorParsing;
             this._csvParser = null;
 
-            if (abort)
-            {
-                // delete data from temporary table
-            }
-            else
-            {
-                // save data to main table
-            }
+            OnWorkCompleting(abort);
         }
 
 
-
-
         #endregion // CSV_PARSER_EVENTS
-
-
-
-
-
-
-
-
-
-
 
     }
 }

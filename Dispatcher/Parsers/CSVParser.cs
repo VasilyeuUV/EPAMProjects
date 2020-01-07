@@ -3,6 +3,7 @@ using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FileParser.Parsers
 {
@@ -15,6 +16,20 @@ namespace FileParser.Parsers
         public event EventHandler<bool> ParsingCompleted;
         public event EventHandler ErrorParsing;
 
+        private void OnErrorParsing()
+        {
+            this._abort = true;
+            ErrorParsing?.Invoke(this, EventArgs.Empty);
+            this.Stop();
+            ParsingCompleted?.Invoke(this, this._abort);
+        }
+
+
+        public void Stop()
+        {
+            this._abort = true;
+        }
+
 
         /// <summary>
         /// CSV file parsing process
@@ -24,7 +39,11 @@ namespace FileParser.Parsers
         /// <returns>string array of string fields</returns>
         public IEnumerable<SalesFieldDataModel> Parse(string filePath, string[] delimiters = null )
         {
-            if (!System.IO.File.Exists(filePath)) { return null; }
+            if (!System.IO.File.Exists(filePath)) 
+            { 
+                ErrorParsing?.Invoke(this, EventArgs.Empty);
+                return null;
+            }
 
             if (delimiters == null) { delimiters = new[] { "," }; }            
             try
@@ -40,45 +59,45 @@ namespace FileParser.Parsers
                     {
                         string[] fields = tfp.ReadFields();
 
-                        SalesFieldDataModel sale = null;
-                        if (fields.Length == 4)
-                        {
-                            sale = new SalesFieldDataModel()
-                            {
-                                DTG = fields[0],
-                                Client = fields[1],
-                                Product = fields[2],
-                                Cost = fields[3]
-                            };
-                        }
-                        else 
-                        {
-                            ErrorParsing(this, EventArgs.Empty);
+                        SalesFieldDataModel sfdm = CreateSFDM(fields);
+                        if (sfdm == null) 
+                        { 
+                            OnErrorParsing();
                             return null;
                         }
 
-                        if (++count == 1) 
-                        {
-                            HeaderParsed(this, sale);
-                            continue;
-                        }
-                        else { FieldParsed(this, sale); }
-                        lstFields.Add(sale);
+                        if (++count == 1) { HeaderParsed?.Invoke(this, sfdm); continue; }
+                        else { FieldParsed?.Invoke(this, sfdm); }
+
+                        lstFields.Add(sfdm);
                     }
-                    ParsingCompleted(this, this._abort);
+                    ParsingCompleted?.Invoke(this, this._abort);
                     return lstFields.Count() < 1 ? null : lstFields;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                OnErrorParsing();
                 return null;
             }
         }
 
-        public void Stop()
+        /// <summary>
+        /// Create new SFDM
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        private SalesFieldDataModel CreateSFDM(string[] fields)
         {
-            this._abort = true;
-        }
+            if (fields == null || fields.Length != 4) { return null; }
 
+            return new SalesFieldDataModel()
+            {
+                DTG = fields[0],
+                Client = fields[1],
+                Product = fields[2],
+                Cost = fields[3]
+            };
+        }
     }
 }

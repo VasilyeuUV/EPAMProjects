@@ -54,7 +54,6 @@ namespace epam_task4
                             fileHandler.WorkCompleted += FileHandler_WorkCompleted;
                             fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
                             fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
-                            fileHandler.WrongProductErrorEvent += FileHandler_WrongProductErrorEvent;
                             DisplayMessage($"Processing of file {filePath} starting");
                             fileHandler.Start(filePath);
                         }
@@ -114,32 +113,7 @@ namespace epam_task4
 
 
 
-        /// <summary>
-        /// Wait push key 
-        /// </summary>
-        /// <param name="str"></param>
-        private static ConsoleKeyInfo WaitForContinue(string str = "", ConsoleColor color = ConsoleColor.Green)
-        {
-            if (!String.IsNullOrEmpty(str.Trim()))
-            {
-                Console.ForegroundColor = color;
-                Console.WriteLine(str);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue");
-            return Console.ReadKey();
-        }
 
-        private static void DisplayMessage(string str, ConsoleColor color = ConsoleColor.Green)
-        {
-            if (!string.IsNullOrWhiteSpace(str))
-            {
-                Console.ForegroundColor = color;
-                Console.WriteLine(str);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-        }
 
 
         #region FILE_PROCESSING_THREAD_EVENTS
@@ -150,9 +124,10 @@ namespace epam_task4
             DisplayMessage("Error product data", ConsoleColor.Red);
         }
 
-        private static void FileHandler_FileNamingErrorEvent(object sender, EventArgs e)
+        private static void FileHandler_FileNamingErrorEvent(object sender, bool isSaved)
         {
-            DisplayMessage("Error file name", ConsoleColor.Red);
+            if (isSaved) { DisplayMessage($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
+            else { DisplayMessage("Error file name", ConsoleColor.Red);   }            
         }
 
         private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
@@ -281,16 +256,45 @@ namespace epam_task4
                 svcController.Refresh();
             }
         }
+
+
+        #endregion // FOR_WINDOWS_SERVICE
+
+
+        #region DISPLAY
+        //##################################################################################################
+
+        /// <summary>
+        /// Wait push key 
+        /// </summary>
+        /// <param name="str"></param>
+        private static ConsoleKeyInfo WaitForContinue(string str = "", ConsoleColor color = ConsoleColor.Green)
+        {
+            if (!String.IsNullOrEmpty(str.Trim()))
+            {
+                Console.ForegroundColor = color;
+                Console.WriteLine(str);
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue");
+            return Console.ReadKey();
+        }
+
+        private static void DisplayMessage(string str, ConsoleColor color = ConsoleColor.Green)
+        {
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                Console.ForegroundColor = color;
+                Console.WriteLine(str);
+                Console.WriteLine(str);
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
+
+
+        #endregion // DISPLAY
+
+
     }
-
-    #endregion // FOR_WINDOWS_SERVICE
-
-
-
-
-
-
-
-
-
 }

@@ -1,6 +1,6 @@
 ﻿namespace efdb.DataModels
 {
-    public class Sale : SaleBase
+    public class TmpSale : SaleBase
     {
     }
 }

@@ -1,5 +1,6 @@
 ﻿using efdb.DataModels;
 using System;
+using System.Data.Entity;
 using System.Linq;
 
 namespace efdb.DataContexts
@@ -50,7 +51,7 @@ namespace efdb.DataContexts
             //context.GetService<ILoggerFactory>().AddProvider(new SalesLoggerProvider());
 
             // Loading data using the universal Set method
-            return this._context.Set<TEntity>().AsQueryable();
+            return this._context.Set<TEntity>()/*.AsQueryable()*/;
 
             /*
             For use:
@@ -86,6 +87,46 @@ namespace efdb.DataContexts
                 return false;
             }
         }
+
+
+        /// <summary>
+        /// Delete any entity
+        /// </summary>
+        /// <typeparam name = "TEntity" ></ typeparam >
+        /// < param name="entity"></param>
+        public bool Delete<TEntity>(TEntity entity) where TEntity : class
+        {
+            var dbSet = this._context.Set<TEntity>();
+
+            try
+            {
+                dbSet.Remove(entity);
+                this._context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+
+        //public void Delete<TEntity>(TEntity entity)
+        //    where TEntity : class
+        //{
+        //    // Настройки контекста
+
+        //    var dbSet = this._context.Set<TEntity>();
+
+
+
+        //    //SampleContext context = new SampleContext();
+        //    //context.Database.Log = (s => System.Diagnostics.Debug.WriteLine(s));
+
+        //    context.Entry<TEntity>(entity).State = EntityState.Deleted;
+        //    context.SaveChanges();
+        //}
+
 
 
         #endregion // CRUD
