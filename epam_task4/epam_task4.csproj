@@ -65,13 +65,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleMenu\Display.cs" />
     <Compile Include="ConsoleMenu\Task4Menu.cs" />
     <Compile Include="Enums\EnumErrors.cs" />
+    <Compile Include="Models\FileNameSaleModel.cs" />
     <Compile Include="Models\SaleModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\EmulatorThread.cs" />
     <Compile Include="Threads\FileProcessingThread.cs" />
+    <Compile Include="WorkVersions\ConsoleVertion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

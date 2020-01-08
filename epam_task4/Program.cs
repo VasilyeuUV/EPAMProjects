@@ -2,6 +2,7 @@
 using efdb.DataModels;
 using epam_task4.ConsoleMenu;
 using epam_task4.Threads;
+using epam_task4.WorkVersions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,8 +17,13 @@ namespace epam_task4
     class Program
     {
         public delegate void method();
+
         private static List<FileProcessingThread> _lstThread = new List<FileProcessingThread>();
-        static object locker = new object();
+        private static object locker = new object();
+
+        private static readonly string[] FILE_NAME_STRUCT = { "Manager", "DTG" };
+        private static readonly string[] FILE_DATA_STRUCT = { "DTG", "Client", "Product", "Sum" };
+
 
         [STAThread]
         static void Main(string[] args)
@@ -25,8 +31,7 @@ namespace epam_task4
             // INSTALL DATABASE
             if (!CheckDbAvailability())
             {
-                DisplayMessage("DataBase not found. Continuation of work is not possible", ConsoleColor.Red);
-                WaitForContinue();
+                Display.WaitForContinue("DataBase not found. Continuation of work is not possible", ConsoleColor.Red);
                 return;
             }
 
@@ -51,45 +56,20 @@ namespace epam_task4
         private static void UseConsole()
         {
             Console.Clear();
-            DisplayMessage($"CONSOLE WORK");
+            Display.Message($"CONSOLE WORK", ConsoleColor.Green);
+            string[] files = ConsoleVertion.Run();
 
-            using (OpenFileDialog openFileDialog = new OpenFileDialog
-                {
-                    Title = "Select files",
-                    Multiselect = true,
-                    Filter = "CSV files (*.csv)|*.csv",
-                    RestoreDirectory = true
-                })
+            if (files?.Length < 1)
             {
-                try
-                {
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        // START PROCESSING!!!
-                        lock (locker)
-                        {
-                            foreach (string filePath in openFileDialog.FileNames)
-                            {
-                                FileProcessingThread fileHandler = CreateFileHandlerThread(filePath);
-                                StartProcessing(fileHandler, filePath);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    DisplayMessage(string.Format("Error opening file:\n" + ex.Message, ConsoleColor.Red));
-                    return;
-                }
+                Display.WaitForContinue("Error opening one/several files", ConsoleColor.Red);
+                return;
             }
-           
-            while (_lstThread.Count > 0)
-            {
-            }
-            WaitForContinue();
+
+            foreach (var file in files) { StartProcessing(file); }
+            while (_lstThread.Count > 0) { }
+            Display.WaitForContinue();
         }
-
-
+        
 
 
         /// <summary>
@@ -113,7 +93,7 @@ namespace epam_task4
             Form emulator = emulatorWFA.FormMain.StartForm(true);
             if (emulator != null) { eThread = new EmulatorThread(emulator); }
 
-            WaitForContinue(string.Format("Run the CSV file generator in Emulator"));
+            Display.WaitForContinue(string.Format("Run the CSV file generator in Emulator"));
             Console.WriteLine("");
             Console.WriteLine("Press any key to stop the service.");
             Console.ReadKey();
@@ -122,7 +102,6 @@ namespace epam_task4
             eThread?.Close();
             UninstallService(servicePath);
         }
-
 
 
         /// <summary>
@@ -135,33 +114,6 @@ namespace epam_task4
         }
 
 
-
-
-        /// <summary>
-        /// Start processing
-        /// </summary>
-        /// <param name="fileHandler"></param>
-        /// <param name="filePath"></param>
-        private static void StartProcessing(FileProcessingThread fileHandler, string filePath)
-        {
-            try
-            {
-                if (fileHandler.Start(filePath))
-                {
-                    DisplayMessage($"{filePath}: Processing of file starting");
-                    _lstThread.Add(fileHandler);
-                    DisplayMessage($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
-                }
-                else
-                {
-                    DisplayMessage($"{filePath}: can't starting");
-                }
-            }
-            catch (Exception)
-            {
-                DisplayMessage($"{filePath}: Error starting");
-            }
-        }
 
         /// <summary>
         /// Check database availability
@@ -213,9 +165,35 @@ namespace epam_task4
         #region FILE_PROCESSING_THREAD_EVENTS
         //##################################################################################################
 
-        private static FileProcessingThread CreateFileHandlerThread(string filePath)
+        /// <summary>
+        /// Run file handler
+        /// </summary>
+        /// <param name="file"></param>
+        private static void StartProcessing(string file)
+        {
+            FileProcessingThread fileHandler = CreateFileHandlerThread();
+            try
+            {
+                if (fileHandler.Start(file))
+                {
+                    Display.Message($"{file}: Processing of file starting");
+                    _lstThread.Add(fileHandler);
+                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                }
+                else
+                {
+                    Display.Message($"{file}: can't starting");
+                }
+            }
+            catch (Exception)
+            {
+                Display.Message($"{file}: Error starting");
+            }
+        }
+
+        private static FileProcessingThread CreateFileHandlerThread()
         {            
-            FileProcessingThread fileHandler = new FileProcessingThread();
+            FileProcessingThread fileHandler = new FileProcessingThread(fns: FILE_NAME_STRUCT, fds: FILE_DATA_STRUCT);
 
             fileHandler.WorkCompleted += FileHandler_WorkCompleted;
             fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
@@ -228,30 +206,30 @@ namespace epam_task4
 
         private static void FileHandler_SendMessageEvent(object sender, string msg)
         {
-            DisplayMessage($"Thread {(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.DarkGray);
+            Display.Message($"Thread {(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.DarkGray);
         }
 
 
         private static void FileHandler_WrongProductErrorEvent(object sender, EventArgs e)
         {
-            DisplayMessage($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
+            Display.Message($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
         }
 
         private static void FileHandler_FileNamingErrorEvent(object sender, bool isSaved)
         {
-            if (isSaved) { DisplayMessage($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
-            else { DisplayMessage($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);   }            
+            if (isSaved) { Display.Message($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
+            else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);   }            
         }
 
         private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
         {
-            DisplayMessage($"{(sender as FileProcessingThread)?.Name}: Error file content", ConsoleColor.Red);
+            Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file content", ConsoleColor.Red);
         }
 
         private static void FileHandler_WorkCompleted(object sender, bool aborted)
         {
-            if (aborted) { DisplayMessage($"Processing of file {(sender as FileProcessingThread)?.Name} aborted", ConsoleColor.Red); }
-            else { DisplayMessage($"Processing of file {(sender as FileProcessingThread)?.Name} completed", ConsoleColor.Green); }
+            if (aborted) { Display.Message($"Processing of file {(sender as FileProcessingThread)?.Name} aborted", ConsoleColor.Red); }
+            else { Display.Message($"Processing of file {(sender as FileProcessingThread)?.Name} completed", ConsoleColor.Green); }
 
 
 
@@ -266,7 +244,7 @@ namespace epam_task4
                     fileHandler.SendMessageEvent -= FileHandler_SendMessageEvent;
 
                     _lstThread.Remove(fileHandler);
-                    DisplayMessage($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
                 }
 
             }            
@@ -387,48 +365,6 @@ namespace epam_task4
 
 
         #endregion // FOR_WINDOWS_SERVICE
-
-
-
-
-
-
-
-        #region DISPLAY
-        //##################################################################################################
-
-        /// <summary>
-        /// Wait push key 
-        /// </summary>
-        /// <param name="str"></param>
-        private static ConsoleKeyInfo WaitForContinue(string str = "", ConsoleColor color = ConsoleColor.Green)
-        {
-            if (!String.IsNullOrEmpty(str.Trim()))
-            {
-                Console.ForegroundColor = color;
-                Console.WriteLine(str);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue");
-            return Console.ReadKey();
-        }
-
-        private static void DisplayMessage(string str, ConsoleColor color = ConsoleColor.Green)
-        {
-            if (!string.IsNullOrWhiteSpace(str))
-            {
-                lock (locker)
-                {
-                    Console.ForegroundColor = color;
-                    Console.WriteLine(str);
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-            }
-        }
-
-
-        #endregion // DISPLAY
 
 
     }

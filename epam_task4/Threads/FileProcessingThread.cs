@@ -1,6 +1,5 @@
 ﻿using efdb.DataContexts;
 using efdb.DataModels;
-using FileParser.Models;
 using FileParser.Parsers;
 using System;
 using System.Collections.Generic;
@@ -13,12 +12,13 @@ using System.Threading;
 namespace epam_task4.Threads
 {
     internal sealed class FileProcessingThread
-    {        
+    {   
         private Thread _thread = null;
         private bool _abort = false;
 
-        private SalesFileNameDataModel _fileNameData = null;
-        IEnumerable<SalesFieldDataModel> _fileData = null;
+        private string[] _fileNameStruct = null;
+        private string[] _fileDataStruct = null;
+
         CSVParser _csvParser = null;
 
         private readonly bool _checkProductsDB = false;        
@@ -30,21 +30,70 @@ namespace epam_task4.Threads
         internal event EventHandler<bool> WorkCompleted;
         internal event EventHandler<bool> FileNamingErrorEvent;
         internal event EventHandler FileContentErrorEvent;
+        internal event EventHandler SaveToDbErrorEvent;
         internal event EventHandler<string> SendMessageEvent;
+
 
         /// <summary>
         /// CTOR
         /// </summary>
         /// <param name="filePath"></param>
-        internal FileProcessingThread()
+        internal FileProcessingThread(string[] fns, string[] fds)
         {
             Boolean.TryParse(ConfigurationManager.AppSettings["CheckManagers"], out this._checkManagersDB);
             Boolean.TryParse(ConfigurationManager.AppSettings["CheckProducts"], out this._checkProductsDB);
             Boolean.TryParse(ConfigurationManager.AppSettings["SaveProcessedFile"], out this._isSaveProcessedFile);
 
-            this._thread = new Thread(this.RunProcess);  
-            
+            //private static readonly string[] FILE_NAME_STRUCT = { "Manager", "DTG" };
+            //private static readonly string[] FILE_DATA_STRUCT = { "DTG", "Client", "Product", "Sum" };
+            this._fileDataStruct = fds;
+            this._fileNameStruct = fns;
+
+            this._thread = new Thread(this.RunProcess);              
         }
+
+
+        /// <summary>
+        /// Manager job process
+        /// </summary>
+        /// <param name="obj">product list</param>
+        private void RunProcess(object obj)
+        {
+            string filePath = (string)obj;
+            FileInfo fileInf = new FileInfo(filePath);
+            if (!fileInf.Exists) { OnFileNamingErrorEvent(false); return; }
+
+            this.Name = fileInf.Name;
+            this._thread.Name = fileInf.Name;
+
+            var fileNameData = FileNameParser.Parse(fileInf.Name, _fileNameStruct);
+            if (fileNameData?.Count() < 1) { OnFileNamingErrorEvent(false); return; }
+
+            var fileData = GetFromCSVParser(filePath);
+            if (fileData?.Count() < 1) { OnFileContentErrorEvent(); return; }
+
+            FileName fileName = null;
+            ICollection<TmpSale> tmpSales = null;
+            using (var repo = new Repository())
+            {
+                try
+                {
+                    fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileInf.Name.ToLower()));
+                    tmpSales = GetTmpSalesData(repo, fileName);
+                }
+                catch (Exception ) { }
+            }
+
+            if (fileData?.Count() != tmpSales?.Count)
+            {
+                SaveToDbErrorEvent?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+
+            SaveTmpData(fileName.Name);
+            OnWorkCompleting(this._abort);
+        }
+
 
         /// <summary>
         /// Start this Thread
@@ -76,63 +125,20 @@ namespace epam_task4.Threads
 
 
         /// <summary>
-        /// Manager job process
-        /// </summary>
-        /// <param name="obj">product list</param>
-        private void RunProcess(object obj)
-        {
-            string filePath = (string)obj;
-            FileInfo fileInf = new FileInfo(filePath);
-            if (!fileInf.Exists) { OnFileNamingErrorEvent(false); return; }
-
-            this.Name = fileInf.Name;
-            this._thread.Name = fileInf.Name;
-
-            this._fileNameData = GetFileNameData(fileInf);
-            if (this._fileNameData == null) { OnFileNamingErrorEvent(false); return; }
-
-            this._fileData = RunCSVParser(fileInf);
-
-
-
-
-
-
-
-
-
-
-            FileName fileName = null;
-            using (var repo = new Repository())
-            {
-                try
-                {
-                    fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(this._fileNameData.FileName));
-                }
-                catch (Exception ex) { }                             
-            }
-            if (fileName != null) { OnFileNamingErrorEvent(true); return; }
-
-            //IEnumerable<SalesFieldDataModel> tableRows = RunCSVParser(fileInf);
-
-            OnWorkCompleting(this._abort);
-        }
-
-
-        /// <summary>
         /// CSV Parser work process
         /// </summary>
         /// <param name="fileInf"></param>
         /// <returns></returns>
-        private IEnumerable<SalesFieldDataModel> RunCSVParser(FileInfo fileInf)
+        private IEnumerable<IDictionary<string, string>> GetFromCSVParser(string path)
         {
             this._csvParser = new CSVParser();
             this._csvParser.ParsingCompleted += CsvParser_ParsingCompleted;
-            this._csvParser.HeaderParsed += CsvParser_HeaderParsed;
-            this._csvParser.FieldParsed += CsvParser_FieldParsed;
+            this._csvParser.FieldParsed += _csvParser_FieldParsed;
             this._csvParser.ErrorParsing += CsvParser_ErrorParsing;
-            return this._csvParser.Parse(fileInf.FullName);
+            return this._csvParser.Parse(path);
         }
+
+
 
 
 
@@ -192,13 +198,7 @@ namespace epam_task4.Threads
 
         #region CSV_PARSER_EVENTS
         //############################################################################################################
-
-        /// <summary>
-        /// Table row parsed event handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="parsedData"></param>
-        private void CsvParser_FieldParsed(object sender, SalesFieldDataModel parsedData)
+        private void _csvParser_FieldParsed(object sender, IDictionary<string, string> e)
         {
             using (var repo = new Repository())
             {
@@ -211,15 +211,6 @@ namespace epam_task4.Threads
                     this.Stop();
                 }
             }
-        }
-
-        /// <summary>
-        /// Table Header parsed event handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CsvParser_HeaderParsed(object sender, SalesFieldDataModel e)
-        {
         }
 
 
@@ -244,7 +235,6 @@ namespace epam_task4.Threads
         private void CsvParser_ParsingCompleted(object sender, bool abort)
         {
             this._csvParser.ParsingCompleted -= CsvParser_ParsingCompleted;
-            this._csvParser.HeaderParsed -= CsvParser_HeaderParsed;
             this._csvParser.FieldParsed -= CsvParser_FieldParsed;
             this._csvParser.ErrorParsing -= CsvParser_ErrorParsing;
             this._csvParser = null;            
