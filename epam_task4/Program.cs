@@ -53,43 +53,44 @@ namespace epam_task4
             Console.Clear();
             DisplayMessage($"CONSOLE WORK");
 
-            try
-            {
-                using (OpenFileDialog openFileDialog = new OpenFileDialog
+            using (OpenFileDialog openFileDialog = new OpenFileDialog
                 {
                     Title = "Select files",
-                    Multiselect = true,                    
+                    Multiselect = true,
                     Filter = "CSV files (*.csv)|*.csv",
                     RestoreDirectory = true
                 })
+            {
+                try
                 {
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        // START PROCESS!!!
+                        // START PROCESSING!!!
                         lock (locker)
                         {
                             foreach (string filePath in openFileDialog.FileNames)
                             {
                                 FileProcessingThread fileHandler = CreateFileHandlerThread(filePath);
-                                fileHandler.Start(filePath);
+                                StartProcessing(fileHandler, filePath);
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    DisplayMessage(string.Format("Error opening file:\n" + ex.Message, ConsoleColor.Red));
+                    return;
+                }
             }
-            catch (Exception e)
-            {
-                DisplayMessage(string.Format("Error opening file:\n" + e.Message, ConsoleColor.Red));
-                return;
-            }
-
-            
+           
             while (_lstThread.Count > 0)
             {
             }
             WaitForContinue();
         }
-        
+
+
+
 
         /// <summary>
         /// Start as Service
@@ -136,7 +137,76 @@ namespace epam_task4
 
 
 
+        /// <summary>
+        /// Start processing
+        /// </summary>
+        /// <param name="fileHandler"></param>
+        /// <param name="filePath"></param>
+        private static void StartProcessing(FileProcessingThread fileHandler, string filePath)
+        {
+            try
+            {
+                if (fileHandler.Start(filePath))
+                {
+                    DisplayMessage($"{filePath}: Processing of file starting");
+                    _lstThread.Add(fileHandler);
+                    DisplayMessage($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                }
+                else
+                {
+                    DisplayMessage($"{filePath}: can't starting");
+                }
+            }
+            catch (Exception)
+            {
+                DisplayMessage($"{filePath}: Error starting");
+            }
+        }
 
+        /// <summary>
+        /// Check database availability
+        /// </summary>
+        /// <returns></returns>
+        private static bool CheckDbAvailability()
+        {
+            string clientName = "ClientDefault";
+            string fileName = "fileNameDefault.csv";
+            string managerName = "ManagerDefault";
+            string productName = "ProductDefault";
+
+            try
+            {
+                using (var repo = new Repository())
+                {
+                    Client client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(clientName))
+                                  ?? new Client() { Name = clientName };
+                    FileName file = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileName))
+                                  ?? new FileName() { Name = fileName, DTG = DateTime.Now };
+                    Manager manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(managerName))
+                                  ?? new Manager() { Name = managerName };
+                    Product product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(productName))
+                                  ?? new Product() { Name = productName, Cost = 0 };
+                    TmpSale sale = new TmpSale
+                    {
+                        Client = client,
+                        FileName = file,
+                        Manager = manager,
+                        Product = product,
+                        DTG = DateTime.Now,
+                        Sum = 0
+                    };
+
+                    if (!repo.Insert(sale)) { return false; };
+                    repo.Delete(client);
+                    repo.Delete(file);
+                    repo.Delete(manager);
+                    repo.Delete(product);
+                    repo.Dispose();
+                }
+            }
+            catch (Exception) { return false; }
+            return true;
+        }
 
 
 
@@ -152,9 +222,6 @@ namespace epam_task4
             fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
             fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
 
-            DisplayMessage($"{filePath}: Processing of file starting");
-            _lstThread.Add(fileHandler);
-            DisplayMessage($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
             return fileHandler;
         }
 
@@ -208,57 +275,7 @@ namespace epam_task4
         #endregion // FILE_PROCESSING_THREAD_EVENTS
 
 
-
-        /// <summary>
-        /// Check database availability
-        /// </summary>
-        /// <returns></returns>
-        private static bool CheckDbAvailability()
-        {
-
-
-
-            string clientName = "ClientDefault";
-            string fileName = "fileNameDefault.csv";
-            string managerName = "ManagerDefault";
-            string productName = "ProductDefault";
-
-            try
-            {
-                using (var repo = new Repository())
-                {
-                    Client client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(clientName))
-                                  ?? new Client() { Name = clientName };
-                    FileName file = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileName))
-                                  ?? new FileName() { Name = fileName, DTG = DateTime.Now };
-                    Manager manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(managerName))
-                                  ?? new Manager() { Name = managerName };
-                    Product product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(productName))
-                                  ?? new Product() { Name = productName, Cost = 0 };
-                    TmpSale sale = new TmpSale
-                    {
-                        Client = client,
-                        FileName = file,
-                        Manager = manager,
-                        Product = product,
-                        DTG = DateTime.Now,
-                        Sum = 0
-                    };
-
-                    if (!repo.Insert(sale)) { return false; };
-                    repo.Delete(client);
-                    repo.Delete(file);
-                    repo.Delete(manager);
-                    repo.Delete(product);
-                    repo.Dispose();
-                }
-            }
-            catch (Exception) { return false; }
-            return true;
-        }
-
-
-
+     
         #region FOR_WINDOWS_SERVICE
         //##################################################################################################
 

@@ -9,9 +9,13 @@ namespace FileParser.Models
     {
         public string FileName { get; private set; } = "";
         public string FileExtention { get; private set; } = "";
+        public string Path { get; private set; } = "";
+
 
         public string Manager { get; private set; } = "";
         public DateTime DTG { get; private set; }
+
+        
 
 
         /// <summary>

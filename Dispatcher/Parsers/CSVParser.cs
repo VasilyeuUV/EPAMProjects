@@ -1,9 +1,7 @@
-﻿using FileParser.Models;
-using Microsoft.VisualBasic.FileIO;
+﻿using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FileParser.Parsers
 {
@@ -11,17 +9,14 @@ namespace FileParser.Parsers
     {
         private bool _abort = false;   // for stop parsing
 
-        public event EventHandler<SalesFieldDataModel> HeaderParsed;
-        public event EventHandler<SalesFieldDataModel> FieldParsed;
+        public event EventHandler<IDictionary<string, string>> FieldParsed;
         public event EventHandler<bool> ParsingCompleted;
         public event EventHandler ErrorParsing;
 
         private void OnErrorParsing()
-        {
-            this._abort = true;
-            ErrorParsing?.Invoke(this, EventArgs.Empty);
-            this.Stop();
-            ParsingCompleted?.Invoke(this, this._abort);
+        {            
+            ErrorParsing?.Invoke(this, EventArgs.Empty);  
+            Stop();            
         }
 
 
@@ -37,15 +32,19 @@ namespace FileParser.Parsers
         /// <param name="filePath">CSV file</param>
         /// <param name="delimiters">array of delimiters (string[])</param>
         /// <returns>string array of string fields</returns>
-        public IEnumerable<SalesFieldDataModel> Parse(string filePath, string[] delimiters = null )
+        public IEnumerable<IDictionary<string, string>> Parse(string filePath, string[] delimiters = null )
         {
-            if (!System.IO.File.Exists(filePath)) 
-            { 
-                ErrorParsing?.Invoke(this, EventArgs.Empty);
+            System.IO.FileInfo fileInf = new System.IO.FileInfo(filePath);
+            if (!fileInf.Exists || fileInf.Extension.ToLower() != ".csv") 
+            {
+                OnErrorParsing();
+                ParsingCompleted?.Invoke(this, this._abort);
                 return null;
             }
 
-            if (delimiters == null) { delimiters = new[] { "," }; }            
+            if (delimiters == null) { delimiters = new[] { "," }; }
+
+            List<IDictionary<string, string>> lstFields = new List<IDictionary<string, string>>();
             try
             {
                 using (TextFieldParser tfp = new TextFieldParser(filePath))
@@ -53,29 +52,26 @@ namespace FileParser.Parsers
                     tfp.TextFieldType = FieldType.Delimited;
                     tfp.SetDelimiters(delimiters);
 
-                    List<SalesFieldDataModel> lstFields = new List<SalesFieldDataModel>();
                     int count = 0;
+                    string[] fieldNames = new string[0];
                     while (!tfp.EndOfData && !this._abort)
                     {
                         string[] fields = tfp.ReadFields();
 
-                        SalesFieldDataModel sfdm = CreateSFDM(fields);
-                        if (sfdm == null) 
-                        { 
-                            OnErrorParsing();
-                            return null;
+                        if (++count == 1) { fieldNames = fields; }
+                        else
+                        {
+                            IDictionary<string, string> dicField = ParseFields(fieldNames, fields);
+                            if (dicField?.Count() < 1) { OnErrorParsing(); }
+                            else { lstFields.Add(dicField); }                            
                         }
-
-                        if (++count == 1) { HeaderParsed?.Invoke(this, sfdm); continue; }
-                        else { FieldParsed?.Invoke(this, sfdm); }
-
-                        lstFields.Add(sfdm);
                     }
                     ParsingCompleted?.Invoke(this, this._abort);
-                    return lstFields.Count() < 1 ? null : lstFields;
+                    if (this._abort) { lstFields = null; }
+                    return lstFields?.Count() < 1 ? null : lstFields;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 OnErrorParsing();
                 return null;
@@ -83,21 +79,29 @@ namespace FileParser.Parsers
         }
 
         /// <summary>
-        /// Create new SFDM
+        /// Parse fields
         /// </summary>
-        /// <param name="fields"></param>
+        /// <param name="fieldNames">Columns names</param>
+        /// <param name="fields">Columns values</param>
         /// <returns></returns>
-        private SalesFieldDataModel CreateSFDM(string[] fields)
+        private IDictionary<string, string> ParseFields(string[] fieldNames, string[] fields)
         {
-            if (fields == null || fields.Length != 4) { return null; }
-
-            return new SalesFieldDataModel()
+            if (fieldNames?.Length < 1 
+                || fields?.Length < 1 
+                || fieldNames.Length != fields.Length)
             {
-                DTG = fields[0],
-                Client = fields[1],
-                Product = fields[2],
-                Cost = fields[3]
-            };
+                OnErrorParsing();
+                return null;
+            }
+
+            IDictionary<string, string> dicField = new Dictionary<string, string>();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                dicField.Add(fieldNames[i], fields[i]);
+            }
+            FieldParsed?.Invoke(this, dicField);
+
+            return dicField;
         }
     }
 }

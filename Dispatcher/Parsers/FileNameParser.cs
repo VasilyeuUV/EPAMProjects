@@ -1,26 +1,32 @@
-﻿using FileParcer.Interfaces;
-using FileParser.Models;
-using System.IO;
+﻿using System.Collections.Generic;
 
 namespace Dispatcher.Parsers
 {
-    internal class FileNameParser
+    public class FileNameParser
     {               
 
-        internal IFileNameData Parse(string filePath, int returnData = 0)
+        /// <summary>
+        /// File name Parser
+        /// </summary>
+        /// <param name="filePath">file path</param>
+        /// <param name="dataStruct"></param>
+        /// <param name="delimiters"></param>
+        /// <returns></returns>
+        internal IDictionary<string, string> Parse(string filePath, string[] dataStruct, char[] delimiters = null)
         {
-            if (string.IsNullOrWhiteSpace(filePath)) { return null; }
+            if (string.IsNullOrWhiteSpace(filePath) || dataStruct?.Length < 1) { return null; }
+            if (delimiters?.Length < 1) { delimiters = new[] { '_' }; }
 
-            FileInfo fileInf = new FileInfo(filePath);
-            if (fileInf.Exists)
+            string[] fields = filePath.Split(delimiters);
+            if (fields.Length < dataStruct.Length) { return null; }
+
+            IDictionary<string, string> fileNameData = new Dictionary<string, string>();
+            for (int i = 0; i < dataStruct.Length; i++)
             {
-                switch (returnData)
-                {
-                    case 0: return SalesFileNameDataModel.CreateInstance(fileInf);
-                    default: return null;
-                }
+                fileNameData.Add(dataStruct[i], fields[i]);
             }
-            return null;
+
+            return fileNameData.Count < 1 ? null : fileNameData;
         }
     }
 }

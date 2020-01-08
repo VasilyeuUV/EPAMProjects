@@ -18,11 +18,12 @@ namespace epam_task4.Threads
         private bool _abort = false;
 
         private SalesFileNameDataModel _fileNameData = null;
+        IEnumerable<SalesFieldDataModel> _fileData = null;
         CSVParser _csvParser = null;
 
-
-        private readonly bool _checkProductsDB;        
-        private readonly bool _checkManagersDB;
+        private readonly bool _checkProductsDB = false;        
+        private readonly bool _checkManagersDB = false;
+        private readonly bool _isSaveProcessedFile = true;
 
         internal string Name { get; private set; }
 
@@ -39,6 +40,7 @@ namespace epam_task4.Threads
         {
             Boolean.TryParse(ConfigurationManager.AppSettings["CheckManagers"], out this._checkManagersDB);
             Boolean.TryParse(ConfigurationManager.AppSettings["CheckProducts"], out this._checkProductsDB);
+            Boolean.TryParse(ConfigurationManager.AppSettings["SaveProcessedFile"], out this._isSaveProcessedFile);
 
             this._thread = new Thread(this.RunProcess);  
             
@@ -48,13 +50,15 @@ namespace epam_task4.Threads
         /// Start this Thread
         /// </summary>
         /// <param name="products"></param>
-        internal void Start(string filePath)
+        internal bool Start(string filePath)
         {
             if (!string.IsNullOrWhiteSpace(filePath))
             {
                 this._thread.IsBackground = true;
                 this._thread?.Start(filePath);
+                return true;
             }
+            return false;
         }
 
 
@@ -68,6 +72,9 @@ namespace epam_task4.Threads
 
 
 
+
+
+
         /// <summary>
         /// Manager job process
         /// </summary>
@@ -78,11 +85,22 @@ namespace epam_task4.Threads
             FileInfo fileInf = new FileInfo(filePath);
             if (!fileInf.Exists) { OnFileNamingErrorEvent(false); return; }
 
-            this._thread.Name = fileInf.Name;
             this.Name = fileInf.Name;
+            this._thread.Name = fileInf.Name;
 
             this._fileNameData = GetFileNameData(fileInf);
             if (this._fileNameData == null) { OnFileNamingErrorEvent(false); return; }
+
+            this._fileData = RunCSVParser(fileInf);
+
+
+
+
+
+
+
+
+
 
             FileName fileName = null;
             using (var repo = new Repository())
@@ -95,7 +113,7 @@ namespace epam_task4.Threads
             }
             if (fileName != null) { OnFileNamingErrorEvent(true); return; }
 
-            IEnumerable<SalesFieldDataModel> tableRows = RunCSVParser(fileInf);
+            //IEnumerable<SalesFieldDataModel> tableRows = RunCSVParser(fileInf);
 
             OnWorkCompleting(this._abort);
         }
@@ -127,19 +145,16 @@ namespace epam_task4.Threads
         /// <summary>
         /// Thread work completed event
         /// </summary>
-        /// <param name="abort"> true if thread aborted</param>
-        private void OnWorkCompleting(bool abort)
+        /// <param name="abort"></param>
+        /// <param name="canDeleteTmpData"></param>
+        private void OnWorkCompleting(bool abort, bool canDeleteTmpData = false)
         {
             this._abort = abort;
             this.Stop();
 
-            if (abort)  // delete data from temporary table
-            { 
-                lock (loker)
-                {
-                    DeleteTmpData(this._fileNameData.FileName);
-                }
-
+            if (abort && canDeleteTmpData)  // delete data from temporary table
+            {
+                DeleteTmpData(this._fileNameData.FileName);
             }  
             else { SaveTmpData(this._fileNameData.FileName); }          // save data from temporary table to main table
 
@@ -150,14 +165,14 @@ namespace epam_task4.Threads
         /// <summary>
         /// File naming error event        
         /// </summary>
-        /// <param name="isProcessed">
+        /// <param name="canDelete">
         /// true - if the file was processed earlier;
         /// false - if the file name is incorrect;
         /// </param>
-        private void OnFileNamingErrorEvent(bool isProcessed)
+        private void OnFileNamingErrorEvent(bool canDelete)
         {
-            FileNamingErrorEvent?.Invoke(this.Name, isProcessed);
-            OnWorkCompleting(true);
+            FileNamingErrorEvent?.Invoke(this.Name, canDelete);
+            OnWorkCompleting(true, canDelete);
         }
 
 

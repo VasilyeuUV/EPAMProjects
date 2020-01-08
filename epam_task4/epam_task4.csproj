@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleMenu\Task4Menu.cs" />
+    <Compile Include="Enums\EnumErrors.cs" />
     <Compile Include="Models\SaleModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
