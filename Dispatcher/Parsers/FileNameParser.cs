@@ -20,7 +20,8 @@ namespace FileParser.Parsers
                 if (string.IsNullOrWhiteSpace(filePath) || dataStruct?.Length < 1) { return null; }
                 if (delimiters?.Length < 1) { delimiters = new[] { '_' }; }
 
-                string[] fields = filePath.Split(delimiters);
+                System.IO.FileInfo fileInf = new System.IO.FileInfo(filePath);
+                string[] fields = fileInf.Name.Split(delimiters);
                 if (fields.Length < dataStruct.Length) { return null; }
 
                 IDictionary<string, string> fileNameData = new Dictionary<string, string>();

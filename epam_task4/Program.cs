@@ -215,10 +215,11 @@ namespace epam_task4
             Display.Message($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
         }
 
-        private static void FileHandler_FileNamingErrorEvent(object sender, bool isSaved)
+        private static void FileHandler_FileNamingErrorEvent(object sender, EventArgs e)
         {
-            if (isSaved) { Display.Message($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
-            else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);   }            
+            Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);
+            //if (isSaved) { Display.Message($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
+            //else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);   }            
         }
 
         private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
