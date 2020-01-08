@@ -1,8 +1,12 @@
-﻿using epam_task4.ConsoleMenu;
+﻿using efdb.DataContexts;
+using efdb.DataModels;
+using epam_task4.ConsoleMenu;
 using epam_task4.Threads;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Configuration.Install;
+using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 using System.Windows.Forms;
@@ -11,11 +15,22 @@ namespace epam_task4
 {
     class Program
     {
-        delegate void method();
+        public delegate void method();
+        private static List<FileProcessingThread> _lstThread = new List<FileProcessingThread>();
+        static object locker = new object();
 
         [STAThread]
         static void Main(string[] args)
         {
+            // INSTALL DATABASE
+            if (!CheckDbAvailability())
+            {
+                DisplayMessage("DataBase not found. Continuation of work is not possible", ConsoleColor.Red);
+                WaitForContinue();
+                return;
+            }
+
+
             // MENU
             string[] items = { "Create file", "Use Windows Service", "Exit" };
             method[] methods = new method[] { UseConsole, UseService, Exit };
@@ -35,6 +50,9 @@ namespace epam_task4
         /// </summary>
         private static void UseConsole()
         {
+            Console.Clear();
+            DisplayMessage($"CONSOLE WORK");
+
             try
             {
                 using (OpenFileDialog openFileDialog = new OpenFileDialog
@@ -48,14 +66,13 @@ namespace epam_task4
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         // START PROCESS!!!
-                        foreach (string filePath in openFileDialog.FileNames)
+                        lock (locker)
                         {
-                            FileProcessingThread fileHandler = new FileProcessingThread();
-                            fileHandler.WorkCompleted += FileHandler_WorkCompleted;
-                            fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
-                            fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
-                            DisplayMessage($"Processing of file {filePath} starting");
-                            fileHandler.Start(filePath);
+                            foreach (string filePath in openFileDialog.FileNames)
+                            {
+                                FileProcessingThread fileHandler = CreateFileHandlerThread(filePath);
+                                fileHandler.Start(filePath);
+                            }
                         }
                     }
                 }
@@ -65,7 +82,14 @@ namespace epam_task4
                 DisplayMessage(string.Format("Error opening file:\n" + e.Message, ConsoleColor.Red));
                 return;
             }
+
+            
+            while (_lstThread.Count > 0)
+            {
+            }
+            WaitForContinue();
         }
+        
 
         /// <summary>
         /// Start as Service
@@ -75,9 +99,7 @@ namespace epam_task4
             var watchFolder = ConfigurationManager.AppSettings["defaultFolder"];
             string servicePath = ConfigurationManager.AppSettings["servicePath"];
             //@"E:\_projects\epam\task4\epam_task4\fwService\bin\Debug\fwService.exe";
-
-
-
+                       
 
             // INSTALL SERVICE            
             InstallService(servicePath);
@@ -116,35 +138,124 @@ namespace epam_task4
 
 
 
+
+
         #region FILE_PROCESSING_THREAD_EVENTS
         //##################################################################################################
 
+        private static FileProcessingThread CreateFileHandlerThread(string filePath)
+        {            
+            FileProcessingThread fileHandler = new FileProcessingThread();
+
+            fileHandler.WorkCompleted += FileHandler_WorkCompleted;
+            fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
+            fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
+            fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
+
+            DisplayMessage($"{filePath}: Processing of file starting");
+            _lstThread.Add(fileHandler);
+            DisplayMessage($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+            return fileHandler;
+        }
+
+
+        private static void FileHandler_SendMessageEvent(object sender, string msg)
+        {
+            DisplayMessage($"Thread {(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.DarkGray);
+        }
+
+
         private static void FileHandler_WrongProductErrorEvent(object sender, EventArgs e)
         {
-            DisplayMessage("Error product data", ConsoleColor.Red);
+            DisplayMessage($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
         }
 
         private static void FileHandler_FileNamingErrorEvent(object sender, bool isSaved)
         {
             if (isSaved) { DisplayMessage($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
-            else { DisplayMessage("Error file name", ConsoleColor.Red);   }            
+            else { DisplayMessage($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);   }            
         }
 
         private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
         {
-            DisplayMessage("Error file content", ConsoleColor.Red);
+            DisplayMessage($"{(sender as FileProcessingThread)?.Name}: Error file content", ConsoleColor.Red);
         }
 
         private static void FileHandler_WorkCompleted(object sender, bool aborted)
         {
-            if (aborted) { WaitForContinue($"Processing of file {(sender as FileProcessingThread)?.Name} aborted"); }
-            else { WaitForContinue($"Processing of file {(sender as FileProcessingThread)?.Name} completed"); }
+            if (aborted) { DisplayMessage($"Processing of file {(sender as FileProcessingThread)?.Name} aborted", ConsoleColor.Red); }
+            else { DisplayMessage($"Processing of file {(sender as FileProcessingThread)?.Name} completed", ConsoleColor.Green); }
+
+
+
+            var fileHandler = sender as FileProcessingThread;
+            if (fileHandler != null)
+            {
+                lock (locker)
+                {
+                    fileHandler.WorkCompleted -= FileHandler_WorkCompleted;
+                    fileHandler.FileContentErrorEvent -= FileHandler_FileContentErrorEvent;
+                    fileHandler.FileNamingErrorEvent -= FileHandler_FileNamingErrorEvent;
+                    fileHandler.SendMessageEvent -= FileHandler_SendMessageEvent;
+
+                    _lstThread.Remove(fileHandler);
+                    DisplayMessage($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                }
+
+            }            
         }
 
         #endregion // FILE_PROCESSING_THREAD_EVENTS
 
 
 
+        /// <summary>
+        /// Check database availability
+        /// </summary>
+        /// <returns></returns>
+        private static bool CheckDbAvailability()
+        {
+
+
+
+            string clientName = "ClientDefault";
+            string fileName = "fileNameDefault.csv";
+            string managerName = "ManagerDefault";
+            string productName = "ProductDefault";
+
+            try
+            {
+                using (var repo = new Repository())
+                {
+                    Client client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(clientName))
+                                  ?? new Client() { Name = clientName };
+                    FileName file = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileName))
+                                  ?? new FileName() { Name = fileName, DTG = DateTime.Now };
+                    Manager manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(managerName))
+                                  ?? new Manager() { Name = managerName };
+                    Product product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(productName))
+                                  ?? new Product() { Name = productName, Cost = 0 };
+                    TmpSale sale = new TmpSale
+                    {
+                        Client = client,
+                        FileName = file,
+                        Manager = manager,
+                        Product = product,
+                        DTG = DateTime.Now,
+                        Sum = 0
+                    };
+
+                    if (!repo.Insert(sale)) { return false; };
+                    repo.Delete(client);
+                    repo.Delete(file);
+                    repo.Delete(manager);
+                    repo.Delete(product);
+                    repo.Dispose();
+                }
+            }
+            catch (Exception) { return false; }
+            return true;
+        }
 
 
 
@@ -261,6 +372,11 @@ namespace epam_task4
         #endregion // FOR_WINDOWS_SERVICE
 
 
+
+
+
+
+
         #region DISPLAY
         //##################################################################################################
 
@@ -285,10 +401,12 @@ namespace epam_task4
         {
             if (!string.IsNullOrWhiteSpace(str))
             {
-                Console.ForegroundColor = color;
-                Console.WriteLine(str);
-                Console.WriteLine(str);
-                Console.ForegroundColor = ConsoleColor.White;
+                lock (locker)
+                {
+                    Console.ForegroundColor = color;
+                    Console.WriteLine(str);
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
             }
         }
 

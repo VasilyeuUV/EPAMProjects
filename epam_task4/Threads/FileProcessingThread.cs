@@ -67,6 +67,7 @@ namespace epam_task4.Threads
         }
 
 
+
         /// <summary>
         /// Manager job process
         /// </summary>
@@ -132,7 +133,14 @@ namespace epam_task4.Threads
             this._abort = abort;
             this.Stop();
 
-            if (abort) { DeleteTmpData(this._fileNameData.FileName); }  // delete data from temporary table
+            if (abort)  // delete data from temporary table
+            { 
+                lock (loker)
+                {
+                    DeleteTmpData(this._fileNameData.FileName);
+                }
+
+            }  
             else { SaveTmpData(this._fileNameData.FileName); }          // save data from temporary table to main table
 
             WorkCompleted?.Invoke(this, abort);
@@ -149,7 +157,7 @@ namespace epam_task4.Threads
         private void OnFileNamingErrorEvent(bool isProcessed)
         {
             FileNamingErrorEvent?.Invoke(this.Name, isProcessed);
-            this.Stop();
+            OnWorkCompleting(true);
         }
 
 
@@ -159,7 +167,7 @@ namespace epam_task4.Threads
         private void OnFileContentErrorEvent()
         {
             FileContentErrorEvent?.Invoke(this, EventArgs.Empty);
-            this.Stop();
+            OnWorkCompleting(true);
         }
 
 
@@ -185,6 +193,7 @@ namespace epam_task4.Threads
                 if (!repo.Insert(sale))
                 {
                     SendMessageEvent?.Invoke(this, "Error saving temporary data");
+                    this.Stop();
                 }
             }
         }
