@@ -208,7 +208,7 @@ namespace epam_task4
                     fileHandler.ErrorEvent -= FileHandler_ErrorEvent;
 
                     _lstThread.Remove(fileHandler);
-                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.DarkGray);
                 }
             }
         }
@@ -218,7 +218,7 @@ namespace epam_task4
         {
             lock (locker)
             {
-                Display.Message($"{(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.Gray);
+                Display.Message($"{(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.Yellow);
             }
         }
 

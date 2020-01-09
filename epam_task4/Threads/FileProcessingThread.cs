@@ -15,7 +15,8 @@ namespace epam_task4.Threads
     internal sealed class FileProcessingThread
     {   
         private Thread _thread = null;
-        private bool _abort = false;
+        
+
 
         private string[] _fileNameStruct = null;
         private string[] _fileDataStruct = null;
@@ -29,6 +30,17 @@ namespace epam_task4.Threads
         private readonly bool _isSaveProcessedFile = true;
 
         internal string Name { get; private set; }
+
+        private bool _abort = false;
+        private bool Abort
+        {
+            get => _abort;
+            set
+            {
+                _abort = value;
+                OnWorkCompleting(_abort);
+            }
+        }
 
         internal event EventHandler<bool> WorkCompleted;
         internal event EventHandler<string> ErrorEvent;
@@ -59,7 +71,7 @@ namespace epam_task4.Threads
         internal void Stop()
         {
             this._csvParser?.Stop();
-            this._abort = true;
+            this.Abort = true;
         }
 
 
@@ -122,7 +134,7 @@ namespace epam_task4.Threads
             }
 
             SaveTmpData(fileName.Name);
-            OnWorkCompleting(this._abort);
+            OnWorkCompleting(this.Abort);
         }
 
 
@@ -257,7 +269,6 @@ namespace epam_task4.Threads
         /// <param name="deleteTmpData">true - if data was saved to database</param>
         private void OnWorkCompleting(bool abort)
         {
-            this.Stop();
             WorkCompleted?.Invoke(this, abort);
         }
 
@@ -308,9 +319,9 @@ namespace epam_task4.Threads
                     ErrorEvent?.Invoke(this, msg[n]);
                     break;
                 default: return;
-            }
-            if (deleteTmpData) { DeleteTmpData(this._fnsm); }            
-            this.Stop();
+            }            
+            if (deleteTmpData) { DeleteTmpData(this._fnsm); }
+            Stop();
         }
 
         #endregion
@@ -540,7 +551,7 @@ namespace epam_task4.Threads
             sale.FileName = GetFromDB<FileName>(repo, this._fnsm.FileName);
             if (sale.FileName.DTG == new DateTime()) { sale.FileName.DTG = this._fnsm.DTG; }
 
-            if (this._abort == true) { sale = null; }
+            if (this.Abort == true) { sale = null; }
             return sale;
         }
 
