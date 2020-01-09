@@ -176,13 +176,8 @@ namespace epam_task4
             lock (locker)
             {
                 FileProcessingThread fileHandler = new FileProcessingThread(fns: FILE_NAME_STRUCT, fds: FILE_DATA_STRUCT);
-
                 fileHandler.WorkCompleted += FileHandler_WorkCompleted;
                 fileHandler.ErrorEvent += FileHandler_ErrorEvent;
-                //fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
-                //fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
-                //fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
-
                 return fileHandler;
             }
         }
@@ -208,7 +203,7 @@ namespace epam_task4
                     fileHandler.ErrorEvent -= FileHandler_ErrorEvent;
 
                     _lstThread.Remove(fileHandler);
-                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.DarkGray);
+                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
                 }
             }
         }
