@@ -74,8 +74,13 @@ namespace fwService
         {
             try
             {
-                ServiceController sc = new ServiceController("FWService");
-                sc.Start();
+                using (ServiceController sc = new ServiceController("FWService"))
+                {
+                    //string[] args = new string[1];
+                    //args[0] = "watchedfolder";
+                    sc.Start(/*args*/);
+                };
+                
             }
             catch (System.Exception)
             {
@@ -96,6 +101,7 @@ namespace fwService
                 this.serviceInstallerFW.BeforeUninstall -= ServiceInstaller_BeforeUninstall;
                 ServiceController sc = new ServiceController("FWService");
                 sc.Stop();
+                sc.Dispose();
             }
             catch (System.Exception)
             {

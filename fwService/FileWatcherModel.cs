@@ -1,4 +1,5 @@
-﻿using System;
+﻿using fwService.Constants;
+using System;
 using System.IO;
 using System.Threading;
 
@@ -10,12 +11,11 @@ namespace fwService
         public FileSystemWatcher Watcher => _watcher;
 
 
-        private object obj = new object();          // some object for lock
+        
         private bool enabled = true;                // work will continue as long as the this variable is true
 
         public event EventHandler<string> NewFileDetectedEvent;
 
-        private string _logFile = @"D:\fwLogFile.txt";
 
         
 
@@ -44,7 +44,7 @@ namespace fwService
             }
             catch (Exception e)
             {
-                RecordEntry("Error created Watcher" + e.Message);
+                FWMessage.RecordEntry("Error created Watcher" + e.Message);
             }
         }
 
@@ -57,9 +57,10 @@ namespace fwService
         {
             try
             {
-                FileWatcherModel logger = new FileWatcherModel();
-                logger._watcher.Path = path;                
-                return logger;
+                FileWatcherModel fwm = new FileWatcherModel();
+                fwm._watcher.Path = path;
+                FWMessage.RecordEntry($"watching folder {path}", "watcher");
+                return fwm;
             }
             catch (Exception)
             {
@@ -73,7 +74,7 @@ namespace fwService
         public void Start()
         {            
             _watcher.EnableRaisingEvents = true;         // Begin watching
-            RecordEntry("Begin watching", "watcher");
+            FWMessage.RecordEntry("Begin watching", "watcher");
             while (enabled)
             {
                 Thread.Sleep(1000);
@@ -87,43 +88,9 @@ namespace fwService
         {
             _watcher.EnableRaisingEvents = false;
             enabled = false;
-            RecordEntry("Stop", "watcher");
+            FWMessage.RecordEntry("Stop", "watcher");
         }
 
-        /// <summary>
-        /// Save event result
-        /// </summary>
-        /// <param name="fileEvent"></param>
-        /// <param name="filePath"></param>
-        internal void RecordEntry(string fileEvent, string filePath)
-        {
-            lock (obj)
-            {
-                using (StreamWriter writer = new StreamWriter(_logFile, true))
-                {
-                    writer.WriteLine(string.Format("{0}: File {1} was {2}",
-                        DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"), filePath, fileEvent));
-                    writer.Flush();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Save event result
-        /// </summary>
-        /// <param name="logEvent"></param>
-        internal void RecordEntry(string logEvent)
-        {
-            lock (obj)
-            {
-                using (StreamWriter writer = new StreamWriter(_logFile, true))
-                {
-                    writer.WriteLine(string.Format("{0}: {1}",
-                        DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"), logEvent));
-                    writer.Flush();
-                }
-            }
-        }
 
         /// <summary>
         /// Chechk for file ready to use
@@ -139,8 +106,7 @@ namespace fwService
                 using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
                     return inputStream.Length > 0;
-                }
-                    
+                }                    
             }
             catch (Exception)
             {
@@ -165,15 +131,15 @@ namespace fwService
             string filePath = e.FullPath;
             if (IsFileReady(filePath)) 
             {
-                string fileEvent = "changed";                
-                RecordEntry(fileEvent, filePath);
+                string fileEvent = "changed";
+                FWMessage.RecordEntry(fileEvent, filePath);
                 NewFileDetectedEvent?.Invoke(this, filePath);
 
                 Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
             } 
             else
             {
-                RecordEntry("0", filePath);
+                FWMessage.RecordEntry("0", filePath);
             }
         }
 
@@ -187,7 +153,7 @@ namespace fwService
         {
             string fileEvent = "added";
             string filePath = e.FullPath;
-            RecordEntry(fileEvent, filePath);
+            FWMessage.RecordEntry(fileEvent, filePath);
         }
 
 
@@ -200,7 +166,7 @@ namespace fwService
         {
             string fileEvent = "deleted";
             string filePath = e.FullPath;
-            RecordEntry(fileEvent, filePath);
+            FWMessage.RecordEntry(fileEvent, filePath);
         }
 
         /// <summary>
@@ -212,7 +178,7 @@ namespace fwService
         {
             string fileEvent = "renamed to " + e.FullPath;
             string filePath = e.OldFullPath;
-            RecordEntry(fileEvent, filePath);
+            FWMessage.RecordEntry(fileEvent, filePath);
         }
 
         #endregion //EVENT HANDLERS

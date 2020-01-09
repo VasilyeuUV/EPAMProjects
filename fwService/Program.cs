@@ -1,4 +1,5 @@
-﻿using System.Configuration.Install;
+﻿using fwService.Constants;
+using System.Configuration.Install;
 using System.ServiceProcess;
 
 namespace fwService
@@ -10,55 +11,21 @@ namespace fwService
         /// </summary>
         static void Main(string[] args)
         {
+            //FWMessage.RecordEntry($"Main: args.Length = {args.Length}");
+            //if (args.Length > 0)
+            //{
+            //    for (int i = 0; i < args.Length; i++)
+            //    {
+            //        FWMessage.RecordEntry(i.ToString(), args[i]);
+            //    }
+            //}
+
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new FWService(args)
             };
             ServiceBase.Run(ServicesToRun);
-
-
-
-            //if (Environment.UserInteractive == false)
-            //{
-            //    Console.WriteLine("Run service");
-
-            //    Console.ReadKey();
-            //}
-            //else
-            //{
-            //    if (uac(args[0])) {
-            //        ManagedInstallerClass.InstallHelper(new[] { Assembly.GetExecutingAssembly().Location });
-            //    }                
-            //}
         }
-
-        //static bool uac(string data)
-        //{
-        //    WindowsPrincipal pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
-        //    bool hasAdministrativeRight = pricipal.IsInRole(WindowsBuiltInRole.Administrator);
-        //    if (hasAdministrativeRight == false)
-        //    {
-        //        Console.WriteLine("Haven't Administrative right");
-        //        //ProcessStartInfo processInfo = new ProcessStartInfo();
-        //        //processInfo.Verb = "runas";
-        //        //processInfo.FileName = Application.ExecutablePath;
-        //        //try
-        //        //{
-        //        //    processInfo.Arguments = data;
-        //        //    Process.Start(processInfo);
-        //        //}
-        //        //catch ()
-        //        //{
-
-        //        //}
-        //        //Application.Exit();
-        //        return false;
-        //    }
-        //    else { return true; }
-        //}
-
-
-
     }
 }

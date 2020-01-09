@@ -1,4 +1,6 @@
-﻿using System;
+﻿using fwService.Constants;
+using System;
+using System.Configuration;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -7,9 +9,9 @@ namespace fwService
     public partial class FWService : ServiceBase
     {
         private FileWatcherModel _fwModel;
-        private string _watchedFolder = @"D:\epam_temp";
+        private string _watchedFolderDefault = ConfigurationManager.AppSettings["WatcherFolder"];
+        private string _logFile = ConfigurationManager.AppSettings["LogFile"];
 
-        public event EventHandler<string> SendMessage;
         public event EventHandler<string> NewFileDetectedEvent;
 
         /// <summary>
@@ -21,7 +23,18 @@ namespace fwService
 
             this.CanStop = true;                    // service can be stopped
             this.CanPauseAndContinue = true;        // service can be paused and then continued
-            this.AutoLog = true;                    // service can record to the log            
+            this.AutoLog = true;                    // service can record to the log   
+
+
+            //FWMessage.RecordEntry($"FWService: args.Length = {args.Length}");
+            //if (args.Length > 0)
+            //{
+            //    for (int i = 0; i < args.Length; i++)
+            //    {
+            //        FWMessage.RecordEntry(i.ToString(), args[i]);
+            //    }
+            //}
+
         }
 
 
@@ -31,15 +44,36 @@ namespace fwService
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            _watchedFolder = CheckFolder(_watchedFolder);
+            string watchedFolder = _watchedFolderDefault;
+            FWMessage.LogFile = _logFile;
 
-            if (!string.IsNullOrWhiteSpace(_watchedFolder))
+            //FWMessage.RecordEntry($"FWService: Args.Length = {args.Length}");
+            //if (args.Length > 0)
+            //{
+            //    for (int i = 0; i < args.Length; i++)
+            //    {
+            //        FWMessage.RecordEntry(i.ToString(), args[i]);
+            //    }
+
+            //    watchedFolder = CheckFolder(args[0]);
+            //}
+            if (string.IsNullOrWhiteSpace(watchedFolder))
+            {
+                watchedFolder = CheckFolder(_watchedFolderDefault);
+            }
+            FWMessage.RecordEntry($"Folder: {watchedFolder}");
+
+            if (!string.IsNullOrWhiteSpace(watchedFolder))
             {                
-                _fwModel = FileWatcherModel.CreateInstance(_watchedFolder);
-                _fwModel.NewFileDetectedEvent += _logger_NewFileDetectedEvent; ;
-                SendMessage?.Invoke(this, "Service starting");
-                Thread loggerThread = new Thread(new ThreadStart(_fwModel.Start));
-                loggerThread.Start();
+                _fwModel = FileWatcherModel.CreateInstance(watchedFolder);
+                _fwModel.NewFileDetectedEvent += _logger_NewFileDetectedEvent;
+                FWMessage.RecordEntry($"Service starting. Watching folder: {watchedFolder}");
+                Thread fwServiceThread = new Thread(new ThreadStart(_fwModel.Start));
+                fwServiceThread.Start();
+            }
+            else
+            {
+                FWMessage.RecordEntry($"Service starting Error. Not watching folder.");
             }
         }
 
@@ -65,7 +99,7 @@ namespace fwService
             try
             {
                 dirInfo = System.IO.Directory.CreateDirectory(path);
-                return dirInfo.FullName;
+                return dirInfo?.FullName;
             }
             catch (Exception)
             {
@@ -80,7 +114,7 @@ namespace fwService
         {
             _fwModel?.Stop();
             Thread.Sleep(1000);
-            SendMessage?.Invoke(this, "Service stopped");
+            FWMessage.RecordEntry($"Service stopped.");
         }
 
     }

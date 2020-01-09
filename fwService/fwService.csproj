@@ -52,6 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -65,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\EnumChanges.cs" />
+    <Compile Include="Constants\FWMessage.cs" />
     <Compile Include="FileWatcherModel.cs" />
     <Compile Include="FWService.cs">
       <SubType>Component</SubType>
