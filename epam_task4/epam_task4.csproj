@@ -74,7 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\EmulatorThread.cs" />
     <Compile Include="Threads\FileProcessingThread.cs" />
-    <Compile Include="WorkVersions\ConsoleVertion.cs" />
+    <Compile Include="WorkVersions\OpenFileVertion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

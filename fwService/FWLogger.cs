@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace fwService
 {
-    internal class FWLogger
+    public class FWLogger
     {
         private FileSystemWatcher _watcher;         // Watcher
         public FileSystemWatcher Watcher => _watcher;
@@ -54,7 +54,7 @@ namespace fwService
         /// </summary>
         /// <param name="watchedFolder"></param>
         /// <returns></returns>
-        internal static FWLogger CreateInstance(string path)
+        public static FWLogger CreateInstance(string path)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace fwService
         /// <summary>
         /// We will track changes in the folder through the FileSystemWatcher object.
         /// </summary>
-        internal void Start()
+        public void Start()
         {            
             _watcher.EnableRaisingEvents = true;         // Begin watching
             RecordEntry("Begin watching", "watcher");
@@ -84,7 +84,7 @@ namespace fwService
         /// <summary>
         /// Stop track changes in folder
         /// </summary>
-        internal void Stop()
+        public void Stop()
         {
             _watcher.EnableRaisingEvents = false;
             enabled = false;
@@ -168,6 +168,8 @@ namespace fwService
             {
                 string fileEvent = "changed";                
                 RecordEntry(fileEvent, filePath);
+                NewFileDetectedEvent?.Invoke(e.FullPath);
+
             } 
             else
             {

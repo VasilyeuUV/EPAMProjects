@@ -3,6 +3,7 @@ using efdb.DataModels;
 using epam_task4.ConsoleMenu;
 using epam_task4.Threads;
 using epam_task4.WorkVersions;
+using fwService;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -35,10 +36,9 @@ namespace epam_task4
                 return;
             }
 
-
             // MENU
-            string[] items = { "Create file", "Use Windows Service", "Exit" };
-            method[] methods = new method[] { UseConsole, UseService, Exit };
+            string[] items = { "Create file", "Use Console", "Use Windows Service", "Exit" };
+            method[] methods = new method[] { RunOpenFileVertion, RunConsoleVertion, RunServiceVertion, Exit };
             Task4Menu menu = new Task4Menu(items);
             int menuResult;
             do
@@ -50,14 +50,15 @@ namespace epam_task4
         }
 
 
+
         /// <summary>
-        /// Start as Console
+        /// Start OpenFileVertion
         /// </summary>
-        private static void UseConsole()
+        private static void RunOpenFileVertion()
         {
             Console.Clear();
-            Display.Message($"CONSOLE WORK", ConsoleColor.Green);
-            string[] files = ConsoleVertion.Run();
+            Display.Message($"OPEN_FILE_VERTION WORK", ConsoleColor.Green);
+            string[] files = OpenFileVertion.Run();
 
             if (files == null || files.Length < 1)
             {
@@ -66,23 +67,63 @@ namespace epam_task4
             }
             foreach (var file in files) { StartProcessing(file); }
 
-            while (true) 
+            while (true)
             {
                 if (_lstThread.Count < 1)
                 {
                     Thread.Sleep(500);
                     break;
-                }                
+                }
             }
             Display.WaitForContinue();
         }
+
+        /// <summary>
+        /// Start Console Vertion
+        /// </summary>
+        private static void RunConsoleVertion()
+        {
+            Console.Clear();
+            Display.Message($"CONSOLE_VERTION WORK", ConsoleColor.Green);
+
+            var watchFolder = ConfigurationManager.AppSettings["defaultFolder"];
+
+            FWLogger fwLogger = FWLogger.CreateInstance(watchFolder);
+            fwLogger.NewFileDetectedEvent += FwLogger_NewFileDetectedEvent;
+            Thread fwThread = new Thread(new ThreadStart(fwLogger.Start));
+            fwThread.Start();
+
+            // START EMULATOR
+            EmulatorThread eThread = null;
+            Form emulator = emulatorWFA.FormMain.StartForm(true);
+            if (emulator != null) { eThread = new EmulatorThread(emulator); }
+
+            do
+            {
+                while (!Console.KeyAvailable)
+                {                    
+                }
+            } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+            fwLogger.NewFileDetectedEvent -= FwLogger_NewFileDetectedEvent;
+            fwLogger.Stop();
+
+            Console.Clear();
+            eThread?.Close();
+        }
+
+        private static void FwLogger_NewFileDetectedEvent(string file)
+        {
+            StartProcessing(file);
+        }
+
+
         
 
 
         /// <summary>
         /// Start as Service
         /// </summary>
-        private static void UseService()
+        private static void RunServiceVertion()
         {
             var watchFolder = ConfigurationManager.AppSettings["defaultFolder"];
             string servicePath = ConfigurationManager.AppSettings["servicePath"];
@@ -116,8 +157,8 @@ namespace epam_task4
         /// </summary>
         private static void Exit()
         {
-            Console.WriteLine("Press any key to Exit");
-            Console.ReadKey();
+            //Console.WriteLine("Press any key to Exit");
+            //Console.ReadKey();
         }
 
 
@@ -146,7 +187,7 @@ namespace epam_task4
         /// Run file handler
         /// </summary>
         /// <param name="file"></param>
-        private static void StartProcessing(string file)
+        internal static void StartProcessing(string file)
         {
             lock (locker)
             {
