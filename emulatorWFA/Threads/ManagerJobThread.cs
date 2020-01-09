@@ -14,6 +14,7 @@ namespace emulatorWFA.Threads
         private Thread _thread = null;
         private string _folder = "";
         private bool _canceled = false;
+        private DateTime _startData;
 
         internal string Name 
         {
@@ -41,9 +42,10 @@ namespace emulatorWFA.Threads
         /// </summary>
         /// <param name="name">Manager name</param>
         /// <param name="folder"></param>
-        internal ManagerJobThread(string name, string folder)
+        internal ManagerJobThread(string name, string folder, DateTime startDate)
         {
-            this._folder = folder;           
+            this._folder = folder;
+            this._startData = startDate;
 
             this._thread = new Thread(this.RunProcess);
             this.Name = name;
@@ -78,8 +80,8 @@ namespace emulatorWFA.Threads
         private void RunProcess(object obj)
         {
             Dictionary<string, int> products = (Dictionary<string, int>)obj;
-            int day = 23;
-            DateTime startData = new DateTime(2019, 12, day, 4, 0, 0);
+            int day = this._startData.Day;
+            DateTime startData = new DateTime(this._startData.Year, this._startData.Month, day, 4, 0, 0);
 
             while (startData <= DateTime.Now.AddDays(-1) && !this._canceled)
             {
@@ -92,7 +94,7 @@ namespace emulatorWFA.Threads
                     SendReport(startData, sales, i + 1);
                 }
                 day = ++day > 28 ? 1 : day;
-                startData = new DateTime(2019, 12, day, 4, 0, 0);
+                startData = new DateTime(this._startData.Year, this._startData.Month, day, 4, 0, 0);
             }
             ThreadCompleted(this, this._canceled);
         }

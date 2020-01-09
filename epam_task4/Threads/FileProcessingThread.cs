@@ -154,24 +154,7 @@ namespace epam_task4.Threads
             return this._csvParser.Parse(path);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                     
 
 
         #region FILENAME_PARSING

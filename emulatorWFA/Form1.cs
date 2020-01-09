@@ -66,7 +66,7 @@ namespace emulatorWFA
                 flag = !flag;
                 Dictionary<string, int> usingProducts = flag ? goods : products;
 
-                ManagerJobThread managerJobThread = new ManagerJobThread(manager, tbWatchedFolder.Text);
+                ManagerJobThread managerJobThread = new ManagerJobThread(manager, tbWatchedFolder.Text, dtpStartData.Value.Date);
                 managerJobThread.FileSended += ManagerJobThread_FileSended;
                 managerJobThread.ThreadCompleted += ManagerJobThread_ThreadCompleted;
                 managerJobThread.Start(usingProducts);

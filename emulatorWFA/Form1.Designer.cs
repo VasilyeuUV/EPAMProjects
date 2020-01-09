@@ -168,6 +168,7 @@
             this.btnStopProcess = new System.Windows.Forms.ToolStripButton();
             this.tbLog = new System.Windows.Forms.TextBox();
             this.tpDB = new System.Windows.Forms.TabPage();
+            this.dtpStartData = new System.Windows.Forms.DateTimePicker();
             this.tcMain.SuspendLayout();
             this.tpInstall.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scMain)).BeginInit();
@@ -741,6 +742,7 @@
             // 
             // gbSettings
             // 
+            this.gbSettings.Controls.Add(this.dtpStartData);
             this.gbSettings.Controls.Add(this.checkCost);
             this.gbSettings.Controls.Add(this.checkDate);
             this.gbSettings.Controls.Add(this.checkProducts);
@@ -759,7 +761,7 @@
             this.checkCost.Checked = true;
             this.checkCost.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkCost.Enabled = false;
-            this.checkCost.Location = new System.Drawing.Point(6, 108);
+            this.checkCost.Location = new System.Drawing.Point(6, 136);
             this.checkCost.Name = "checkCost";
             this.checkCost.Size = new System.Drawing.Size(108, 21);
             this.checkCost.TabIndex = 3;
@@ -771,7 +773,7 @@
             this.checkDate.AutoSize = true;
             this.checkDate.Checked = true;
             this.checkDate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkDate.Location = new System.Drawing.Point(6, 81);
+            this.checkDate.Location = new System.Drawing.Point(6, 109);
             this.checkDate.Name = "checkDate";
             this.checkDate.Size = new System.Drawing.Size(110, 21);
             this.checkDate.TabIndex = 2;
@@ -783,7 +785,7 @@
             this.checkProducts.AutoSize = true;
             this.checkProducts.Checked = true;
             this.checkProducts.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkProducts.Location = new System.Drawing.Point(6, 54);
+            this.checkProducts.Location = new System.Drawing.Point(6, 82);
             this.checkProducts.Name = "checkProducts";
             this.checkProducts.Size = new System.Drawing.Size(136, 21);
             this.checkProducts.TabIndex = 1;
@@ -795,7 +797,7 @@
             this.checkManagers.AutoSize = true;
             this.checkManagers.Checked = true;
             this.checkManagers.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkManagers.Location = new System.Drawing.Point(6, 27);
+            this.checkManagers.Location = new System.Drawing.Point(6, 55);
             this.checkManagers.Name = "checkManagers";
             this.checkManagers.Size = new System.Drawing.Size(143, 21);
             this.checkManagers.TabIndex = 0;
@@ -874,6 +876,13 @@
             this.tpDB.TabIndex = 2;
             this.tpDB.Text = "DataBase";
             this.tpDB.UseVisualStyleBackColor = true;
+            // 
+            // dtpStartData
+            // 
+            this.dtpStartData.Location = new System.Drawing.Point(6, 27);
+            this.dtpStartData.Name = "dtpStartData";
+            this.dtpStartData.Size = new System.Drawing.Size(178, 22);
+            this.dtpStartData.TabIndex = 4;
             // 
             // FormMain
             // 
@@ -977,6 +986,7 @@
         private System.Windows.Forms.ToolStripButton btnStartProcess;
         private System.Windows.Forms.ToolStripButton btnStopProcess;
         private System.Windows.Forms.TextBox tbLog;
+        private System.Windows.Forms.DateTimePicker dtpStartData;
     }
 }
 
