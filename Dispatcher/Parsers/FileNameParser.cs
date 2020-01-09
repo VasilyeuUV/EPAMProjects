@@ -18,7 +18,7 @@ namespace FileParser.Parsers
             lock (locker)
             {
                 if (string.IsNullOrWhiteSpace(filePath) || dataStruct?.Length < 1) { return null; }
-                if (delimiters?.Length < 1) { delimiters = new[] { '_' }; }
+                if (delimiters == null || delimiters.Length < 1) { delimiters = new[] { '_' }; }
 
                 System.IO.FileInfo fileInf = new System.IO.FileInfo(filePath);
                 string[] fields = fileInf.Name.Split(delimiters);

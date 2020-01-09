@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using FileParser.Enums;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,11 @@ namespace FileParser.Parsers
 
         public event EventHandler<IDictionary<string, string>> FieldParsed;
         public event EventHandler<bool> ParsingCompleted;
-        public event EventHandler ErrorParsing;
+        public event EventHandler<EnumErrors> ErrorParsing;
 
-        private void OnErrorParsing()
+        private void OnErrorParsing(EnumErrors error)
         {            
-            ErrorParsing?.Invoke(this, EventArgs.Empty);  
+            ErrorParsing?.Invoke(this, error);  
             Stop();            
         }
 
@@ -37,12 +38,12 @@ namespace FileParser.Parsers
             System.IO.FileInfo fileInf = new System.IO.FileInfo(filePath);
             if (!fileInf.Exists || fileInf.Extension.ToLower() != ".csv") 
             {
-                OnErrorParsing();
+                OnErrorParsing(EnumErrors.fileNameError);
                 ParsingCompleted?.Invoke(this, this._abort);
                 return null;
             }
 
-            if (delimiters == null) { delimiters = new[] { "," }; }
+            if (delimiters == null || delimiters.Length < 1) { delimiters = new[] { "," }; }
 
             List<IDictionary<string, string>> lstFields = new List<IDictionary<string, string>>();
             try
@@ -62,8 +63,15 @@ namespace FileParser.Parsers
                         else
                         {
                             IDictionary<string, string> dicField = ParseFields(fieldNames, fields);
-                            if (dicField?.Count() < 1) { OnErrorParsing(); }
-                            else { lstFields.Add(dicField); }                            
+                            if (dicField == null) 
+                            { 
+                                OnErrorParsing(EnumErrors.fileContentError); 
+                            }
+                            else 
+                            { 
+                                lstFields.Add(dicField);
+                                FieldParsed?.Invoke(this, dicField);
+                            }                            
                         }
                     }
                     ParsingCompleted?.Invoke(this, this._abort);
@@ -73,7 +81,7 @@ namespace FileParser.Parsers
             }
             catch (Exception)
             {
-                OnErrorParsing();
+                OnErrorParsing(EnumErrors.fileParseError);
                 return null;
             }
         }
@@ -86,11 +94,10 @@ namespace FileParser.Parsers
         /// <returns></returns>
         private IDictionary<string, string> ParseFields(string[] fieldNames, string[] fields)
         {
-            if (fieldNames?.Length < 1 
-                || fields?.Length < 1 
+            if (fieldNames == null || fieldNames.Length < 1 
+                || fields == null || fields.Length < 1 
                 || fieldNames.Length != fields.Length)
             {
-                OnErrorParsing();
                 return null;
             }
 
@@ -99,8 +106,6 @@ namespace FileParser.Parsers
             {
                 dicField.Add(fieldNames[i], fields[i]);
             }
-            FieldParsed?.Invoke(this, dicField);
-
             return dicField;
         }
     }

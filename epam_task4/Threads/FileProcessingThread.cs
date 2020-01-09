@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -31,7 +30,7 @@ namespace epam_task4.Threads
         internal string Name { get; private set; }
 
         internal event EventHandler<bool> WorkCompleted;
-        internal event EventHandler FileNamingErrorEvent;
+        internal event EventHandler<bool> FileNamingErrorEvent;
         internal event EventHandler FileContentErrorEvent;
         internal event EventHandler SaveToDbErrorEvent;
         internal event EventHandler<string> SendMessageEvent;
@@ -62,23 +61,23 @@ namespace epam_task4.Threads
         /// <param name="obj">product list</param>
         private void RunProcess(object obj)
         {
-            string filePath = (string)obj;
-            
-            var fileNameData = FileNameParser.Parse(filePath, this._fileNameStruct);
-            if (fileNameData?.Count() < 1) { OnFileNamingErrorEvent(); return; }
+            string filePath = (string)obj;          
 
-            this._fnsm = FileNameSaleModel.CreateInstance(filePath, fileNameData);
-            if (this._fnsm == null) { OnFileNamingErrorEvent(); return; }
+
+            // PARSE FILE NAME
+            this._fnsm = GetFileNameData(filePath);
+            if (this._fnsm == null) { return; }
 
             this.Name = this._fnsm.FileName;
             this._thread.Name = this._fnsm.FileName;
+            
 
-            //this._lstSM = GetFromCSVParser(filePath);
-            //if (_lstSM?.Count() < 1) { OnFileContentErrorEvent(); return; }
+            // PARSE FILE CONTENT
+            var fileData = GetFileContentData(filePath);
+            if (fileData == null || fileData.Count() < 1) { OnFileContentErrorEvent(); return; }
 
-            var fileData = GetFromCSVParser(filePath);
-            if (fileData?.Count() < 1) { OnFileContentErrorEvent(); return; }
-
+            
+            // CHECK CORRECT FILE CONTENT PARSING
             FileName fileName = null;
             ICollection<TmpSale> tmpSales = null;
             using (var repo = new Repository())
@@ -86,7 +85,7 @@ namespace epam_task4.Threads
                 try
                 {
                     fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(this._fnsm.FileName.ToLower()));
-                    tmpSales = GetTmpSalesData(repo, fileName);
+                    tmpSales = GetTmpSalesData<TmpSale>(repo, fileName);
                 }
                 catch (Exception ) { }
             }
@@ -99,6 +98,39 @@ namespace epam_task4.Threads
 
             SaveTmpData(fileName.Name);
             OnWorkCompleting(this._abort);
+        }
+
+
+        /// <summary>
+        /// Check if data is saved in database from file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private bool CheckIfDataSaved(string fName)
+        {
+            List<Sale> sales = null;
+            using (var repo = new Repository())
+            {
+                try
+                {
+                    FileName fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fName.ToLower()));
+                    sales = GetTmpSalesData<Sale>(repo, fileName);
+                }
+                catch (Exception) { }
+            }
+            return sales != null;
+        }
+
+        private FileName GetFileNameFromDB(Repository repo, string fname)
+        {
+            try
+            {
+                return repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fname.ToLower()));
+            }
+            catch (Exception)
+            {
+                return null;
+            }            
         }
 
 
@@ -136,17 +168,53 @@ namespace epam_task4.Threads
         /// </summary>
         /// <param name="fileInf"></param>
         /// <returns></returns>
-        //private IEnumerable<IDictionary<string, string>> GetFromCSVParser(string path)
-        private IEnumerable<IDictionary<string, string>> GetFromCSVParser(string path)
+        //private IEnumerable<IDictionary<string, string>> GetFileContentData(string path)
+        private IEnumerable<IDictionary<string, string>> GetFileContentData(string path)
         {
             this._csvParser = new CSVParser();
             this._csvParser.ParsingCompleted += CsvParser_ParsingCompleted;
             this._csvParser.FieldParsed += _csvParser_FieldParsed;
-            this._csvParser.ErrorParsing += CsvParser_ErrorParsing;
+            this._csvParser.ErrorParsing += _csvParser_ErrorParsing;           
 
             return this._csvParser.Parse(path);
         }
 
+
+
+
+
+        #region PARSING
+        //############################################################################################################
+
+        /// <summary>
+        /// Get file name data
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private FileNameSaleModel GetFileNameData(string filePath)
+        {
+            this.Name = filePath;
+
+            var fileNameData = FileNameParser.Parse(filePath, this._fileNameStruct);
+            if (fileNameData == null
+                || fileNameData.Count() != this._fileNameStruct.Length)
+            {
+                OnFileNamingErrorEvent();
+                return null;
+            }
+
+            FileNameSaleModel fnsm = FileNameSaleModel.CreateInstance(filePath, fileNameData);
+            if (fnsm == null) { OnFileNamingErrorEvent(); return null; }
+            if (CheckIfDataSaved(fnsm.FileName))
+            {
+                bool fileSaved = true;
+                OnFileNamingErrorEvent(fileSaved);
+                return null;
+            }
+            return fnsm;
+        }
+
+        #endregion // PARSING
 
 
 
@@ -160,13 +228,13 @@ namespace epam_task4.Threads
         /// <summary>
         /// Thread work completed event
         /// </summary>
-        /// <param name="abort"></param>
-        /// <param name="canDeleteTmpData"></param>
-        private void OnWorkCompleting(bool abort)
+        /// <param name="abort">true - if thread was being aborted</param>
+        /// <param name="isSaved">true - if data was saved to database</param>
+        private void OnWorkCompleting(bool abort, bool isSaved = false)
         {
             this._abort = abort;
             this.Stop();
-            if (abort) { DeleteTmpData(this._fnsm.FileName); } // delete data from temporary table
+            if (abort && !isSaved) { DeleteTmpData(this._fnsm); }   // delete data from temporary table
             WorkCompleted?.Invoke(this, abort);
         }
 
@@ -174,14 +242,14 @@ namespace epam_task4.Threads
         /// <summary>
         /// File naming error event        
         /// </summary>
-        /// <param name="canDelete">
-        /// true - if the file was processed earlier;
-        /// false - if the file name is incorrect;
+        /// <param name="isSaved">
+        /// true - file was saved to db earlier;
+        /// false - (default) incorrect file name;
         /// </param>
-        private void OnFileNamingErrorEvent()
+        private void OnFileNamingErrorEvent(bool isSaved = false)
         {
-            FileNamingErrorEvent?.Invoke(this.Name, EventArgs.Empty);
-            OnWorkCompleting(true);
+            FileNamingErrorEvent?.Invoke(this, isSaved);
+            OnWorkCompleting(true, isSaved);
         }
 
 
@@ -221,13 +289,25 @@ namespace epam_task4.Threads
         /// On error parsing
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CsvParser_ErrorParsing(object sender, EventArgs e)
+        /// <param name="error"></param>
+        private void _csvParser_ErrorParsing(object sender, FileParser.Enums.EnumErrors error)
         {
-            FileContentErrorEvent(this, EventArgs.Empty);
             this.Stop();
-        }
+            switch (error)
+            {
+                case FileParser.Enums.EnumErrors.fileNameError:
+                    break;
+                case FileParser.Enums.EnumErrors.fileContentError:
+                    break;
+                case FileParser.Enums.EnumErrors.fileParseError:
+                    break;
+                default:
+                    break;
+            }
 
+            FileContentErrorEvent(this, EventArgs.Empty);
+            
+        }
 
 
         /// <summary>
@@ -239,8 +319,10 @@ namespace epam_task4.Threads
         {
             this._csvParser.ParsingCompleted -= CsvParser_ParsingCompleted;
             this._csvParser.FieldParsed -= _csvParser_FieldParsed;
-            this._csvParser.ErrorParsing -= CsvParser_ErrorParsing;
-            this._csvParser = null;            
+            this._csvParser.ErrorParsing -= _csvParser_ErrorParsing;
+            this._csvParser = null;
+
+            OnWorkCompleting(abort);
         }
 
 
@@ -262,7 +344,7 @@ namespace epam_task4.Threads
                 using (var repo = new Repository())
                 {
                     FileName fileData = GetFileNameData(repo, fileName);
-                    ICollection<TmpSale> tmpSales = GetTmpSalesData(repo, fileData);
+                    ICollection<TmpSale> tmpSales = GetTmpSalesData<TmpSale>(repo, fileData);
                     IEnumerable<Sale> sales = ConvertToSaleList<Sale, TmpSale>(tmpSales);
 
                     if (!repo.Inserts(sales))
@@ -286,17 +368,21 @@ namespace epam_task4.Threads
         /// Delete TmpSales from DB by filename
         /// </summary>
         /// <param name="fileName"></param>
-        private void DeleteTmpData(string fileName)
+        private void DeleteTmpData(FileNameSaleModel fileData)
         {
+            if (fileData == null) { return; }
+
             try
             {
                 using (var repo = new Repository())
                 {
-                    FileName fileData = GetFileNameData(repo, fileName);
+                    FileName fileName = GetFileNameData(repo, fileData.FileName);
                     if (fileData == null) { return; }
 
-                    List<TmpSale> tmpSales = GetTmpSalesData(repo, fileData);
-                    if (fileData != null && tmpSales?.Count > 0 && !repo.Delete(fileData))
+                    List<TmpSale> tmpSales = GetTmpSalesData<TmpSale>(repo, fileName);
+                    if (fileName != null 
+                        && tmpSales != null && tmpSales.Count > 0 
+                        && !repo.Delete(fileName))
                     {
                         SendMessageEvent?.Invoke(this, "Error deleting temporary data from the database");
                     }
@@ -314,10 +400,10 @@ namespace epam_task4.Threads
         /// <param name="repo"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private List<TmpSale> GetTmpSalesData(Repository repo, FileName fileName)
+        private List<T> GetTmpSalesData<T>(Repository repo, FileName fileName) where T : SaleBase
         {
             if (repo == null || fileName == null) { return null; }
-            return repo.Select<TmpSale>()
+            return repo.Select<T>()
                        .Include(m => m.Manager)
                        .Include(p => p.Product)
                        .Include(c => c.Client)
@@ -394,10 +480,12 @@ namespace epam_task4.Threads
             var manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(this._fnsm.Manager));
             sale.Manager = manager ?? new Manager() { Name = this._fnsm.Manager };
 
-            var client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(parsedData["Client"]));
+            string clnt = parsedData["Client"];
+            var client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(clnt));
             sale.Client = client ?? new Client() { Name = parsedData["Client"] };
 
-            var product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(parsedData["Product"]));
+            string prdct = parsedData["Product"];
+            var product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(prdct));
             sale.Product = product ?? new Product { Name = parsedData["Product"], Cost = sale.Sum };
 
             var fileName = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(this._fnsm.FileName));

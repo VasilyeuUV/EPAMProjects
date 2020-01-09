@@ -59,14 +59,21 @@ namespace epam_task4
             Display.Message($"CONSOLE WORK", ConsoleColor.Green);
             string[] files = ConsoleVertion.Run();
 
-            if (files?.Length < 1)
+            if (files == null || files.Length < 1)
             {
                 Display.WaitForContinue("Error opening one/several files", ConsoleColor.Red);
                 return;
             }
-
             foreach (var file in files) { StartProcessing(file); }
-            while (_lstThread.Count > 0) { }
+
+            while (true) 
+            {
+                if (_lstThread.Count < 1)
+                {
+                    Thread.Sleep(500);
+                    break;
+                }                
+            }
             Display.WaitForContinue();
         }
         
@@ -121,49 +128,19 @@ namespace epam_task4
         /// <returns></returns>
         private static bool CheckDbAvailability()
         {
-            string clientName = "ClientDefault";
-            string fileName = "fileNameDefault.csv";
             string managerName = "ManagerDefault";
-            string productName = "ProductDefault";
-
             try
             {
                 using (var repo = new Repository())
                 {
-                    Client client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(clientName))
-                                  ?? new Client() { Name = clientName };
-                    FileName file = repo.Select<FileName>().FirstOrDefault(x => x.Name.Equals(fileName))
-                                  ?? new FileName() { Name = fileName, DTG = DateTime.Now };
-                    Manager manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(managerName))
-                                  ?? new Manager() { Name = managerName };
-                    Product product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(productName))
-                                  ?? new Product() { Name = productName, Cost = 0 };
-                    TmpSale sale = new TmpSale
-                    {
-                        Client = client,
-                        FileName = file,
-                        Manager = manager,
-                        Product = product,
-                        DTG = DateTime.Now,
-                        Sum = 0
-                    };
-
-                    if (!repo.Insert(sale)) { return false; };
-                    repo.Delete(client);
-                    repo.Delete(file);
-                    repo.Delete(manager);
-                    repo.Delete(product);
-                    repo.Dispose();
+                    Manager manager = repo.Select<Manager>()
+                                          .FirstOrDefault(x => x.Name.Equals(managerName))
+                                                             ?? new Manager() { Name = managerName };
                 }
             }
             catch (Exception) { return false; }
             return true;
         }
-
-
-
-        #region FILE_PROCESSING_THREAD_EVENTS
-        //##################################################################################################
 
         /// <summary>
         /// Run file handler
@@ -171,84 +148,107 @@ namespace epam_task4
         /// <param name="file"></param>
         private static void StartProcessing(string file)
         {
-            FileProcessingThread fileHandler = CreateFileHandlerThread();
-            try
+            lock (locker)
             {
-                if (fileHandler.Start(file))
+                FileProcessingThread fileHandler = CreateFileHandlerThread();
+                try
                 {
-                    Display.Message($"{file}: Processing of file starting");
-                    _lstThread.Add(fileHandler);
-                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                    if (fileHandler.Start(file))
+                    {
+                        Display.Message($"{file}: Processing of file starting");
+                        _lstThread.Add(fileHandler);
+                        Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                    }
+                    else
+                    {
+                        Display.Message($"{file}: can't starting");
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    Display.Message($"{file}: can't starting");
+                    Display.Message($"{file}: Error starting");
                 }
-            }
-            catch (Exception)
-            {
-                Display.Message($"{file}: Error starting");
             }
         }
 
         private static FileProcessingThread CreateFileHandlerThread()
-        {            
-            FileProcessingThread fileHandler = new FileProcessingThread(fns: FILE_NAME_STRUCT, fds: FILE_DATA_STRUCT);
+        {
+            lock (locker)
+            {
+                FileProcessingThread fileHandler = new FileProcessingThread(fns: FILE_NAME_STRUCT, fds: FILE_DATA_STRUCT);
 
-            fileHandler.WorkCompleted += FileHandler_WorkCompleted;
-            fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
-            fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
-            fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
+                fileHandler.WorkCompleted += FileHandler_WorkCompleted;
+                fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
+                fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
+                fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
 
-            return fileHandler;
+                return fileHandler;
+            }
         }
+
+
+
+        #region FILE_PROCESSING_THREAD_EVENTS
+        //##################################################################################################
 
 
         private static void FileHandler_SendMessageEvent(object sender, string msg)
         {
-            Display.Message($"Thread {(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.DarkGray);
+            lock (locker)
+            {
+                Display.Message($"Thread {(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.DarkGray);
+            }               
         }
 
 
         private static void FileHandler_WrongProductErrorEvent(object sender, EventArgs e)
         {
-            Display.Message($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
+            lock(locker)
+            {
+                Display.Message($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
+            }           
         }
 
-        private static void FileHandler_FileNamingErrorEvent(object sender, EventArgs e)
+        private static void FileHandler_FileNamingErrorEvent(object sender, bool isSaved)
         {
-            Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);
-            //if (isSaved) { Display.Message($"File {sender.ToString()} was saved earlier", ConsoleColor.Yellow); }
-            //else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red);   }            
+            lock (locker)
+            {
+                if (isSaved) { Display.Message($"File {(sender as FileProcessingThread)?.Name} was saved earlier", ConsoleColor.Yellow); }
+                else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red); }
+            }
         }
 
         private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
         {
-            Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file content", ConsoleColor.Red);
+            lock (locker)
+            {
+                Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file content", ConsoleColor.Red);
+            }               
         }
 
         private static void FileHandler_WorkCompleted(object sender, bool aborted)
         {
-            if (aborted) { Display.Message($"Processing of file {(sender as FileProcessingThread)?.Name} aborted", ConsoleColor.Red); }
-            else { Display.Message($"Processing of file {(sender as FileProcessingThread)?.Name} completed", ConsoleColor.Green); }
-
-
-
-            var fileHandler = sender as FileProcessingThread;
-            if (fileHandler != null)
+            lock(locker)
             {
-                lock (locker)
+                if (aborted) { Display.Message($"{(sender as FileProcessingThread)?.Name}: Processing aborted", ConsoleColor.Red); }
+                else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Processing completed", ConsoleColor.Green); }
+
+                var fileHandler = sender as FileProcessingThread;
+                if (fileHandler != null)
                 {
-                    fileHandler.WorkCompleted -= FileHandler_WorkCompleted;
-                    fileHandler.FileContentErrorEvent -= FileHandler_FileContentErrorEvent;
-                    fileHandler.FileNamingErrorEvent -= FileHandler_FileNamingErrorEvent;
-                    fileHandler.SendMessageEvent -= FileHandler_SendMessageEvent;
+                    lock (locker)
+                    {
+                        fileHandler.WorkCompleted -= FileHandler_WorkCompleted;
+                        fileHandler.FileContentErrorEvent -= FileHandler_FileContentErrorEvent;
+                        fileHandler.FileNamingErrorEvent -= FileHandler_FileNamingErrorEvent;
+                        fileHandler.SendMessageEvent -= FileHandler_SendMessageEvent;
 
-                    _lstThread.Remove(fileHandler);
-                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                        _lstThread.Remove(fileHandler);
+                        Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
+                    }
+
                 }
-
-            }            
+            }           
         }
 
         #endregion // FILE_PROCESSING_THREAD_EVENTS

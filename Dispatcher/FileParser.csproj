@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\EnumErrors.cs" />
     <Compile Include="Parsers\CSVParser.cs" />
     <Compile Include="Parsers\FileNameParser.cs" />
     <Compile Include="Program.cs" />

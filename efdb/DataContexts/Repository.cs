@@ -10,6 +10,7 @@ namespace efdb.DataContexts
     {
         private bool disposed = false;                      // Flag: Has Dispose already been called?
         private readonly SalesContext _context = null;
+        private static object locker = new object();
 
         /// <summary>
         /// CTOR
@@ -52,7 +53,9 @@ namespace efdb.DataContexts
             //context.GetService<ILoggerFactory>().AddProvider(new SalesLoggerProvider());
 
             // Loading data using the universal Set method
-            return this._context.Set<TEntity>()/*.AsQueryable()*/;
+
+            lock (locker) { return this._context.Set<TEntity>(); }
+            
 
             /*
             For use:
@@ -74,19 +77,21 @@ namespace efdb.DataContexts
         /// <param name="entity"></param>
         public bool Insert<TEntity>(TEntity entity) where TEntity : class
         {
-            var dbSet = this._context.Set<TEntity>();
-            try
+            lock (locker)
             {
-                //context.GetService<ILoggerFactory>().AddProvider(new SalesLoggerProvider());
-                dbSet.Add(entity);
-                this._context.SaveChanges();
-                return true;
+                var dbSet = this._context.Set<TEntity>();
+                try
+                {
+                    dbSet.Add(entity);
+                    this._context.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
-            catch (Exception ex)
-            {
-                //Console.WriteLine(ex.Message);
-                return false;
-            }
+
         }
 
         /// <summary>
@@ -96,15 +101,19 @@ namespace efdb.DataContexts
         /// <param name="entities"></param>
         public bool Inserts<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            if (entities?.Count() > 0)
+            lock (locker)
             {
-                foreach (TEntity entity in entities)
+                if (entities?.Count() > 0)
                 {
-                    if (!this.Insert(entity)) { return false; }                                  
+                    foreach (TEntity entity in entities)
+                    {
+                        if (!this.Insert(entity)) { return false; }
+                    }
+                    return true;
                 }
-                return true;
+                return false;
             }
-            return false;
+
         }
 
 
@@ -115,32 +124,38 @@ namespace efdb.DataContexts
         /// < param name="entity"></param>
         public bool Delete<TEntity>(TEntity entity) where TEntity : class
         {
-            var dbSet = this._context.Set<TEntity>();
+            lock (locker)
+            {
+                var dbSet = this._context.Set<TEntity>();
 
-            try
-            {
-                dbSet.Remove(entity);
-                this._context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
+                try
+                {
+                    dbSet.Remove(entity);
+                    this._context.SaveChanges();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
             }
         }
 
 
         public bool Deletes<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            if (entities?.Count() > 0)
+            lock (locker)
             {
-                foreach (TEntity entity in entities)
+                if (entities?.Count() > 0)
                 {
-                    if (!this.Delete(entity)) { return false; }
+                    foreach (TEntity entity in entities)
+                    {
+                        if (!this.Delete(entity)) { return false; }
+                    }
+                    return true;
                 }
-                return true;
+                return false;
             }
-            return false;
         }
 
 
@@ -152,47 +167,56 @@ namespace efdb.DataContexts
         //#################################################################################################################
         private static Product GetProduct(SalesContext context, string name)
         {
-            var product = context.Products.FirstOrDefault(x => x.Name.Equals(name));
-            return product == null
-                ? new Product()
-                {
-                    Name = name,
-                    Cost = 200
-                }
-                : product;
+            lock (locker)
+            {
+                var product = context.Products.FirstOrDefault(x => x.Name.Equals(name));
+                return product == null
+                    ? new Product()
+                    {
+                        Name = name,
+                        Cost = 200
+                    }
+                    : product;
+            }
         }
 
         private static Manager GetManager(SalesContext context, string name)
         {
-            var manager = context.Managers.FirstOrDefault(x => x.Name.Equals(name));
+            lock (locker)
+            {
+                var manager = context.Managers.FirstOrDefault(x => x.Name.Equals(name));
 
-            return manager == null
-                ? new Manager() { Name = name }
-                : manager;
+                return manager == null
+                    ? new Manager() { Name = name }
+                    : manager;
+            }
         }
 
         private static FileName GetFileName(SalesContext context, string name)
         {
-            var fileName = context.Files.FirstOrDefault(x => x.Name.Equals(name));
-            return fileName == null
-                ? new FileName()
-                {
-                    Name = name,
-                    DTG = DateTime.Now
-                }
-                : fileName;
+            lock (locker)
+            {
+                var fileName = context.Files.FirstOrDefault(x => x.Name.Equals(name));
+                return fileName == null
+                    ? new FileName()
+                    {
+                        Name = name,
+                        DTG = DateTime.Now
+                    }
+                    : fileName;
+            }
         }
 
         private static Client GetClient(SalesContext context, string name)
         {
-            var client = context.Clients.FirstOrDefault(x => x.Name.Equals(name));
+            lock (locker)
+            {
+                var client = context.Clients.FirstOrDefault(x => x.Name.Equals(name));
 
-            return client == null
-                ? new Client() { Name = name }
-                : client;
-
-            //return context.Clients.Find(name) ?? new Client() { Name = name };
-
+                return client == null
+                    ? new Client() { Name = name }
+                    : client;
+            }
         }
 
 
