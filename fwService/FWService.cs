@@ -6,9 +6,10 @@ namespace fwService
 {
     public partial class FWService : ServiceBase
     {
-        private FWLogger _logger;
+        private FileWatcherModel _fwModel;
         private string _watchedFolder = @"D:\epam_temp";
 
+        public event EventHandler<string> SendMessage;
         public event EventHandler<string> NewFileDetectedEvent;
 
         /// <summary>
@@ -17,11 +18,6 @@ namespace fwService
         public FWService(string[] args)
         {
             InitializeComponent();
-
-            if (args.Length > 0)
-            {
-                this._watchedFolder = args[0];
-            }
 
             this.CanStop = true;                    // service can be stopped
             this.CanPauseAndContinue = true;        // service can be paused and then continued
@@ -39,10 +35,10 @@ namespace fwService
 
             if (!string.IsNullOrWhiteSpace(_watchedFolder))
             {                
-                _logger = FWLogger.CreateInstance(_watchedFolder);
-                _logger.NewFileDetectedEvent += _logger_NewFileDetectedEvent; ;
-                _logger.RecordEntry("Service starting");
-                Thread loggerThread = new Thread(new ThreadStart(_logger.Start));
+                _fwModel = FileWatcherModel.CreateInstance(_watchedFolder);
+                _fwModel.NewFileDetectedEvent += _logger_NewFileDetectedEvent; ;
+                SendMessage?.Invoke(this, "Service starting");
+                Thread loggerThread = new Thread(new ThreadStart(_fwModel.Start));
                 loggerThread.Start();
             }
         }
@@ -82,9 +78,10 @@ namespace fwService
         /// </summary>
         protected override void OnStop()
         {
-            _logger?.Stop();
+            _fwModel?.Stop();
             Thread.Sleep(1000);
-            _logger.RecordEntry("Service stopped");
+            SendMessage?.Invoke(this, "Service stopped");
         }
+
     }
 }

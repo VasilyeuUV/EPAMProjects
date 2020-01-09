@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace epam_task4.WorkVersions
 {
-    internal static class OpenFileVertion
+    internal static class OpenFileVersion
     {
         /// <summary>
         /// Run console vertion

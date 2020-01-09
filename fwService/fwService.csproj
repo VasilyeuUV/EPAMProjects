@@ -65,7 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\EnumChanges.cs" />
-    <Compile Include="FWLogger.cs" />
+    <Compile Include="FileWatcherModel.cs" />
     <Compile Include="FWService.cs">
       <SubType>Component</SubType>
     </Compile>

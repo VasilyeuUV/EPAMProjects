@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace fwService
 {
-    public class FWLogger
+    public class FileWatcherModel
     {
         private FileSystemWatcher _watcher;         // Watcher
         public FileSystemWatcher Watcher => _watcher;
@@ -23,7 +23,7 @@ namespace fwService
         /// <summary>
         /// CTOR
         /// </summary>
-        private FWLogger()
+        private FileWatcherModel()
         {
             try
             {
@@ -53,12 +53,12 @@ namespace fwService
         /// </summary>
         /// <param name="watchedFolder"></param>
         /// <returns></returns>
-        public static FWLogger CreateInstance(string path)
+        public static FileWatcherModel CreateInstance(string path)
         {
             try
             {
-                FWLogger logger = new FWLogger();
-                logger._watcher.Path = path;
+                FileWatcherModel logger = new FileWatcherModel();
+                logger._watcher.Path = path;                
                 return logger;
             }
             catch (Exception)
@@ -168,6 +168,8 @@ namespace fwService
                 string fileEvent = "changed";                
                 RecordEntry(fileEvent, filePath);
                 NewFileDetectedEvent?.Invoke(this, filePath);
+
+                Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
             } 
             else
             {
