@@ -11,15 +11,6 @@ namespace fwService
         /// </summary>
         static void Main(string[] args)
         {
-            //FWMessage.RecordEntry($"Main: args.Length = {args.Length}");
-            //if (args.Length > 0)
-            //{
-            //    for (int i = 0; i < args.Length; i++)
-            //    {
-            //        FWMessage.RecordEntry(i.ToString(), args[i]);
-            //    }
-            //}
-
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {

@@ -9,8 +9,8 @@ namespace fwService
     public partial class FWService : ServiceBase
     {
         private FileWatcherModel _fwModel;
-        private string _watchedFolderDefault = ConfigurationManager.AppSettings["WatcherFolder"];
-        private string _logFile = ConfigurationManager.AppSettings["LogFile"];
+        private string _watchedFolderDefault = @"d:\epam_temp\";
+        private string _logFile = @"d:\fwLogFile.txt";
 
         public event EventHandler<string> NewFileDetectedEvent;
 
@@ -25,15 +25,7 @@ namespace fwService
             this.CanPauseAndContinue = true;        // service can be paused and then continued
             this.AutoLog = true;                    // service can record to the log   
 
-
-            //FWMessage.RecordEntry($"FWService: args.Length = {args.Length}");
-            //if (args.Length > 0)
-            //{
-            //    for (int i = 0; i < args.Length; i++)
-            //    {
-            //        FWMessage.RecordEntry(i.ToString(), args[i]);
-            //    }
-            //}
+            //SaveToAppConfig("WatcherFolder", @"d:\epam\");
 
         }
 
@@ -44,23 +36,9 @@ namespace fwService
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            string watchedFolder = _watchedFolderDefault;
-            FWMessage.LogFile = _logFile;
+            string watchedFolder = CheckFolder(ConfigurationManager.AppSettings["WatcherFolder"] ?? _watchedFolderDefault);
+            FWMessage.LogFile = ConfigurationManager.AppSettings["LogFile"] ?? _logFile;
 
-            //FWMessage.RecordEntry($"FWService: Args.Length = {args.Length}");
-            //if (args.Length > 0)
-            //{
-            //    for (int i = 0; i < args.Length; i++)
-            //    {
-            //        FWMessage.RecordEntry(i.ToString(), args[i]);
-            //    }
-
-            //    watchedFolder = CheckFolder(args[0]);
-            //}
-            if (string.IsNullOrWhiteSpace(watchedFolder))
-            {
-                watchedFolder = CheckFolder(_watchedFolderDefault);
-            }
             FWMessage.RecordEntry($"Folder: {watchedFolder}");
 
             if (!string.IsNullOrWhiteSpace(watchedFolder))
@@ -117,5 +95,14 @@ namespace fwService
             FWMessage.RecordEntry($"Service stopped.");
         }
 
+
+        private static void SaveToAppConfig(string key, string value)
+        {
+            Configuration configuration =
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            configuration.AppSettings.Settings[key].Value = value;
+            configuration.Save(ConfigurationSaveMode.Full, true);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
     }
 }

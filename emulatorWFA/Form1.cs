@@ -1,4 +1,5 @@
 ﻿using emulatorWFA.Threads;
+using fwService;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -138,23 +139,7 @@ namespace emulatorWFA
                 thread.Close();
             }
         }
-
-               
-        //private delegate void SafeCallDelegate(object sender, ManagerThread.EventFileSendedEventArgs e);        
-        //private void ManagerThread_FileSended(object sender, ManagerThread.EventFileSendedEventArgs e)
-        //{
-        //    string s = $"{e.Manager} send {e.FileName}" + Environment.NewLine;
-        //    if (tbLog.InvokeRequired)
-        //    {
-        //        var d = new SafeCallDelegate(ManagerThread_FileSended);
-        //        tbLog.Invoke(d, new object[] { sender, e });
-        //    }
-        //    else
-        //    {
-        //        tbLog.Text += s;
-        //    }
-        //}
-
+            
        
         private Dictionary<string, int> GetProduct(ListView.ListViewItemCollection products)
         {
@@ -258,6 +243,8 @@ namespace emulatorWFA
                     continue;
                 }
             }
+
+
 
             // Set the paths to dispatcher and reinstall
         }

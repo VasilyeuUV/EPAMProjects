@@ -64,6 +64,7 @@ namespace fwService
             }
             catch (Exception)
             {
+                FWMessage.RecordEntry($"Error for watching folder {path}.", "watcher");
                 return null;
             }
         }
