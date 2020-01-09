@@ -2,12 +2,14 @@
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace FileParser.Parsers
 {
     public class CSVParser
     {
+        private const string FILE_EXTENTION = ".csv";
         private bool _abort = false;   // for stop parsing
 
         public event EventHandler<IDictionary<string, string>> FieldParsed;
@@ -16,7 +18,7 @@ namespace FileParser.Parsers
 
         private void OnErrorParsing(EnumErrors error)
         {            
-            ErrorParsing?.Invoke(this, error);  
+            ErrorParsing?.Invoke(this, error);
             Stop();            
         }
 
@@ -35,55 +37,69 @@ namespace FileParser.Parsers
         /// <returns>string array of string fields</returns>
         public IEnumerable<IDictionary<string, string>> Parse(string filePath, string[] delimiters = null )
         {
-            System.IO.FileInfo fileInf = new System.IO.FileInfo(filePath);
-            if (!fileInf.Exists || fileInf.Extension.ToLower() != ".csv") 
+            IEnumerable<IDictionary<string, string>> lstFields = null;
+            FileInfo fileInf = new FileInfo(filePath);
+            if (!fileInf.Exists || fileInf.Extension.ToLower() != FILE_EXTENTION) 
             {
-                OnErrorParsing(EnumErrors.fileNameError);
-                ParsingCompleted?.Invoke(this, this._abort);
-                return null;
+                OnErrorParsing(EnumErrors.fileError);
             }
-
-            if (delimiters == null || delimiters.Length < 1) { delimiters = new[] { "," }; }
-
-            List<IDictionary<string, string>> lstFields = new List<IDictionary<string, string>>();
-            try
+            else
             {
-                using (TextFieldParser tfp = new TextFieldParser(filePath))
+                if (delimiters == null || delimiters.Length < 1) { delimiters = new[] { "," }; }
+                try
                 {
-                    tfp.TextFieldType = FieldType.Delimited;
-                    tfp.SetDelimiters(delimiters);
-
-                    int count = 0;
-                    string[] fieldNames = new string[0];
-                    while (!tfp.EndOfData && !this._abort)
-                    {
-                        string[] fields = tfp.ReadFields();
-
-                        if (++count == 1) { fieldNames = fields; }
-                        else
-                        {
-                            IDictionary<string, string> dicField = ParseFields(fieldNames, fields);
-                            if (dicField == null) 
-                            { 
-                                OnErrorParsing(EnumErrors.fileContentError); 
-                            }
-                            else 
-                            { 
-                                lstFields.Add(dicField);
-                                FieldParsed?.Invoke(this, dicField);
-                            }                            
-                        }
-                    }
-                    ParsingCompleted?.Invoke(this, this._abort);
-                    if (this._abort) { lstFields = null; }
-                    return lstFields?.Count() < 1 ? null : lstFields;
+                    lstFields = Parsing(delimiters, fileInf.FullName);
+                }
+                catch (Exception)
+                {
+                    OnErrorParsing(EnumErrors.fileParseError);
                 }
             }
-            catch (Exception)
+
+            ParsingCompleted?.Invoke(this, this._abort);
+            return lstFields;
+        }
+
+        /// <summary>
+        /// Parsing process
+        /// </summary>
+        /// <param name="delimiters"></param>
+        /// <param name="filePath"></param>
+        /// <param name="lstFields"></param>
+        /// <returns></returns>
+        private IEnumerable<IDictionary<string, string>> Parsing(string[] delimiters, string filePath)
+        {
+            int count = 0;
+            string[] fieldNames = new string[0];
+            List<IDictionary<string, string>> lstFields = new List<IDictionary<string, string>>();
+
+            using (TextFieldParser tfp = new TextFieldParser(filePath))
             {
-                OnErrorParsing(EnumErrors.fileParseError);
-                return null;
+                tfp.TextFieldType = FieldType.Delimited;
+                tfp.SetDelimiters(delimiters);
+                
+                while (!tfp.EndOfData && !this._abort)
+                {
+                    string[] fields = tfp.ReadFields();
+
+                    if (++count == 1) { fieldNames = fields; }
+                    else
+                    {
+                        IDictionary<string, string> dicField = ParseFields(fieldNames, fields);
+                        if (dicField == null)
+                        {
+                            OnErrorParsing(EnumErrors.fileContentError);
+                        }
+                        else
+                        {
+                            lstFields.Add(dicField);
+                            FieldParsed?.Invoke(this, dicField);
+                        }
+                    }
+                }
+                if (this._abort) { lstFields = null; }
             }
+            return lstFields;
         }
 
         /// <summary>

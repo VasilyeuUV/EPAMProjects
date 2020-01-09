@@ -2,8 +2,9 @@
 {
     public enum EnumErrors
     {
-        fileNameError = 1,
+        fileError = 1,
+        fileNameError,
         fileContentError,
-        fileParseError          
+        fileParseError
     }
 }

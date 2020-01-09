@@ -178,9 +178,10 @@ namespace epam_task4
                 FileProcessingThread fileHandler = new FileProcessingThread(fns: FILE_NAME_STRUCT, fds: FILE_DATA_STRUCT);
 
                 fileHandler.WorkCompleted += FileHandler_WorkCompleted;
-                fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
-                fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
-                fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
+                fileHandler.ErrorEvent += FileHandler_ErrorEvent;
+                //fileHandler.FileContentErrorEvent += FileHandler_FileContentErrorEvent;
+                //fileHandler.FileNamingErrorEvent += FileHandler_FileNamingErrorEvent;
+                //fileHandler.SendMessageEvent += FileHandler_SendMessageEvent;
 
                 return fileHandler;
             }
@@ -188,47 +189,14 @@ namespace epam_task4
 
 
 
+
+
         #region FILE_PROCESSING_THREAD_EVENTS
         //##################################################################################################
 
-
-        private static void FileHandler_SendMessageEvent(object sender, string msg)
-        {
-            lock (locker)
-            {
-                Display.Message($"Thread {(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.DarkGray);
-            }               
-        }
-
-
-        private static void FileHandler_WrongProductErrorEvent(object sender, EventArgs e)
-        {
-            lock(locker)
-            {
-                Display.Message($"{(sender as FileProcessingThread)?.Name}: Error product data", ConsoleColor.Red);
-            }           
-        }
-
-        private static void FileHandler_FileNamingErrorEvent(object sender, bool isSaved)
-        {
-            lock (locker)
-            {
-                if (isSaved) { Display.Message($"File {(sender as FileProcessingThread)?.Name} was saved earlier", ConsoleColor.Yellow); }
-                else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file name", ConsoleColor.Red); }
-            }
-        }
-
-        private static void FileHandler_FileContentErrorEvent(object sender, EventArgs e)
-        {
-            lock (locker)
-            {
-                Display.Message($"{(sender as FileProcessingThread)?.Name}: Error file content", ConsoleColor.Red);
-            }               
-        }
-
         private static void FileHandler_WorkCompleted(object sender, bool aborted)
         {
-            lock(locker)
+            lock (locker)
             {
                 if (aborted) { Display.Message($"{(sender as FileProcessingThread)?.Name}: Processing aborted", ConsoleColor.Red); }
                 else { Display.Message($"{(sender as FileProcessingThread)?.Name}: Processing completed", ConsoleColor.Green); }
@@ -236,20 +204,24 @@ namespace epam_task4
                 var fileHandler = sender as FileProcessingThread;
                 if (fileHandler != null)
                 {
-                    lock (locker)
-                    {
-                        fileHandler.WorkCompleted -= FileHandler_WorkCompleted;
-                        fileHandler.FileContentErrorEvent -= FileHandler_FileContentErrorEvent;
-                        fileHandler.FileNamingErrorEvent -= FileHandler_FileNamingErrorEvent;
-                        fileHandler.SendMessageEvent -= FileHandler_SendMessageEvent;
+                    fileHandler.WorkCompleted -= FileHandler_WorkCompleted;
+                    fileHandler.ErrorEvent -= FileHandler_ErrorEvent;
 
-                        _lstThread.Remove(fileHandler);
-                        Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
-                    }
-
+                    _lstThread.Remove(fileHandler);
+                    Display.Message($"Number of file handler threads - {_lstThread.Count}", ConsoleColor.Blue);
                 }
-            }           
+            }
         }
+
+
+        private static void FileHandler_ErrorEvent(object sender, string msg)
+        {
+            lock (locker)
+            {
+                Display.Message($"{(sender as FileProcessingThread)?.Name}: " + msg, ConsoleColor.Gray);
+            }
+        }
+
 
         #endregion // FILE_PROCESSING_THREAD_EVENTS
 

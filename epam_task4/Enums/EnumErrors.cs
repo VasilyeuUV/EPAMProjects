@@ -2,11 +2,14 @@
 {
     public enum EnumErrors
     {
-        fileNameError = 1,
-        fileDataError,
-        managerError,
-        productError,
-        dateError,
-        costError
-    }
+        fileError = 1,              // file missing, unable to open file
+        fileNameError,              // incorrect file name        
+        fileContentError,           // incorrect file content
+        managerError,               // incorrect manager 
+        productError,               // incorrect product
+        dateError,                  // incorrect data
+        costError,                  // incorrect cost
+        saveToDbError,
+        fileWasSaved
+    }   
 }
