@@ -3,7 +3,6 @@ using efdb.DataModels;
 using epam_task4.ConsoleMenu;
 using epam_task4.Threads;
 using epam_task4.WorkVersions;
-using fwService;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -86,12 +85,7 @@ namespace epam_task4
             Console.Clear();
             Display.Message($"CONSOLE_VERTION WORK", ConsoleColor.Green);
 
-            var watchFolder = ConfigurationManager.AppSettings["defaultFolder"];
-
-            FWLogger fwLogger = FWLogger.CreateInstance(watchFolder);
-            fwLogger.NewFileDetectedEvent += FwLogger_NewFileDetectedEvent;
-            Thread fwThread = new Thread(new ThreadStart(fwLogger.Start));
-            fwThread.Start();
+            ConsoleVertion.StartFileWatcher();
 
             // START EMULATOR
             EmulatorThread eThread = null;
@@ -101,23 +95,19 @@ namespace epam_task4
             do
             {
                 while (!Console.KeyAvailable)
-                {                    
+                {
                 }
             } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
-            fwLogger.NewFileDetectedEvent -= FwLogger_NewFileDetectedEvent;
-            fwLogger.Stop();
 
-            Console.Clear();
+            ConsoleVertion.StopFileWatcher();
             eThread?.Close();
-        }
 
-        private static void FwLogger_NewFileDetectedEvent(string file)
-        {
-            StartProcessing(file);
+            Display.WaitForContinue("File watcher is stopped", ConsoleColor.Green);            
         }
 
 
-        
+
+
 
 
         /// <summary>

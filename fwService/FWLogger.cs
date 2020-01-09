@@ -13,8 +13,7 @@ namespace fwService
         private object obj = new object();          // some object for lock
         private bool enabled = true;                // work will continue as long as the this variable is true
 
-        public delegate void NewFileDetectedHandler(string file);
-        public event NewFileDetectedHandler NewFileDetectedEvent;
+        public event EventHandler<string> NewFileDetectedEvent;
 
         private string _logFile = @"D:\fwLogFile.txt";
 
@@ -168,8 +167,7 @@ namespace fwService
             {
                 string fileEvent = "changed";                
                 RecordEntry(fileEvent, filePath);
-                NewFileDetectedEvent?.Invoke(e.FullPath);
-
+                NewFileDetectedEvent?.Invoke(this, filePath);
             } 
             else
             {

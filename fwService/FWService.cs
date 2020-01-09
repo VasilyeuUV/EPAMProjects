@@ -6,23 +6,22 @@ namespace fwService
 {
     public partial class FWService : ServiceBase
     {
-        //public delegate void NewFileDetected(string file);
-        //public event NewFileDetected NewFileDetectedEvent;
-
         private FWLogger _logger;
         private string _watchedFolder = @"D:\epam_temp";
+
+        public event EventHandler<string> NewFileDetectedEvent;
 
         /// <summary>
         /// CTOR
         /// </summary>
-        public FWService(/*string[] args*/)
+        public FWService(string[] args)
         {
             InitializeComponent();
 
-            //if (args.Length > 0)
-            //{
-            //    this._watchedFolder = args[0];
-            //}
+            if (args.Length > 0)
+            {
+                this._watchedFolder = args[0];
+            }
 
             this.CanStop = true;                    // service can be stopped
             this.CanPauseAndContinue = true;        // service can be paused and then continued
@@ -41,17 +40,23 @@ namespace fwService
             if (!string.IsNullOrWhiteSpace(_watchedFolder))
             {                
                 _logger = FWLogger.CreateInstance(_watchedFolder);
-                //_logger.NewFileDetectedEvent += NewFileDetectedHandler; 
+                _logger.NewFileDetectedEvent += _logger_NewFileDetectedEvent; ;
                 _logger.RecordEntry("Service starting");
                 Thread loggerThread = new Thread(new ThreadStart(_logger.Start));
                 loggerThread.Start();
             }
         }
 
-        //private void NewFileDetectedHandler(string file)
-        //{
-        //    NewFileDetectedEvent?.Invoke(file);
-        //}
+        /// <summary>
+        /// Event Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="filePath"></param>
+        private void _logger_NewFileDetectedEvent(object sender, string filePath)
+        {
+            NewFileDetectedEvent?.Invoke(this, filePath);
+        }
+
 
         /// <summary>
         /// Checking for a directory
@@ -71,7 +76,6 @@ namespace fwService
                 return "";
             }            
         }
-
 
         /// <summary>
         /// Service stop

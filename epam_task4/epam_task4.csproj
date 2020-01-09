@@ -74,6 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\EmulatorThread.cs" />
     <Compile Include="Threads\FileProcessingThread.cs" />
+    <Compile Include="WorkVersions\ConsoleVertion.cs" />
     <Compile Include="WorkVersions\OpenFileVertion.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +98,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configurations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

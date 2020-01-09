@@ -8,12 +8,12 @@ namespace fwService
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
-        static void Main(/*string[] args*/)
+        static void Main(string[] args)
         {
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new FWService(/*args*/)
+                new FWService(args)
             };
             ServiceBase.Run(ServicesToRun);
 
