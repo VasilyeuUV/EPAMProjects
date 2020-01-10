@@ -76,6 +76,7 @@
     <Compile Include="Threads\FileProcessingThread.cs" />
     <Compile Include="WorkVersions\ConsoleVersion.cs" />
     <Compile Include="WorkVersions\OpenFileVersion.cs" />
+    <Compile Include="WorkVersions\Process.cs" />
     <Compile Include="WorkVersions\ServiceVersion.cs" />
   </ItemGroup>
   <ItemGroup>

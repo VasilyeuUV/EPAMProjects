@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 
 namespace fwService.Constants
@@ -6,7 +7,7 @@ namespace fwService.Constants
     internal static class FWMessage
     {
         private static object obj = new object();          // some object for lock
-        internal static string LogFile { get; set; }
+        internal static string LogFile { get; set; } = ConfigurationManager.AppSettings["LogFile"] ?? @"d:\fwLogFile.txt";
 
 
         /// <summary>

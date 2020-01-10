@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace emulatorWFA.Threads
 {
@@ -83,7 +82,7 @@ namespace emulatorWFA.Threads
             int day = this._startData.Day;
             DateTime startData = new DateTime(this._startData.Year, this._startData.Month, day, 4, 0, 0);
 
-            while (startData <= DateTime.Now.AddDays(-1) && !this._canceled)
+            while (startData <= DateTime.Now && !this._canceled)
             {
                 int reportCount = Const.RND.Next(1, 5);
                 for (int i = 0; i < reportCount; i++)

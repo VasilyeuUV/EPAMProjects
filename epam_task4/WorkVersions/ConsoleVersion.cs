@@ -25,7 +25,7 @@ namespace epam_task4.WorkVersions
         /// <param name="filePath"></param>
         private static void FwLogger_NewFileDetectedEvent(object sender, string filePath)
         {
-            Program.StartProcessing(filePath);
+            Process.StartProcessing(filePath);
         }
 
 

@@ -1,5 +1,4 @@
 ﻿using emulatorWFA.Threads;
-using fwService;
 using System;
 using System.Collections.Generic;
 using System.IO;

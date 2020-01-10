@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 
 namespace efdb.DataContexts
 {
@@ -10,7 +11,9 @@ namespace efdb.DataContexts
     {
         private bool disposed = false;                      // Flag: Has Dispose already been called?
         private readonly SalesContext _context = null;
+
         private static object locker = new object();
+        private static AutoResetEvent waitHandler = new AutoResetEvent(true);
 
         /// <summary>
         /// CTOR
@@ -86,12 +89,11 @@ namespace efdb.DataContexts
                     this._context.SaveChanges();
                     return true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     return false;
                 }
             }
-
         }
 
         /// <summary>

@@ -136,12 +136,12 @@ namespace fwService
                 FWMessage.RecordEntry(fileEvent, filePath);
                 NewFileDetectedEvent?.Invoke(this, filePath);
 
-                Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
+                //Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
             } 
-            else
-            {
-                FWMessage.RecordEntry("0", filePath);
-            }
+            //else
+            //{
+            //    FWMessage.RecordEntry("0", filePath);
+            //}
         }
 
 
