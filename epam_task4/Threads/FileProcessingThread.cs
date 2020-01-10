@@ -470,7 +470,14 @@ namespace epam_task4.Threads
         {
             if (repo == null || string.IsNullOrWhiteSpace(name)) { return null; }
 
-            Manager manager = repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(name));
+            try
+            {
+                return repo.Select<Manager>().FirstOrDefault(x => x.Name.Equals(name));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
             //if (checkBD && data == null)
             //{
             //    var error = (typeof(T) == typeof(Manager))
@@ -479,13 +486,20 @@ namespace epam_task4.Threads
             //    OnErrorEvent(error);
             //    return null;
             //}
-            return manager ?? new Manager() { Name = name };
+            //return manager ?? new Manager() { Name = name };
         }
         private Product GetProductFromDB(Repository repo, string name, bool checkBD = false)
         {
             if (repo == null || string.IsNullOrWhiteSpace(name)) { return null; }
 
-            Product product = repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(name));
+            try
+            {
+                return repo.Select<Product>().FirstOrDefault(x => x.Name.Equals(name));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
             //if (checkBD && data == null)
             //{
             //    var error = (typeof(T) == typeof(Manager))
@@ -494,15 +508,23 @@ namespace epam_task4.Threads
             //    OnErrorEvent(error);
             //    return null;
             //}
-            return product ?? new Product() { Name = name };
+            //return product;
         }
 
         private Client GetClientFromDB(Repository repo, string name)
         {
             if (repo == null || string.IsNullOrWhiteSpace(name)) { return null; }
 
-            Client client = repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(name));
-            return client ?? new Client() { Name = name };
+            try
+            {
+                return repo.Select<Client>().FirstOrDefault(x => x.Name.Equals(name));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            
         }
 
 

@@ -47,7 +47,7 @@ namespace epam_task4
         private static void DisplayData()
         {
             Console.Clear();
-            int viewPositions = 10;
+            int viewPositions = 1000;
 
             Display.DisplayData<Manager>(viewPositions);
             Display.DisplayData<FileName>(viewPositions);
