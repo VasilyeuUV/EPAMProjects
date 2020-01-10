@@ -62,7 +62,6 @@ namespace fwService
         /// <param name="filePath"></param>
         private void _logger_NewFileDetectedEvent(object sender, string filePath)
         {
-            Transceiver.AddItem(filePath);
             NewFileDetectedEvent?.Invoke(this, filePath);
         }
 

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace epam_task4
 {
-    class Program
+    public class Program
     {
         public delegate void method();
         private static object locker = new object();
@@ -56,7 +56,13 @@ namespace epam_task4
         }
 
 
-
+        public static void MediatorStartProcess(string fileName)
+        {
+            lock (locker)
+            {
+                Process.StartProcessing(fileName);
+            }
+        }
 
 
 
@@ -113,7 +119,8 @@ namespace epam_task4
 
             Display.WaitForContinue("File watcher is stopped", ConsoleColor.Green);            
         }
-               
+
+
 
         /// <summary>
         /// Start as Service
@@ -128,7 +135,15 @@ namespace epam_task4
             if (emulator != null) { eThread = new EmulatorThread(emulator); }
 
 
-            Transceiver.PropertyChanged += Transceiver_PropertyChanged;
+            
+
+            //Transceiver.PropertyChanged += (object o, string fileName) =>
+            //{
+            //    lock (locker)
+            //    {
+            //        Process.StartProcessing(fileName);
+            //    }
+            //};
 
 
             Display.Message("Run the CSV file generator in Emulator");
@@ -147,15 +162,6 @@ namespace epam_task4
             
         }
 
-        private static void Transceiver_PropertyChanged(object sender, string fileName)
-        {
-            lock(locker)
-            {
-                Process.StartProcessing(fileName);
-                Transceiver.RemoveItem(fileName);
-            }
-        }
-
 
         /// <summary>
         /// Exit
@@ -165,6 +171,7 @@ namespace epam_task4
             //Console.WriteLine("Press any key to Exit");
             //Console.ReadKey();
         }
+
 
 
 

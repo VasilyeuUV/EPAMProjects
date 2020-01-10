@@ -134,8 +134,9 @@ namespace fwService
             {
                 string fileEvent = "changed";
                 FWMessage.RecordEntry(fileEvent, filePath);
-                NewFileDetectedEvent?.Invoke(this, filePath);               
-
+                NewFileDetectedEvent?.Invoke(this, filePath);
+                //Transceiver.AddItem(filePath);
+                Transceiver.Transmit(filePath);
             } 
             //else
             //{
