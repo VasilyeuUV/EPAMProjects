@@ -1,11 +1,8 @@
 ﻿using efdb.DataContexts;
 using efdb.DataModels;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace epam_task4.ConsoleMenu
 {
