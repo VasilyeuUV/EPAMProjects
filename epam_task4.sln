@@ -13,7 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParser", "Dispatcher\Fi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "efdb", "efdb\efdb.csproj", "{9771DA28-681B-48C8-9D8A-584B861562F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "efc", "efc\efc.csproj", "{FDD18CDD-EF80-4785-96E8-8E681A66B46B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "efc", "efc\efc.csproj", "{FDD18CDD-EF80-4785-96E8-8E681A66B46B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator", "Mediator\Mediator.csproj", "{B8128272-D63E-470C-8D5D-5082F8618FFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDD18CDD-EF80-4785-96E8-8E681A66B46B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8128272-D63E-470C-8D5D-5082F8618FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8128272-D63E-470C-8D5D-5082F8618FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8128272-D63E-470C-8D5D-5082F8618FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8128272-D63E-470C-8D5D-5082F8618FFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -103,5 +103,11 @@
       <DependentUpon>FWServiceInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mediator\Mediator.csproj">
+      <Project>{b8128272-d63e-470c-8d5d-5082f8618ffb}</Project>
+      <Name>Mediator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

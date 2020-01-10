@@ -20,10 +20,10 @@ namespace fwService.Constants
             lock (obj)
             {
                 using (StreamWriter writer = new StreamWriter(LogFile, true))
-                {
+                {                    
                     writer.WriteLine(string.Format("{0}: File {1} was {2}",
                         DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"), filePath, fileEvent));
-                    writer.Flush();
+                    writer.Flush();                    
                 }
             }
         }

@@ -13,9 +13,7 @@ namespace epam_task4
     class Program
     {
         public delegate void method();
-
-        //private static List<FileProcessingThread> _lstThread = new List<FileProcessingThread>();
-
+        private static object locker = new object();
 
         [STAThread]
         static void Main(string[] args)
@@ -129,6 +127,10 @@ namespace epam_task4
             Form emulator = emulatorWFA.FormMain.StartForm(true);
             if (emulator != null) { eThread = new EmulatorThread(emulator); }
 
+
+            Transceiver.PropertyChanged += Transceiver_PropertyChanged;
+
+
             Display.Message("Run the CSV file generator in Emulator");
             Console.WriteLine("");
             do
@@ -139,9 +141,19 @@ namespace epam_task4
             } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
 
             Console.Clear();
+            //Transceiver.PropertyChanged -= Transceiver_PropertyChanged;
             eThread?.Close();
             ServiceVersion.Stop(true);
             
+        }
+
+        private static void Transceiver_PropertyChanged(object sender, string fileName)
+        {
+            lock(locker)
+            {
+                Process.StartProcessing(fileName);
+                Transceiver.RemoveItem(fileName);
+            }
         }
 
 

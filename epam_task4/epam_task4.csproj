@@ -97,6 +97,10 @@
       <Project>{2cb21cc4-53e1-4748-8049-2869b6c77959}</Project>
       <Name>fwService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mediator\Mediator.csproj">
+      <Project>{b8128272-d63e-470c-8d5d-5082f8618ffb}</Project>
+      <Name>Mediator</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configurations\" />
