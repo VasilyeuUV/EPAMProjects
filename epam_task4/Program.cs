@@ -29,8 +29,8 @@ namespace epam_task4
             }
 
             // MENU
-            string[] items = { "Create file", "Use Console", "Use Windows Service", "Exit" };
-            method[] methods = new method[] { RunOpenFileVertion, RunConsoleVertion, RunServiceVertion, Exit };
+            string[] items = { "Create file", "Use Console", "Use Windows Service", "View Data", "Exit" };
+            method[] methods = new method[] { RunOpenFileVertion, RunConsoleVertion, RunServiceVertion, DisplayData, Exit };
             Task4Menu menu = new Task4Menu(items);
             int menuResult;
             do
@@ -40,7 +40,28 @@ namespace epam_task4
                 methods[menuResult]();
             } while (menuResult != items.Length - 1);
         }
-               
+
+        /// <summary>
+        /// Display data
+        /// </summary>
+        private static void DisplayData()
+        {
+            Console.Clear();
+            int viewPositions = 10;
+
+            Display.DisplayData<Manager>(viewPositions);
+            Display.DisplayData<FileName>(viewPositions);
+            Display.DisplayData<Client>(viewPositions);
+            Display.DisplayData<Product>(viewPositions);
+
+            Display.WaitForContinue();
+        }
+
+
+
+
+
+
 
         /// <summary>
         /// Start OpenFileVertion
